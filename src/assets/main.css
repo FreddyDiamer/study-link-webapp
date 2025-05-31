@@ -1,0 +1,136 @@
+@import './base.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Основные стили для темной темы */
+@layer base {
+  html,
+  body {
+    @apply bg-telegram-bg text-telegram-text font-sans;
+    @apply min-h-screen antialiased overflow-x-hidden;
+  }
+
+  #app {
+    @apply min-h-screen;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-telegram-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-telegram-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-telegram-accent;
+  }
+}
+
+/* Компоненты */
+@layer components {
+  /* Кнопки */
+  .btn {
+    @apply px-4 py-2 rounded-xl font-medium transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-telegram-bg;
+  }
+
+  .btn-primary {
+    @apply bg-telegram-button text-white;
+    @apply hover:bg-telegram-buttonHover active:scale-95;
+    @apply focus:ring-telegram-accent;
+  }
+
+  .btn-secondary {
+    @apply bg-telegram-secondary text-telegram-text border border-telegram-border;
+    @apply hover:bg-telegram-card active:scale-95;
+    @apply focus:ring-telegram-accent;
+  }
+
+  .btn-ghost {
+    @apply text-telegram-accent bg-transparent;
+    @apply hover:bg-telegram-secondary active:scale-95;
+    @apply focus:ring-telegram-accent;
+  }
+
+  /* Карточки */
+  .card {
+    @apply bg-telegram-card rounded-2xl p-4 border border-telegram-border;
+    @apply shadow-card transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply hover:shadow-card-hover hover:-translate-y-1;
+  }
+
+  .card-gradient {
+    @apply bg-gradient-to-br from-gradient-from to-gradient-to;
+    @apply text-white border-none;
+  }
+
+  /* Поля ввода */
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-telegram-border;
+    @apply bg-telegram-input text-telegram-text placeholder-telegram-textSecondary;
+    @apply focus:outline-none focus:ring-2 focus:ring-telegram-accent focus:border-transparent;
+    @apply transition-all duration-200;
+  }
+
+  /* Навигация */
+  .nav-item {
+    @apply flex items-center px-4 py-3 rounded-xl text-telegram-textSecondary;
+    @apply hover:bg-telegram-secondary hover:text-telegram-text;
+    @apply transition-all duration-200;
+  }
+
+  .nav-item.active {
+    @apply bg-telegram-accent text-white;
+  }
+
+  /* Бейджи */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-telegram-success text-white;
+  }
+
+  .badge-warning {
+    @apply bg-telegram-warning text-white;
+  }
+
+  .badge-error {
+    @apply bg-telegram-destructive text-white;
+  }
+
+  /* Анимации */
+  .animate-enter {
+    @apply animate-fade-in;
+  }
+
+  .animate-slide {
+    @apply animate-slide-up;
+  }
+}
+
+/* Утилиты */
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-telegram-accent to-telegram-button bg-clip-text text-transparent;
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
