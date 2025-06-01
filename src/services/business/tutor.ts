@@ -1,4 +1,4 @@
-import { tutorsApi, type TutorSearchParams, type Tutor } from '@/api/tutors'
+import { tutorsApi, type TutorSearchParams, type Tutor } from '@/services/api/tutors'
 import { useTelegramStore } from '@/stores/telegram'
 
 export class TutorService {

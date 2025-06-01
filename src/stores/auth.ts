@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import type { User, TelegramUser } from '@/shared/types'
 import { STORAGE_KEYS } from '@/shared/constants'
-import { authApi } from '@/api/auth'
-import { telegramService } from '@/services/telegram/init'
+import { authApi } from '@/services/api/auth'
+import { telegramService } from '@/services/integrations/telegram'
 
 interface AuthResponse {
   user: User

@@ -1,10 +1,13 @@
-// Бизнес-сервисы
-export { tutorService } from './tutorService'
-export { orderService } from './orderService'
+// API services
+export * from './api'
 
-// Telegram сервис
-export { telegramService } from './telegram/init'
+// Platform integrations
+export { telegramService } from './integrations/telegram'
 
-// Типы сервисов
-export type { TutorService } from './tutorService'
-export type { OrderService } from './orderService'
+// Business services
+export { tutorService } from './business/tutor'
+export { orderService } from './business/order'
+
+// Types
+export type { TutorService } from './business/tutor'
+export type { OrderService } from './business/order'

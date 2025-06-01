@@ -1,4 +1,9 @@
-import { ordersApi, type CreateOrderData, type Order, type OrderResponse } from '@/api/orders'
+import {
+  ordersApi,
+  type CreateOrderData,
+  type Order,
+  type OrderResponse,
+} from '@/services/api/orders'
 import { useTelegramStore } from '@/stores/telegram'
 import { useAuthStore } from '@/stores/auth'
 

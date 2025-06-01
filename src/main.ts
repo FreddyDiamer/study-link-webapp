@@ -5,7 +5,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
-import { telegramService } from '@/services/telegram/init'
+import { telegramService } from '@/services/integrations/telegram'
 import { useAuthStore } from '@/stores/auth'
 
 const app = createApp(App)

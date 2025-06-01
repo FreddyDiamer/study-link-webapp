@@ -12,8 +12,8 @@ export const useTelegramStore = defineStore('telegram', () => {
   const lastName = computed(() => user.value?.last_name)
 
   const initWebApp = () => {
-    if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
-      webApp.value = (window as any).Telegram.WebApp
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+      webApp.value = window.Telegram.WebApp
       webApp.value.ready()
       webApp.value.expand()
       isInitialized.value = true
