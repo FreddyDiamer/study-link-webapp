@@ -1,14 +1,25 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { onMounted } from 'vue'
-import { useTelegramStore } from '@/stores/telegram'
+import { onMounted, ref } from 'vue'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import BottomNav from '@/shared/components/layout/BottomNav.vue'
 
-const telegramStore = useTelegramStore()
+const loading = ref(true)
+
+const authUser = async () => {
+  loading.value = true
+
+  try {
+    const { authService } = await import('@/services')
+
+    await authService.loginWithTelegram()
+  } finally {
+    loading.value = false
+  }
+}
 
 onMounted(() => {
-  telegramStore.initWebApp()
+  authUser()
 })
 </script>
 

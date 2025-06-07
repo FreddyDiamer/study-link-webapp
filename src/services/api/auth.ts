@@ -24,6 +24,9 @@ export const authApi = {
   // Получение текущего пользователя
   getCurrentUser: () => apiClient.get<User>('/auth/me'),
 
+  // Обновление профиля пользователя
+  updateProfile: (data: Partial<User>) => apiClient.put<User>('/auth/profile', data),
+
   // Проверка токена
   verifyToken: () => apiClient.get<{ valid: boolean }>('/auth/verify'),
 }

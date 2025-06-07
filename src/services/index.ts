@@ -5,8 +5,7 @@ export * from './api'
 export { telegramService } from './integrations/telegram'
 
 // Business services
-export { tutorService } from './business/tutor'
-export { orderService } from './business/order'
+export * from './business'
 
 // Types
 export type { TutorService } from './business/tutor'

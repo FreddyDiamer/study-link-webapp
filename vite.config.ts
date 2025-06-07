@@ -13,6 +13,8 @@ export default defineConfig({
     },
   },
   server: {
+    // TODO: remove this
+    allowedHosts: true,
     host: true,
     port: 3000,
   },

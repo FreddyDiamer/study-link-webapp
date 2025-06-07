@@ -1,14 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
-import type { User, TelegramUser } from '@/shared/types'
+import type { User } from '@/shared/types'
 import { STORAGE_KEYS } from '@/shared/constants'
-import { authApi } from '@/services/api/auth'
-import { telegramService } from '@/services/integrations/telegram'
-
-interface AuthResponse {
-  user: User
-  token: string
-}
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -23,7 +16,38 @@ export const useAuthStore = defineStore('auth', () => {
   const isStudent = computed(() => userRole.value === 'student' || userRole.value === 'both')
   const isTutor = computed(() => userRole.value === 'tutor' || userRole.value === 'both')
 
-  // Actions
+  // Mutations (только изменение состояния)
+  const setUser = (newUser: User) => {
+    user.value = newUser
+    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser))
+  }
+
+  const setToken = (newToken: string) => {
+    token.value = newToken
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, newToken)
+  }
+
+  const setAuth = (authData: { user: User; token: string }) => {
+    setUser(authData.user)
+    setToken(authData.token)
+  }
+
+  const setLoading = (loading: boolean) => {
+    isLoading.value = loading
+  }
+
+  const setError = (errorMessage: string | null) => {
+    error.value = errorMessage
+  }
+
+  const clearAuth = () => {
+    user.value = null
+    token.value = null
+    error.value = null
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
+    localStorage.removeItem(STORAGE_KEYS.USER)
+  }
+
   const initializeAuth = () => {
     // Загружаем данные из localStorage
     const savedToken = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
@@ -40,82 +64,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const loginWithTelegram = async () => {
-    if (!telegramService.isReady()) {
-      throw new Error('Telegram WebApp not initialized')
-    }
-
-    const telegramUser = telegramService.getUser()
-    if (!telegramUser) {
-      throw new Error('No Telegram user data')
-    }
-
-    isLoading.value = true
-    error.value = null
-
-    try {
-      const initData = telegramService.getInitData()
-
-      const response = await authApi.loginWithTelegram({
-        initData,
-        user: telegramUser,
-      })
-
-      user.value = response.user
-      token.value = response.token
-
-      // Сохраняем в localStorage
-      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.token)
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user))
-
-      return response.user
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Ошибка авторизации'
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const logout = async () => {
-    try {
-      await authApi.logout()
-    } catch (err) {
-      console.warn('Ошибка при выходе:', err)
-    } finally {
-      clearAuth()
-    }
-  }
-
-  const clearAuth = () => {
-    user.value = null
-    token.value = null
-    error.value = null
-    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
-    localStorage.removeItem(STORAGE_KEYS.USER)
-  }
-
-  const updateProfile = async (userData: Partial<User>) => {
-    if (!user.value) return
-
-    isLoading.value = true
-    try {
-      const updatedUser = await authApi.getCurrentUser()
-
-      user.value = { ...user.value, ...updatedUser }
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user.value))
-
-      return updatedUser
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Ошибка обновления профиля'
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
   return {
-    // State
+    // State (readonly для защиты от прямых изменений)
     user: readonly(user),
     token: readonly(token),
     isLoading: readonly(isLoading),
@@ -127,11 +77,13 @@ export const useAuthStore = defineStore('auth', () => {
     isStudent,
     isTutor,
 
-    // Actions
-    initializeAuth,
-    loginWithTelegram,
-    logout,
+    // Mutations
+    setUser,
+    setToken,
+    setAuth,
+    setLoading,
+    setError,
     clearAuth,
-    updateProfile,
+    initializeAuth,
   }
 })

@@ -1,52 +1,78 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { telegramService } from '@/services/integrations/telegram'
 
 export const useTelegramStore = defineStore('telegram', () => {
-  const webApp = ref<any>(null)
   const isInitialized = ref(false)
 
-  const user = computed(() => webApp.value?.initDataUnsafe?.user)
+  // Computed properties для реактивности
+  const webApp = computed(() => telegramService.getWebApp())
+  const user = computed(() => telegramService.getUser())
   const userId = computed(() => user.value?.id)
   const username = computed(() => user.value?.username)
   const firstName = computed(() => user.value?.first_name)
   const lastName = computed(() => user.value?.last_name)
+  const initData = computed(() => telegramService.getInitData())
 
-  const initWebApp = () => {
-    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-      webApp.value = window.Telegram.WebApp
-      webApp.value.ready()
-      webApp.value.expand()
-      isInitialized.value = true
-    }
+  // Инициализация
+  const init = async () => {
+    const success = await telegramService.init()
+    isInitialized.value = success
+    return success
+  }
+
+  // Proxy методы для удобства (делегируем в сервис)
+  const showMainButton = (text: string, callback: () => void) => {
+    telegramService.showMainButton(text, callback)
+  }
+
+  const hideMainButton = () => {
+    telegramService.hideMainButton()
+  }
+
+  const showBackButton = (callback: () => void) => {
+    telegramService.showBackButton(callback)
+  }
+
+  const hideBackButton = () => {
+    telegramService.hideBackButton()
   }
 
   const showAlert = (message: string) => {
-    webApp.value?.showAlert(message)
+    telegramService.showAlert(message)
   }
 
   const showConfirm = (message: string): Promise<boolean> => {
-    return new Promise((resolve) => {
-      webApp.value?.showConfirm(message, resolve)
-    })
+    return telegramService.showConfirm(message)
   }
 
-  const hapticFeedback = (type: 'light' | 'medium' | 'heavy' = 'light') => {
-    webApp.value?.HapticFeedback?.impactOccurred(type)
+  const hapticFeedback = (type: 'light' | 'medium' | 'heavy' | 'success' | 'error' | 'warning') => {
+    telegramService.hapticFeedback(type)
   }
 
   const close = () => {
-    webApp.value?.close()
+    telegramService.close()
   }
 
   return {
-    webApp,
+    // State
     isInitialized,
+
+    // Computed (reactive)
+    webApp,
     user,
     userId,
     username,
     firstName,
     lastName,
-    initWebApp,
+    initData,
+
+    // Methods
+    init,
+    showMainButton,
+    hideMainButton,
+    showBackButton,
+    hideBackButton,
     showAlert,
     showConfirm,
     hapticFeedback,
