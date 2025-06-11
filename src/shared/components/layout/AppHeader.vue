@@ -3,6 +3,9 @@ import { computed, ref } from 'vue'
 import { useTelegramStore } from '@/stores/telegram'
 import { useAppStore, type UserFlow } from '@/stores/app'
 import Button from '@/shared/components/ui/Button.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const telegramStore = useTelegramStore()
 const appStore = useAppStore()
@@ -44,7 +47,7 @@ const selectFlow = (flow: UserFlow) => {
   >
     <div class="flex items-center justify-between px-4 h-14">
       <!-- Logo/Title -->
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-3" @click="router.push('/')">
         <div class="w-8 h-8 bg-telegram-accent rounded-lg flex items-center justify-center">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -55,7 +58,7 @@ const selectFlow = (flow: UserFlow) => {
             />
           </svg>
         </div>
-        <h1 class="text-lg font-semibold text-telegram-text">Кай Репетитор</h1>
+        <h1 class="text-lg font-semibold text-telegram-text">KAI</h1>
       </div>
 
       <!-- Flow Selector & Profile -->
