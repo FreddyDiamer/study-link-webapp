@@ -1,75 +1,81 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import WelcomeView from '../views/WelcomeView.vue'
+import { PATHS } from './paths'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: PATHS.HOME,
       name: 'welcome',
       component: WelcomeView,
     },
 
     // Student routes
     {
-      path: '/student',
+      path: PATHS.STUDENT,
       name: 'student',
       component: () => import('../features/student/pages/StudentPage.vue'),
     },
     {
-      path: '/student/orders',
+      path: PATHS.STUDENT_ORDERS,
       name: 'student-orders',
       component: () => import('../features/student/pages/OrdersPage.vue'),
     },
     {
-      path: '/student/orders/create',
+      path: PATHS.STUDENT_CREATE_ORDER,
       name: 'student-create-order',
       component: () => import('../features/student/pages/CreateOrderPage.vue'),
     },
     {
-      path: '/student/tutors',
+      path: PATHS.STUDENT_TUTORS,
       name: 'student-tutors',
       component: () => import('../features/student/pages/TutorsListPage.vue'),
     },
     {
-      path: '/student/favorites',
+      path: PATHS.STUDENT_SERVICES,
+      name: 'student-services',
+      component: () => import('../features/student/pages/ServicesPage.vue'),
+    },
+    {
+      path: PATHS.STUDENT_FAVORITES,
       name: 'student-favorites',
       component: () => import('../features/student/pages/FavoritesPage.vue'),
     },
     {
-      path: '/student/profile',
+      path: PATHS.STUDENT_PROFILE,
       name: 'student-profile',
       component: () => import('../features/student/pages/ProfilePage.vue'),
     },
 
     // Tutor routes
     {
-      path: '/tutor',
+      path: PATHS.TUTOR,
       name: 'tutor',
       component: () => import('../features/tutor/pages/TutorPage.vue'),
     },
     {
-      path: '/tutor/services',
+      path: PATHS.TUTOR_SERVICES,
       name: 'tutor-services',
       component: () => import('../features/tutor/pages/ServicesPage.vue'),
     },
     {
-      path: '/tutor/services/create',
+      path: PATHS.TUTOR_CREATE_SERVICE,
       name: 'tutor-create-service',
       component: () => import('../features/tutor/pages/CreateServicePage.vue'),
     },
     {
-      path: '/tutor/orders',
+      path: PATHS.TUTOR_ORDERS,
       name: 'tutor-orders',
       component: () => import('../features/tutor/pages/OrdersPage.vue'),
     },
     {
-      path: '/tutor/requests',
+      path: PATHS.TUTOR_REQUESTS,
       name: 'tutor-requests',
       component: () => import('../features/tutor/pages/RequestsPage.vue'),
     },
     {
-      path: '/tutor/profile',
+      path: PATHS.TUTOR_PROFILE,
       name: 'tutor-profile',
       component: () => import('../features/tutor/pages/ProfilePage.vue'),
     },

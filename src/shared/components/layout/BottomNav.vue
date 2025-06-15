@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useTelegramStore } from '@/stores/telegram'
+import { PATHS } from '@/router/paths'
 
 const route = useRoute()
 const router = useRouter()
@@ -19,20 +20,20 @@ interface NavItem {
 
 const studentNavItems: NavItem[] = [
   {
-    path: '/student',
+    path: PATHS.STUDENT,
     label: 'Поиск',
     icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
   },
   {
-    path: '/student/orders',
-    label: 'Заявки',
-    icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
-    badge: 2,
+    path: PATHS.STUDENT_SERVICES,
+    label: 'Услуги',
+    icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
   },
   {
-    path: '/student/favorites',
-    label: 'Избранное',
-    icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+    path: PATHS.STUDENT_ORDERS,
+    label: 'Мои заказы',
+    icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+    badge: 2,
   },
   {
     path: '/student/profile',
