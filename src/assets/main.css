@@ -38,25 +38,22 @@
   /* Кнопки */
   .btn {
     @apply px-4 py-2 rounded-xl font-medium transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-telegram-bg;
+    @apply focus:outline-none;
   }
 
   .btn-primary {
     @apply bg-telegram-button text-white;
     @apply hover:bg-telegram-buttonHover active:scale-95;
-    @apply focus:ring-telegram-accent;
   }
 
   .btn-secondary {
     @apply bg-telegram-secondary text-telegram-text border border-telegram-border;
     @apply hover:bg-telegram-card active:scale-95;
-    @apply focus:ring-telegram-accent;
   }
 
   .btn-ghost {
     @apply text-telegram-accent bg-transparent;
     @apply hover:bg-telegram-secondary active:scale-95;
-    @apply focus:ring-telegram-accent;
   }
 
   /* Карточки */
@@ -78,7 +75,7 @@
   .input {
     @apply w-full px-4 py-3 rounded-xl border border-telegram-border;
     @apply bg-telegram-input text-telegram-text placeholder-telegram-textSecondary;
-    @apply focus:outline-none focus:ring-2 focus:ring-telegram-accent focus:border-transparent;
+    @apply focus:outline-none;
     @apply transition-all duration-200;
   }
 

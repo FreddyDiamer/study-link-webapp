@@ -4,6 +4,7 @@ import { useTelegramStore } from '@/stores/telegram'
 import { useAppStore, type UserFlow } from '@/stores/app'
 import Button from '@/shared/components/ui/Button.vue'
 import { useRouter } from 'vue-router'
+import { PATHS } from '@/router/paths'
 
 const router = useRouter()
 
@@ -39,6 +40,24 @@ const selectFlow = (flow: UserFlow) => {
   appStore.setFlow(flow)
   showFlowSelector.value = false
 }
+
+const handleProfileClick = () => {
+  telegramStore.hapticFeedback('light')
+
+  if (appStore.isStudentFlow) {
+    router.push(PATHS.STUDENT_PROFILE)
+  } else {
+    router.push(PATHS.TUTOR_PROFILE)
+  }
+}
+
+const handleLogoClick = () => {
+  if (appStore.isStudentFlow) {
+    router.push(PATHS.STUDENT)
+  } else {
+    router.push(PATHS.TUTOR)
+  }
+}
 </script>
 
 <template>
@@ -47,7 +66,7 @@ const selectFlow = (flow: UserFlow) => {
   >
     <div class="flex items-center justify-between px-4 h-14">
       <!-- Logo/Title -->
-      <div class="flex items-center space-x-3" @click="router.push('/')">
+      <div class="flex items-center space-x-3" @click="handleLogoClick">
         <div class="w-8 h-8 bg-telegram-accent rounded-lg flex items-center justify-center">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -65,7 +84,7 @@ const selectFlow = (flow: UserFlow) => {
       <div class="flex items-center space-x-2">
         <!-- Flow Selector -->
         <div class="relative">
-          <Button variant="ghost" @click="toggleFlowSelector" class="px-3 py-2 text-sm">
+          <Button variant="ghost" @click="toggleFlowSelector" size="sm" class="flex items-center">
             <span class="mr-2">{{ flowDisplayName }}</span>
             <svg
               class="w-4 h-4 transition-transform duration-200"
@@ -145,6 +164,7 @@ const selectFlow = (flow: UserFlow) => {
         <!-- Profile Avatar -->
         <div
           class="w-9 h-9 bg-telegram-accent rounded-full flex items-center justify-center text-white text-sm font-medium"
+          @click="handleProfileClick"
         >
           {{ userInitials }}
         </div>

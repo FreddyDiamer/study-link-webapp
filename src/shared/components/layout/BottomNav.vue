@@ -21,8 +21,8 @@ interface NavItem {
 const studentNavItems: NavItem[] = [
   {
     path: PATHS.STUDENT,
-    label: 'Поиск',
-    icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
+    label: 'Главная',
+    icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
   },
   {
     path: PATHS.STUDENT_SERVICES,
@@ -36,7 +36,7 @@ const studentNavItems: NavItem[] = [
     badge: 2,
   },
   {
-    path: '/student/profile',
+    path: PATHS.STUDENT_PROFILE,
     label: 'Профиль',
     icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
   },
@@ -44,27 +44,22 @@ const studentNavItems: NavItem[] = [
 
 const tutorNavItems: NavItem[] = [
   {
-    path: '/tutor',
+    path: PATHS.TUTOR,
     label: 'Главная',
     icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
   },
   {
-    path: '/tutor/services',
-    label: 'Услуги',
-    icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
-  },
-  {
-    path: '/tutor/orders',
+    path: PATHS.TUTOR_ORDERS,
     label: 'Заказы',
     icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
   },
   {
-    path: '/tutor/requests',
-    label: 'Заявки',
-    icon: 'M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4',
+    path: PATHS.TUTOR_SERVICES,
+    label: 'Мои услуги',
+    icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
   },
   {
-    path: '/tutor/profile',
+    path: PATHS.TUTOR_PROFILE,
     label: 'Профиль',
     icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
   },
@@ -82,7 +77,7 @@ const navigateTo = (path: string) => {
 }
 
 const isActiveRoute = (path: string) => {
-  return route.path === path || (path !== '/' && route.path.startsWith(path))
+  return route.path === path
 }
 </script>
 
@@ -103,10 +98,7 @@ const isActiveRoute = (path: string) => {
         }"
       >
         <!-- Icon -->
-        <div
-          class="w-6 h-6 mb-1 transition-transform duration-200 relative"
-          :class="{ 'scale-110': isActiveRoute(item.path) }"
-        >
+        <div class="w-6 h-6 mb-1 transition-transform duration-200 relative">
           <svg
             class="w-full h-full"
             fill="none"
@@ -127,19 +119,13 @@ const isActiveRoute = (path: string) => {
 
         <!-- Label -->
         <span
-          class="text-xs font-medium leading-none transition-all duration-200"
+          class="text-xs font-medium leading-none transition-all duration-200 whitespace-nowrap"
           :class="{
             'font-semibold': isActiveRoute(item.path),
           }"
         >
           {{ item.label }}
         </span>
-
-        <!-- Active indicator -->
-        <div
-          v-if="isActiveRoute(item.path)"
-          class="w-1 h-1 bg-telegram-accent rounded-full mt-1 animate-pulse"
-        ></div>
       </button>
     </div>
   </nav>

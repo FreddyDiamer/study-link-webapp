@@ -1,9 +1,3 @@
-<template>
-  <button :class="buttonClasses" :disabled="disabled" @click="$emit('click', $event)">
-    <slot />
-  </button>
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
 
@@ -44,3 +38,9 @@ const buttonClasses = computed(() => {
   return `${baseClasses} ${variantClasses[props.variant]} ${sizeClasses[props.size]} ${disabledClasses}`
 })
 </script>
+
+<template>
+  <button :class="buttonClasses" :disabled="disabled" @click="$emit('click', $event)">
+    <slot />
+  </button>
+</template>
