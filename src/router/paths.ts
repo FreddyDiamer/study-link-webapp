@@ -3,7 +3,7 @@ export const PATHS = {
   HOME: '/',
 
   // Student paths
-  STUDENT: '/student',
+  STUDENT_MAIN: '/student',
   STUDENT_ORDERS: '/student/orders',
   STUDENT_CREATE_ORDER: '/student/orders/create',
   STUDENT_TUTORS: '/student/tutors',
@@ -12,7 +12,7 @@ export const PATHS = {
   STUDENT_PROFILE: '/student/profile',
 
   // Tutor paths
-  TUTOR: '/tutor',
+  TUTOR_MAIN: '/tutor',
   TUTOR_SERVICES: '/tutor/services',
   TUTOR_CREATE_SERVICE: '/tutor/services/create',
   TUTOR_ORDERS: '/tutor/orders',

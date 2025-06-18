@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
 
 export type UserFlow = 'student' | 'tutor'
 
 export const useAppStore = defineStore('app', () => {
-  const currentFlow = ref<UserFlow | null>(null)
+  const currentFlow = useLocalStorage<UserFlow | null>('currentFlow', null)
   const isAuthenticated = ref(false)
 
   const setFlow = (flow: UserFlow) => {

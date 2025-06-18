@@ -1,15 +1,24 @@
 <script setup lang="ts">
+// Vue
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+// Store
 import { useAppStore } from '@/stores/app'
 import { useTelegramStore } from '@/stores/telegram'
+
+// Constants
 import { PATHS } from '@/router/paths'
 
+// Composables
 const route = useRoute()
 const router = useRouter()
+
+// Stores
 const appStore = useAppStore()
 const telegramStore = useTelegramStore()
 
+// Types
 interface NavItem {
   path: string
   label: string
@@ -18,9 +27,10 @@ interface NavItem {
   badge?: number
 }
 
+// Data
 const studentNavItems: NavItem[] = [
   {
-    path: PATHS.STUDENT,
+    path: PATHS.STUDENT_MAIN,
     label: 'Главная',
     icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
   },
@@ -44,7 +54,7 @@ const studentNavItems: NavItem[] = [
 
 const tutorNavItems: NavItem[] = [
   {
-    path: PATHS.TUTOR,
+    path: PATHS.TUTOR_MAIN,
     label: 'Главная',
     icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
   },
@@ -65,12 +75,14 @@ const tutorNavItems: NavItem[] = [
   },
 ]
 
+// Computed
 const currentNavItems = computed(() => {
   if (appStore.isStudentFlow) return studentNavItems
   if (appStore.isTutorFlow) return tutorNavItems
   return []
 })
 
+// Methods
 const navigateTo = (path: string) => {
   telegramStore.hapticFeedback('light')
   router.push(path)
@@ -110,7 +122,7 @@ const isActiveRoute = (path: string) => {
           </svg>
           <!-- Badge -->
           <div
-            v-if="item.badge && item.badge > 0 && !isActiveRoute(item.path)"
+            v-if="item.badge && item.badge > 0"
             class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold min-w-4"
           >
             {{ item.badge > 9 ? '9+' : item.badge }}

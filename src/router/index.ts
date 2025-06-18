@@ -13,9 +13,14 @@ const router = createRouter({
 
     // Student routes
     {
-      path: PATHS.STUDENT,
+      path: PATHS.STUDENT_MAIN,
       name: 'student',
       component: () => import('../features/student/pages/StudentPage.vue'),
+    },
+    {
+      path: PATHS.STUDENT_SERVICES,
+      name: 'student-services',
+      component: () => import('../features/student/pages/ServicesPage.vue'),
     },
     {
       path: PATHS.STUDENT_ORDERS,
@@ -33,11 +38,6 @@ const router = createRouter({
       component: () => import('../features/student/pages/TutorsListPage.vue'),
     },
     {
-      path: PATHS.STUDENT_SERVICES,
-      name: 'student-services',
-      component: () => import('../features/student/pages/ServicesPage.vue'),
-    },
-    {
       path: PATHS.STUDENT_FAVORITES,
       name: 'student-favorites',
       component: () => import('../features/student/pages/FavoritesPage.vue'),
@@ -50,7 +50,7 @@ const router = createRouter({
 
     // Tutor routes
     {
-      path: PATHS.TUTOR,
+      path: PATHS.TUTOR_MAIN,
       name: 'tutor',
       component: () => import('../features/tutor/pages/TutorPage.vue'),
     },

@@ -1,18 +1,29 @@
 <script setup lang="ts">
+// Vue
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+// Store
 import { useTelegramStore } from '@/stores/telegram'
 import { useAppStore, type UserFlow } from '@/stores/app'
+
+// Component
 import Button from '@/shared/components/ui/Button.vue'
-import { useRouter } from 'vue-router'
+
+// Constants
 import { PATHS } from '@/router/paths'
 
+// Composables
 const router = useRouter()
 
+// Stores
 const telegramStore = useTelegramStore()
 const appStore = useAppStore()
 
+// Data
 const showFlowSelector = ref(false)
 
+// Computed
 const userInitials = computed(() => {
   const firstName = telegramStore.firstName || 'Пользователь'
   const lastName = telegramStore.lastName || ''
@@ -30,6 +41,22 @@ const flowDisplayName = computed(() => {
   }
 })
 
+// Methods
+const openHomePage = () => {
+  telegramStore.hapticFeedback('light')
+
+  if (appStore.isStudentFlow) {
+    router.push(PATHS.STUDENT_MAIN)
+  } else {
+    router.push(PATHS.TUTOR_MAIN)
+  }
+}
+
+const openProfilePage = () => {
+  telegramStore.hapticFeedback('light')
+  router.push(PATHS.STUDENT_PROFILE)
+}
+
 const toggleFlowSelector = () => {
   telegramStore.hapticFeedback('light')
   showFlowSelector.value = !showFlowSelector.value
@@ -37,25 +64,18 @@ const toggleFlowSelector = () => {
 
 const selectFlow = (flow: UserFlow) => {
   telegramStore.hapticFeedback('medium')
+
   appStore.setFlow(flow)
   showFlowSelector.value = false
-}
 
-const handleProfileClick = () => {
-  telegramStore.hapticFeedback('light')
-
-  if (appStore.isStudentFlow) {
-    router.push(PATHS.STUDENT_PROFILE)
-  } else {
-    router.push(PATHS.TUTOR_PROFILE)
-  }
+  openHomePage()
 }
 
 const handleLogoClick = () => {
   if (appStore.isStudentFlow) {
-    router.push(PATHS.STUDENT)
+    router.push(PATHS.STUDENT_MAIN)
   } else {
-    router.push(PATHS.TUTOR)
+    router.push(PATHS.TUTOR_MAIN)
   }
 }
 </script>
@@ -164,7 +184,7 @@ const handleLogoClick = () => {
         <!-- Profile Avatar -->
         <div
           class="w-9 h-9 bg-telegram-accent rounded-full flex items-center justify-center text-white text-sm font-medium"
-          @click="handleProfileClick"
+          @click="openProfilePage"
         >
           {{ userInitials }}
         </div>
