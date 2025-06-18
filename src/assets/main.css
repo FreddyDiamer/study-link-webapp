@@ -9,10 +9,23 @@
   body {
     @apply bg-telegram-bg text-telegram-text font-sans;
     @apply min-h-screen antialiased overflow-x-hidden;
+
+    /* Устранение 300ms задержки на мобильных */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   #app {
     @apply min-h-screen;
+  }
+
+  /* Оптимизация кликов для всех интерактивных элементов */
+  button,
+  [role='button'],
+  .cursor-pointer,
+  a {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Scrollbar styling */

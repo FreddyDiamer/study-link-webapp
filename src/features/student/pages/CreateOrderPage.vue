@@ -104,10 +104,6 @@ const goBack = () => {
           required
           class="mb-4"
         />
-
-        <div v-if="form.subject === 'other'">
-          <Input v-model="form.customSubject" placeholder="Укажите предмет" class="w-full" />
-        </div>
       </Card>
 
       <!-- Teacher (optional) -->
