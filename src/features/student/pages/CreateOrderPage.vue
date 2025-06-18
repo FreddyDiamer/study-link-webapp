@@ -5,44 +5,45 @@ import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
+import Select from '@/shared/components/ui/Select.vue'
 
 const router = useRouter()
 const telegramStore = useTelegramStore()
 
 const form = reactive({
   subject: '',
+  customSubject: '',
   teacherName: '',
-  format: '',
   budget: '',
   description: '',
+  deadline: '',
   urgency: 'normal',
   schedule: '',
 })
 
 const subjects = [
-  'Математика',
-  'Физика',
-  'Химия',
-  'Биология',
-  'История',
-  'Литература',
-  'Русский язык',
-  'Английский язык',
-  'Информатика',
-  'География',
-  'Обществознание',
-  'Другое',
+  { value: 'mathematics', label: 'Математика' },
+  { value: 'physics', label: 'Физика' },
+  { value: 'chemistry', label: 'Химия' },
+  { value: 'biology', label: 'Биология' },
+  { value: 'history', label: 'История' },
+  { value: 'literature', label: 'Литература' },
+  { value: 'russian', label: 'Русский язык' },
+  { value: 'english', label: 'Английский язык' },
+  { value: 'informatics', label: 'Информатика' },
+  { value: 'geography', label: 'География' },
+  { value: 'social', label: 'Обществознание' },
+  { value: 'other', label: 'Другое' },
 ]
 
-const formats = [
-  { value: 'online', label: 'Онлайн', icon: '💻' },
-  { value: 'offline', label: 'Очно', icon: '🏫' },
-  { value: 'both', label: 'Любой формат', icon: '🔄' },
-]
-
-const urgencyOptions = [
-  { value: 'normal', label: 'Обычная заявка', description: 'Поиск в течение недели' },
-  { value: 'urgent', label: 'Срочно', description: 'Найти в течение дня', extra: '+200₽' },
+const deadlines = [
+  { value: 'day', label: 'День', description: 'Исполнение в течение дня' },
+  { value: 'week', label: 'Неделя', description: 'Исполнение в течение недели' },
+  {
+    value: 'endOfSemester',
+    label: 'До конца семестра',
+    description: 'Исполнение до конца семестра',
+  },
 ]
 
 const isSubmitting = ref(false)
@@ -62,7 +63,8 @@ const submitOrder = async () => {
 }
 
 const validateForm = () => {
-  return form.subject && form.description && form.budget
+  const hasSubject = form.subject && (form.subject !== 'other' || form.customSubject)
+  return hasSubject && form.description && form.budget && form.deadline
 }
 
 const goBack = () => {
@@ -95,25 +97,16 @@ const goBack = () => {
       <Card class="p-6 mb-6">
         <h2 class="text-lg font-semibold text-telegram-text mb-4">Предмет</h2>
 
-        <div class="grid grid-cols-2 gap-3 mb-4">
-          <button
-            v-for="subject in subjects"
-            :key="subject"
-            @click="form.subject = subject"
-            class="p-3 rounded-xl border-2 transition-all duration-200 text-left"
-            :class="{
-              'border-telegram-accent bg-telegram-accent/10 text-telegram-accent':
-                form.subject === subject,
-              'border-telegram-border bg-telegram-secondary text-telegram-text hover:border-telegram-accent/50':
-                form.subject !== subject,
-            }"
-          >
-            <span class="font-medium text-sm">{{ subject }}</span>
-          </button>
-        </div>
+        <Select
+          v-model="form.subject"
+          :options="subjects"
+          placeholder="Выберите предмет"
+          required
+          class="mb-4"
+        />
 
-        <div v-if="form.subject === 'Другое'">
-          <Input v-model="form.subject" placeholder="Укажите предмет" class="w-full" />
+        <div v-if="form.subject === 'other'">
+          <Input v-model="form.customSubject" placeholder="Укажите предмет" class="w-full" />
         </div>
       </Card>
 
@@ -129,30 +122,6 @@ const goBack = () => {
           placeholder="Например: Иванов И.И., кафедра математики"
           class="w-full"
         />
-      </Card>
-
-      <!-- Format -->
-      <Card class="p-6 mb-6">
-        <h2 class="text-lg font-semibold text-telegram-text mb-4">Формат занятий</h2>
-
-        <div class="space-y-3">
-          <button
-            v-for="format in formats"
-            :key="format.value"
-            @click="form.format = format.value"
-            class="w-full p-4 rounded-xl border-2 transition-all duration-200 flex items-center space-x-3"
-            :class="{
-              'border-telegram-accent bg-telegram-accent/10': form.format === format.value,
-              'border-telegram-border bg-telegram-secondary hover:border-telegram-accent/50':
-                form.format !== format.value,
-            }"
-          >
-            <div class="text-2xl">{{ format.icon }}</div>
-            <div class="text-left">
-              <div class="font-medium text-telegram-text">{{ format.label }}</div>
-            </div>
-          </button>
-        </div>
       </Card>
 
       <!-- Budget -->
@@ -198,28 +167,25 @@ const goBack = () => {
 
         <div class="space-y-3">
           <button
-            v-for="option in urgencyOptions"
-            :key="option.value"
-            @click="form.urgency = option.value"
+            v-for="deadline in deadlines"
+            :key="deadline.value"
+            @click="form.deadline = deadline.value"
             class="w-full p-4 rounded-xl border-2 transition-all duration-200"
             :class="{
-              'border-telegram-accent bg-telegram-accent/10': form.urgency === option.value,
+              'border-telegram-accent bg-telegram-accent/10': form.deadline === deadline.value,
               'border-telegram-border bg-telegram-secondary hover:border-telegram-accent/50':
-                form.urgency !== option.value,
+                form.deadline !== deadline.value,
             }"
           >
             <div class="flex items-center justify-between">
               <div class="text-left">
                 <div class="font-medium text-telegram-text flex items-center space-x-2">
-                  <span>{{ option.label }}</span>
-                  <span v-if="option.extra" class="text-telegram-success text-sm">{{
-                    option.extra
-                  }}</span>
+                  <span>{{ deadline.label }}</span>
                 </div>
-                <div class="text-telegram-textSecondary text-sm">{{ option.description }}</div>
+                <div class="text-telegram-textSecondary text-sm">{{ deadline.description }}</div>
               </div>
               <div
-                v-if="form.urgency === option.value"
+                v-if="form.deadline === deadline.value"
                 class="w-5 h-5 bg-telegram-accent rounded-full flex items-center justify-center"
               >
                 <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
