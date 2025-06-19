@@ -4,15 +4,17 @@ import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 
 const telegramStore = useTelegramStore()
+
+const stats = [
+  { label: 'Активных услуг', value: '0', icon: '📚' },
+  { label: 'Заявок за месяц', value: '0', icon: '📋' },
+  { label: 'Студентов', value: '0', icon: '👥' },
+  { label: 'Рейтинг', value: '5.0', icon: '⭐' },
+]
 </script>
 
 <template>
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-telegram-text mb-2">Профиль</h1>
-      <p class="text-telegram-textSecondary">Управляйте своим профилем репетитора</p>
-    </div>
-
     <!-- Profile info -->
     <Card class="p-6 mb-6">
       <div class="flex items-center space-x-4 mb-6">
@@ -48,19 +50,6 @@ const telegramStore = useTelegramStore()
 
       <Button variant="ghost" class="w-full"> Редактировать профиль </Button>
     </Card>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-2 gap-4 mb-6">
-      <Card class="p-4 text-center">
-        <div class="text-2xl font-bold text-telegram-text mb-1">0</div>
-        <div class="text-telegram-textSecondary text-sm">Активных услуг</div>
-      </Card>
-
-      <Card class="p-4 text-center">
-        <div class="text-2xl font-bold text-telegram-text mb-1">0</div>
-        <div class="text-telegram-textSecondary text-sm">Студентов</div>
-      </Card>
-    </div>
 
     <!-- Menu items -->
     <div class="space-y-3">
@@ -185,6 +174,15 @@ const telegramStore = useTelegramStore()
             />
           </svg>
         </div>
+      </Card>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="grid grid-cols-2 gap-4 mb-8 mt-8">
+      <Card v-for="stat in stats" :key="stat.label" class="p-4 text-center">
+        <div class="text-2xl mb-2">{{ stat.icon }}</div>
+        <div class="text-2xl font-bold text-telegram-text mb-1">{{ stat.value }}</div>
+        <div class="text-telegram-textSecondary text-sm">{{ stat.label }}</div>
       </Card>
     </div>
   </div>
