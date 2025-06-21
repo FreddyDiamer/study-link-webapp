@@ -35,6 +35,17 @@
 
 /* Компоненты */
 @layer components {
+  /* App flow */
+  .flow-student {
+    --custom-primary: #64b5f6;
+    --custom-secondary: #242f3d;
+  }
+
+  .flow-tutor {
+    --custom-primary: #48bb78;
+    --custom-secondary: #242f3d;
+  }
+
   /* Кнопки */
   .btn {
     @apply px-4 py-2 rounded-xl font-medium transition-all duration-200;
@@ -42,8 +53,8 @@
   }
 
   .btn-primary {
-    @apply bg-telegram-button text-white;
-    @apply hover:bg-telegram-buttonHover active:scale-95;
+    @apply bg-custom-primary text-white;
+    @apply hover:bg-custom-primary active:scale-95;
   }
 
   .btn-secondary {

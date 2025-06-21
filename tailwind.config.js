@@ -25,6 +25,12 @@ export default {
           from: '#667eea',
           to: '#764ba2',
         },
+
+        // Кастомные цвета
+        custom: {
+          primary: 'var(--custom-primary)',
+          secondary: 'var(--custom-secondary)',
+        },
       },
       fontFamily: {
         sans: [

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // Vue
+import type { Component } from 'vue'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -9,6 +10,7 @@ import { useTelegramStore } from '@/stores/telegram'
 
 // Constants
 import { PATHS } from '@/router/paths'
+import { HomeIcon, ServiceIcon, OrderIcon, ProfileIcon } from '@components/icons'
 
 // Composables
 const route = useRoute()
@@ -22,7 +24,7 @@ const telegramStore = useTelegramStore()
 interface NavItem {
   path: string
   label: string
-  icon: string
+  icon: Component
   activeIcon?: string
   badge?: number
 }
@@ -32,23 +34,23 @@ const studentNavItems: NavItem[] = [
   {
     path: PATHS.STUDENT_MAIN,
     label: 'Главная',
-    icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+    icon: HomeIcon,
   },
   {
     path: PATHS.STUDENT_SERVICES,
     label: 'Услуги',
-    icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
+    icon: ServiceIcon,
   },
   {
     path: PATHS.STUDENT_ORDERS,
     label: 'Мои заказы',
-    icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+    icon: OrderIcon,
     badge: 2,
   },
   {
     path: PATHS.STUDENT_PROFILE,
     label: 'Профиль',
-    icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+    icon: ProfileIcon,
   },
 ]
 
@@ -56,22 +58,22 @@ const tutorNavItems: NavItem[] = [
   {
     path: PATHS.TUTOR_MAIN,
     label: 'Главная',
-    icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+    icon: HomeIcon,
   },
   {
     path: PATHS.TUTOR_ORDERS,
     label: 'Заказы',
-    icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
+    icon: OrderIcon,
   },
   {
     path: PATHS.TUTOR_SERVICES,
     label: 'Мои услуги',
-    icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
+    icon: ServiceIcon,
   },
   {
     path: PATHS.TUTOR_PROFILE,
     label: 'Профиль',
-    icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+    icon: ProfileIcon,
   },
 ]
 
@@ -105,21 +107,19 @@ const isActiveRoute = (path: string) => {
         @click="navigateTo(item.path)"
         class="flex flex-col items-center justify-center py-2 px-3 min-w-0 flex-1 transition-all duration-200"
         :class="{
-          'text-telegram-accent': isActiveRoute(item.path),
+          'text-telegram-accent': isActiveRoute(item.path) && appStore.isStudentFlow,
+          'text-telegram-success': isActiveRoute(item.path) && appStore.isTutorFlow,
           'text-telegram-textSecondary hover:text-telegram-text': !isActiveRoute(item.path),
         }"
       >
         <!-- Icon -->
         <div class="w-6 h-6 mb-1 transition-transform duration-200 relative">
-          <svg
+          <component
+            :is="item.icon"
             class="w-full h-full"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
             :stroke-width="isActiveRoute(item.path) ? '2.5' : '2'"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
-          </svg>
+          />
+
           <!-- Badge -->
           <div
             v-if="item.badge && item.badge > 0"

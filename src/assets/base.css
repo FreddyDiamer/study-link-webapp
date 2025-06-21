@@ -23,6 +23,10 @@
   --color-heading: var(--vt-c-text-dark-1);
   --color-text: var(--vt-c-text-dark-2);
   --section-gap: 160px;
+
+  /* Кастомные цвета */
+  --custom-primary: #64b5f6;
+  --custom-secondary: #242f3d;
 }
 
 /* Базовые стили */
@@ -32,6 +36,12 @@
   box-sizing: border-box;
   margin: 0;
   font-weight: normal;
+}
+
+html {
+  font-size: 16px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 body {
@@ -59,4 +69,8 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+/* Hide scrollbars */
+::-webkit-scrollbar {
+  display: none;
 }

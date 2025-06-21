@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useTelegramStore } from '@/stores/telegram'
 import { useRouter } from 'vue-router'
-import Card from '@/shared/components/ui/Card.vue'
-import Button from '@/shared/components/ui/Button.vue'
+import { Input, Card, Button } from '@components/ui'
 
 const telegramStore = useTelegramStore()
 const router = useRouter()
+
+const searchQuery = ref('')
 
 const stats = [
   { label: 'Активных услуг', value: '0', icon: '📚' },
@@ -68,6 +70,30 @@ const quickActions = [
         <div class="text-telegram-textSecondary text-sm">{{ stat.label }}</div>
       </Card>
     </div>
+
+    <!-- Search -->
+    <Card class="p-4 mb-6">
+      <div class="space-y-3">
+        <Input v-model="searchQuery" placeholder="Поиск репетиторов, предметов..." class="w-full">
+          <template #prepend>
+            <svg
+              class="w-4 h-4 text-telegram-textSecondary"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </template>
+        </Input>
+        <Button class="w-full" size="sm"> Найти репетиторов </Button>
+      </div>
+    </Card>
 
     <!-- Quick actions -->
     <div class="mb-8">
