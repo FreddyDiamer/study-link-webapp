@@ -12,6 +12,7 @@ const appStore = useAppStore()
 const telegramStore = useTelegramStore()
 
 const searchQuery = ref('')
+const groupNumber = ref('') // Новая переменная для номера группы
 
 // Персонализированные предметы студента с статистикой
 const mySubjects = ref([
@@ -117,27 +118,14 @@ const viewOrders = () => {
 
 <template>
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
-    <!-- Welcome section -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-telegram-text mb-2">Добро пожаловать!</h1>
-      <p class="text-telegram-textSecondary">Управляйте обучением и находите лучших репетиторов</p>
-    </div>
-
-    <!-- Stats overview -->
-    <div class="grid grid-cols-3 gap-3 mb-6">
-      <Card class="p-4 text-center">
-        <div class="text-2xl font-bold text-telegram-accent">{{ totalStats.activeSubjects }}</div>
-        <div class="text-telegram-textSecondary text-xs">Активных предметов</div>
-      </Card>
-      <Card class="p-4 text-center">
-        <div class="text-2xl font-bold text-telegram-success">{{ totalStats.totalTutors }}</div>
-        <div class="text-telegram-textSecondary text-xs">Репетиторов</div>
-      </Card>
-      <Card class="p-4 text-center">
-        <div class="text-2xl font-bold text-telegram-text">{{ totalStats.totalServices }}</div>
-        <div class="text-telegram-textSecondary text-xs">Услуг</div>
-      </Card>
-    </div>
+    <!-- Group Number Input -->
+    <Card class="p-4 mb-6">
+      <div class="space-y-3">
+        <Input v-model="groupNumber" placeholder="Введите номер группы" class="w-full" />
+        <!-- Можно добавить кнопку для сохранения или обработки номера группы, если нужно -->
+        <!-- <Button @click="saveGroupNumber" class="w-full" size="sm">Сохранить группу</Button> -->
+      </div>
+    </Card>
 
     <!-- Search -->
     <Card class="p-4 mb-6">
@@ -239,48 +227,6 @@ const viewOrders = () => {
                 {{ formatDate(subject.lastActivity) }}
               </div>
             </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-
-    <!-- Recommended subjects -->
-    <div class="mb-6">
-      <h2 class="text-xl font-semibold text-telegram-text mb-4">Популярные предметы</h2>
-      <div class="space-y-3">
-        <Card
-          v-for="subject in recommendedSubjects"
-          :key="subject.name"
-          @click="addSubject(subject)"
-          class="p-4 cursor-pointer hover:border-telegram-accent transition-colors duration-200"
-        >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div class="text-2xl">{{ subject.icon }}</div>
-              <div>
-                <h3 class="text-telegram-text font-medium">{{ subject.name }}</h3>
-                <div class="flex items-center space-x-4">
-                  <span class="text-telegram-success text-xs">
-                    {{ subject.tutorsCount }} репетиторов
-                  </span>
-                  <span class="text-telegram-textSecondary text-xs">
-                    {{ subject.servicesCount }} услуг
-                  </span>
-                  <span class="text-telegram-accent text-xs"> от {{ subject.averagePrice }}₽ </span>
-                </div>
-              </div>
-            </div>
-            <Button variant="secondary" size="sm">
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              Добавить
-            </Button>
           </div>
         </Card>
       </div>

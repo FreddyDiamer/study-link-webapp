@@ -4,15 +4,27 @@ import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 
 const telegramStore = useTelegramStore()
+
+const stats = [
+  { label: 'Активных услуг', value: '0', icon: '📚' },
+  { label: 'Заявок за месяц', value: '0', icon: '📋' },
+  { label: 'Студентов', value: '0', icon: '👥' },
+  { label: 'Рейтинг', value: '5.0', icon: '⭐' },
+]
+
+const notifications = [
+  { id: 1, text: 'У вас новая заявка от студента', isRead: false },
+  { id: 2, text: 'Обновление расписания занятий', isRead: true },
+]
+
+const openFeedback = () => {
+  // Здесь будет логика открытия формы обратной связи
+  console.log('Открыть форму обратной связи')
+}
 </script>
 
 <template>
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-telegram-text mb-2">Профиль</h1>
-      <p class="text-telegram-textSecondary">Управляйте своим профилем репетитора</p>
-    </div>
-
     <!-- Profile info -->
     <Card class="p-6 mb-6">
       <div class="flex items-center space-x-4 mb-6">
@@ -48,19 +60,6 @@ const telegramStore = useTelegramStore()
 
       <Button variant="ghost" class="w-full"> Редактировать профиль </Button>
     </Card>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-2 gap-4 mb-6">
-      <Card class="p-4 text-center">
-        <div class="text-2xl font-bold text-telegram-text mb-1">0</div>
-        <div class="text-telegram-textSecondary text-sm">Активных услуг</div>
-      </Card>
-
-      <Card class="p-4 text-center">
-        <div class="text-2xl font-bold text-telegram-text mb-1">0</div>
-        <div class="text-telegram-textSecondary text-sm">Студентов</div>
-      </Card>
-    </div>
 
     <!-- Menu items -->
     <div class="space-y-3">
@@ -187,5 +186,70 @@ const telegramStore = useTelegramStore()
         </div>
       </Card>
     </div>
+
+    <!-- Stats grid -->
+    <div class="grid grid-cols-2 gap-4 mb-6 mt-6">
+      <Card v-for="stat in stats" :key="stat.label" class="p-4 text-center">
+        <div class="text-2xl mb-2">{{ stat.icon }}</div>
+        <div class="text-2xl font-bold text-telegram-text mb-1">{{ stat.value }}</div>
+        <div class="text-telegram-textSecondary text-sm">{{ stat.label }}</div>
+      </Card>
+    </div>
+
+    <!-- Блок уведомлений -->
+    <Card class="p-4 mb-3">
+      <h3 class="text-lg font-medium text-telegram-text mb-4">Уведомления</h3>
+      <div class="space-y-3">
+        <div
+          v-for="notification in notifications"
+          :key="notification.id"
+          class="flex items-center justify-between p-2 rounded-lg"
+          :class="notification.isRead ? 'bg-telegram-secondary/20' : 'bg-telegram-secondary/40'"
+        >
+          <div class="flex items-center space-x-2">
+            <div
+              class="w-2 h-2 rounded-full"
+              :class="notification.isRead ? 'bg-telegram-textSecondary' : 'bg-telegram-success'"
+            ></div>
+            <p class="text-telegram-text">{{ notification.text }}</p>
+          </div>
+        </div>
+      </div>
+    </Card>
+
+    <!-- Блок обратной связи -->
+    <Card class="p-4 cursor-pointer mt-6" @click="openFeedback">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-telegram-secondary rounded-lg flex items-center justify-center">
+            <svg
+              class="w-5 h-5 text-telegram-text"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="text-telegram-text font-medium">Обратная связь</p>
+            <p class="text-telegram-textSecondary text-sm">Жалобы и предложения</p>
+          </div>
+        </div>
+        <svg
+          class="w-5 h-5 text-telegram-textSecondary"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </Card>
   </div>
 </template>

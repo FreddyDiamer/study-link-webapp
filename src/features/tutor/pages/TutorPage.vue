@@ -9,13 +9,6 @@ const router = useRouter()
 
 const searchQuery = ref('')
 
-const stats = [
-  { label: 'Активных услуг', value: '0', icon: '📚' },
-  { label: 'Заявок за месяц', value: '0', icon: '📋' },
-  { label: 'Студентов', value: '0', icon: '👥' },
-  { label: 'Рейтинг', value: '5.0', icon: '⭐' },
-]
-
 const quickActions = [
   {
     title: 'Добавить услугу',
@@ -52,25 +45,6 @@ const quickActions = [
 
 <template>
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
-    <!-- Welcome section -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold text-telegram-text mb-2">
-        Добро пожаловать, {{ telegramStore.firstName || 'Репетитор' }}!
-      </h1>
-      <p class="text-telegram-textSecondary">
-        Управляйте своими услугами и находите новых студентов
-      </p>
-    </div>
-
-    <!-- Stats grid -->
-    <div class="grid grid-cols-2 gap-4 mb-8">
-      <Card v-for="stat in stats" :key="stat.label" class="p-4 text-center">
-        <div class="text-2xl mb-2">{{ stat.icon }}</div>
-        <div class="text-2xl font-bold text-telegram-text mb-1">{{ stat.value }}</div>
-        <div class="text-telegram-textSecondary text-sm">{{ stat.label }}</div>
-      </Card>
-    </div>
-
     <!-- Search -->
     <Card class="p-4 mb-6">
       <div class="space-y-3">
@@ -94,7 +68,6 @@ const quickActions = [
         <Button class="w-full" size="sm"> Найти репетиторов </Button>
       </div>
     </Card>
-
     <!-- Quick actions -->
     <div class="mb-8">
       <h2 class="text-xl font-semibold text-telegram-text mb-4">Быстрые действия</h2>

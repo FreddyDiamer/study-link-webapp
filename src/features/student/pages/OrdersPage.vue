@@ -370,23 +370,6 @@ const contactTutor = (response: any) => {
           class="p-6 cursor-pointer hover:border-telegram-accent transition-colors duration-200"
           :class="{ 'border-telegram-accent bg-telegram-accent/5': !response.isRead }"
         >
-          <!-- Header with order info -->
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center space-x-2">
-              <h4 class="text-telegram-textSecondary text-sm">Отклик на заявку:</h4>
-              <span class="text-telegram-accent font-medium">{{ response.orderSubject }}</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <div
-                :class="[getResponseStatusInfo(response.status).color, 'w-2 h-2 rounded-full']"
-              ></div>
-              <span class="text-telegram-textSecondary text-xs">{{
-                getResponseStatusInfo(response.status).text
-              }}</span>
-              <div v-if="!response.isRead" class="w-2 h-2 bg-red-500 rounded-full"></div>
-            </div>
-          </div>
-
           <!-- Tutor info -->
           <div class="flex items-start space-x-3 mb-4">
             <div
@@ -396,7 +379,6 @@ const contactTutor = (response: any) => {
             </div>
             <div class="flex-1">
               <h3 class="text-telegram-text font-semibold">{{ response.tutor.name }}</h3>
-              <p class="text-telegram-textSecondary text-sm">{{ response.tutor.education }}</p>
               <div class="flex items-center space-x-4 mt-1">
                 <div class="flex items-center space-x-1">
                   <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -408,9 +390,10 @@ const contactTutor = (response: any) => {
                     response.tutor.rating
                   }}</span>
                 </div>
-                <span class="text-telegram-textSecondary text-xs"
-                  >{{ response.tutor.experience }} лет опыта</span
-                >
+              </div>
+            </div>
+            <div class="flex items-center justify-end mb-3">
+              <div class="flex items-center space-x-2">
                 <span class="text-telegram-success text-sm font-semibold"
                   >{{ response.price }}₽/занятие</span
                 >
