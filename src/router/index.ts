@@ -4,6 +4,23 @@ import { PATHS } from './paths'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior(to, from, savedPosition) {
+    // Если есть сохраненная позиция (например, при использовании кнопки "назад")
+    if (savedPosition) {
+      return savedPosition
+    }
+
+    // Если есть hash в URL (например, #section), скроллим к элементу
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+      }
+    }
+
+    // Для всех остальных случаев скроллим наверх
+    return { top: 0 }
+  },
   routes: [
     {
       path: '/test',

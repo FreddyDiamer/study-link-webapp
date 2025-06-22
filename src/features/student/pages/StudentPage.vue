@@ -157,13 +157,13 @@ const hideGroupCard = () => {
             <InfoIcon class="w-4 h-4 text-telegram-accent mt-0.5 flex-shrink-0" />
             <p class="text-xs text-telegram-textSecondary leading-relaxed">
               Введите номер группы, и мы автоматически определим ваши предметы, чтобы предложить
-              подходящих репетиторов
+              подходящие услуги и репетиторов
             </p>
           </div>
         </div>
 
         <div class="space-y-3">
-          <Input v-model="groupNumber" placeholder="9-ИСиТ-1, 2-МатАн-3..." class="w-full">
+          <Input v-model="groupNumber" placeholder="4212, 6105..." class="w-full">
             <template #prepend>
               <GroupIcon class="w-4 h-4 text-telegram-textSecondary" />
             </template>
