@@ -8,3 +8,8 @@ export { default as HomeIcon } from './Home.vue'
 export { default as ServiceIcon } from './Service.vue'
 export { default as OrderIcon } from './Order.vue'
 export { default as ProfileIcon } from './Profile.vue'
+
+// Icons
+export { default as PlusIcon } from './Plus.vue'
+export { default as GroupIcon } from './Group.vue'
+export { default as InfoIcon } from './Info.vue'

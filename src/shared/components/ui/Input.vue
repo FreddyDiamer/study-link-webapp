@@ -5,16 +5,32 @@
       <span v-if="required" class="text-telegram-destructive">*</span>
     </label>
 
-    <input
-      :id="inputId"
-      :type="type"
-      :value="modelValue"
-      :placeholder="placeholder"
-      :disabled="disabled"
-      :required="required"
-      class="input"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-    />
+    <div class="relative flex items-center">
+      <!-- Prepend slot -->
+      <div v-if="$slots.prepend" class="absolute left-3 z-10 flex items-center">
+        <slot name="prepend" />
+      </div>
+
+      <input
+        :id="inputId"
+        :type="type"
+        :value="modelValue"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :required="required"
+        class="input"
+        :class="{
+          'pl-10': $slots.prepend,
+          'pr-10': $slots.append,
+        }"
+        @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      />
+
+      <!-- Append slot -->
+      <div v-if="$slots.append" class="absolute right-3 z-10 flex items-center">
+        <slot name="append" />
+      </div>
+    </div>
 
     <p v-if="error" class="text-sm text-telegram-destructive">
       {{ error }}

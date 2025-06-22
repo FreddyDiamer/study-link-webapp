@@ -1,18 +1,25 @@
 <script setup lang="ts">
+// Vue
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAppStore } from '@/stores/app'
-import { useTelegramStore } from '@/stores/telegram'
-import Button from '@/shared/components/ui/Button.vue'
-import Card from '@/shared/components/ui/Card.vue'
-import Input from '@/shared/components/ui/Input.vue'
 
+// Stores
+import { useTelegramStore } from '@/stores/telegram'
+
+// Components
+import { GroupIcon, InfoIcon, PlusIcon, ServiceIcon } from '@components/icons'
+import { Button, Card, Input } from '@components/ui'
+
+// Composables
 const router = useRouter()
-const appStore = useAppStore()
+
+// Stores
 const telegramStore = useTelegramStore()
 
+// Data
 const searchQuery = ref('')
 const groupNumber = ref('') // Новая переменная для номера группы
+const showGroupCard = ref(!localStorage.getItem('hideGroupCard')) // Видимость карточки группы
 
 // Персонализированные предметы студента с статистикой
 const mySubjects = ref([
@@ -58,13 +65,14 @@ const recommendedSubjects = ref([
   { name: 'Биология', tutorsCount: 9, servicesCount: 24, icon: '🧬', averagePrice: 2100 },
 ])
 
-// Статистика
+// Computed
 const totalStats = computed(() => ({
   totalTutors: mySubjects.value.reduce((sum, subject) => sum + subject.tutorsCount, 0),
   totalServices: mySubjects.value.reduce((sum, subject) => sum + subject.servicesCount, 0),
   activeSubjects: mySubjects.value.filter((s) => s.isActive).length,
 }))
 
+// Methods
 const formatDate = (dateString: string | null) => {
   if (!dateString) return 'Никогда'
   const date = new Date(dateString)
@@ -93,18 +101,6 @@ const findTutorsForSubject = (subject: any) => {
   })
 }
 
-const addSubject = (subject: any) => {
-  telegramStore.hapticFeedback('light')
-  mySubjects.value.push({
-    id: Date.now(),
-    ...subject,
-    level: 'Школьная программа',
-    lastActivity: null,
-    isActive: false,
-  })
-  console.log('Добавлен предмет:', subject.name)
-}
-
 const createOrder = () => {
   telegramStore.hapticFeedback('light')
   router.push('/student/orders/create')
@@ -114,39 +110,98 @@ const viewOrders = () => {
   telegramStore.hapticFeedback('light')
   router.push('/student/orders')
 }
+
+const saveGroupNumber = () => {
+  if (!groupNumber.value.trim()) return
+
+  telegramStore.hapticFeedback('medium')
+  // TODO: Сохранить номер группы в backend
+  console.log('Сохраняем номер группы:', groupNumber.value)
+
+  // Скрыть карточку после сохранения
+  showGroupCard.value = false
+}
+
+const hideGroupCard = () => {
+  telegramStore.hapticFeedback('light')
+  showGroupCard.value = false
+  // TODO: Сохранить в localStorage что пользователь скрыл карточку
+  localStorage.setItem('hideGroupCard', 'true')
+}
 </script>
 
 <template>
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
     <!-- Group Number Input -->
-    <Card class="p-4 mb-6">
-      <div class="space-y-3">
-        <Input v-model="groupNumber" placeholder="Введите номер группы" class="w-full" />
-        <!-- Можно добавить кнопку для сохранения или обработки номера группы, если нужно -->
-        <!-- <Button @click="saveGroupNumber" class="w-full" size="sm">Сохранить группу</Button> -->
+    <!-- Карточка номера группы -->
+    <Card v-if="showGroupCard" class="p-5 mb-6 border-l-4 border-l-telegram-accent">
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center space-x-3">
+          <div
+            class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
+          >
+            <ServiceIcon class="w-5 h-5 text-telegram-accent" />
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-telegram-text">Укажите вашу группу</h3>
+            <p class="text-sm text-telegram-textSecondary">
+              Мы подберем репетиторов по вашим предметам
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="bg-telegram-secondary/50 p-3 rounded-lg">
+          <div class="flex items-start space-x-2">
+            <InfoIcon class="w-4 h-4 text-telegram-accent mt-0.5 flex-shrink-0" />
+            <p class="text-xs text-telegram-textSecondary leading-relaxed">
+              Введите номер группы, и мы автоматически определим ваши предметы, чтобы предложить
+              подходящих репетиторов
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <Input v-model="groupNumber" placeholder="9-ИСиТ-1, 2-МатАн-3..." class="w-full">
+            <template #prepend>
+              <GroupIcon class="w-4 h-4 text-telegram-textSecondary" />
+            </template>
+          </Input>
+
+          <div class="space-y-3">
+            <Button
+              @click="saveGroupNumber"
+              :disabled="!groupNumber.trim()"
+              class="w-full"
+              size="sm"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              Сохранить группу
+            </Button>
+
+            <button
+              @click="hideGroupCard"
+              class="text-xs text-telegram-textSecondary hover:text-telegram-text transition-colors underline mx-auto block"
+            >
+              Больше не показывать
+            </button>
+          </div>
+        </div>
       </div>
     </Card>
 
     <!-- Search -->
     <Card class="p-4 mb-6">
       <div class="space-y-3">
-        <Input v-model="searchQuery" placeholder="Поиск репетиторов, предметов..." class="w-full">
-          <template #prepend>
-            <svg
-              class="w-4 h-4 text-telegram-textSecondary"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </template>
-        </Input>
+        <Input v-model="searchQuery" placeholder="Поиск репетиторов, предметов..." class="w-full" />
         <Button @click="search" class="w-full" size="sm"> Найти репетиторов </Button>
       </div>
     </Card>
@@ -156,14 +211,7 @@ const viewOrders = () => {
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold text-telegram-text">Мои предметы</h2>
         <Button variant="secondary" size="sm" @click="createOrder">
-          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
+          <PlusIcon class="w-4 h-4 mr-1" />
           Добавить
         </Button>
       </div>
