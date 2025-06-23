@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
+import { ContactIcon } from '@/shared/components/icons'
 
 const route = useRoute()
 const router = useRouter()
 const telegramStore = useTelegramStore()
-
-const orderId = ref(Number(route.params.id))
 
 // Данные заказа
 const order = ref({
@@ -370,42 +369,29 @@ onMounted(() => {
 
           <!-- Accepted Response Actions -->
           <template v-else-if="response.status === 'accepted'">
-            <div class="space-y-3">
+            <div class="space-y-3 w-full">
               <Button @click="contactTutor(response)" variant="secondary" class="w-full">
+                <ContactIcon class="w-4 h-4 mr-2" />
+                Связаться
+              </Button>
+              <Button @click="acceptService(response)" class="w-full">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    d="M5 13l4 4L19 7"
                   />
                 </svg>
-                Связаться
+                Договорились
               </Button>
-              <div class="flex space-x-3">
-                <Button @click="acceptService(response)" class="flex-1">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Договорились
-                </Button>
-                <Button @click="declineService(response)" variant="ghost" class="flex-1">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                  Не подошел
-                </Button>
-              </div>
+              <Button
+                @click="declineService(response)"
+                variant="ghost"
+                class="w-full mt-3 text-sm text-telegram-textSecondary"
+              >
+                Не подошел
+              </Button>
             </div>
           </template>
 

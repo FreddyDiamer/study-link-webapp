@@ -189,7 +189,7 @@ const hideGroupCard = () => {
 
             <button
               @click="hideGroupCard"
-              class="text-xs text-telegram-textSecondary hover:text-telegram-text transition-colors underline mx-auto block"
+              class="text-xs text-telegram-textSecondary hover:text-telegram-text transition-colors mx-auto block"
             >
               Больше не показывать
             </button>
