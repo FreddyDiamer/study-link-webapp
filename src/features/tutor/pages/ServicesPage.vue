@@ -8,8 +8,31 @@ import Button from '@/shared/components/ui/Button.vue'
 const router = useRouter()
 const telegramStore = useTelegramStore()
 
+// Типы состояний услуг
+type ServiceStatus = 'active' | 'frozen' | 'deleted'
+
+interface Service {
+  id: number
+  title: string
+  subject: string
+  level: string
+  description: string
+  price: number
+  duration: number
+  format: string[]
+  status: ServiceStatus
+  studentsCount: number
+  rating: number
+  reviewsCount: number
+  features: string[]
+  responsesCount: number
+  newResponsesCount: number
+  activeResponsesCount: number
+  hasActiveDeals: boolean
+}
+
 // Примеры услуг репетитора
-const services = ref([
+const services = ref<Service[]>([
   {
     id: 1,
     title: 'Подготовка к ЕГЭ по математике',
@@ -20,10 +43,14 @@ const services = ref([
     price: 2200,
     duration: 90,
     format: ['Онлайн', 'Очно'],
-    isActive: true,
+    status: 'active',
     studentsCount: 15,
     rating: 4.9,
     reviewsCount: 43,
+    responsesCount: 12,
+    newResponsesCount: 3,
+    activeResponsesCount: 8,
+    hasActiveDeals: true,
     features: [
       'Индивидуальный план подготовки',
       'Домашние задания с проверкой',
@@ -41,10 +68,14 @@ const services = ref([
     price: 1800,
     duration: 60,
     format: ['Онлайн'],
-    isActive: true,
+    status: 'frozen',
     studentsCount: 8,
     rating: 4.8,
     reviewsCount: 21,
+    responsesCount: 5,
+    newResponsesCount: 0,
+    activeResponsesCount: 2,
+    hasActiveDeals: false,
     features: [
       'Объяснение сложных тем',
       'Практические задания',
@@ -62,10 +93,14 @@ const services = ref([
     price: 2000,
     duration: 75,
     format: ['Очно'],
-    isActive: false,
+    status: 'active',
     studentsCount: 3,
     rating: 4.7,
     reviewsCount: 12,
+    responsesCount: 8,
+    newResponsesCount: 1,
+    activeResponsesCount: 4,
+    hasActiveDeals: false,
     features: [
       'Основы планиметрии',
       'Стереометрия',
@@ -83,10 +118,14 @@ const services = ref([
     price: 3000,
     duration: 120,
     format: ['Онлайн', 'Очно'],
-    isActive: true,
+    status: 'deleted',
     studentsCount: 5,
     rating: 5.0,
     reviewsCount: 8,
+    responsesCount: 2,
+    newResponsesCount: 0,
+    activeResponsesCount: 0,
+    hasActiveDeals: false,
     features: [
       'Нестандартные задачи',
       'Развитие логики',
@@ -96,34 +135,82 @@ const services = ref([
   },
 ])
 
+const getStatusLabel = (status: ServiceStatus): string => {
+  switch (status) {
+    case 'active':
+      return 'Активна'
+    case 'frozen':
+      return 'Заморожена'
+    case 'deleted':
+      return 'Удалена'
+  }
+}
+
+const getStatusClass = (status: ServiceStatus): string => {
+  switch (status) {
+    case 'active':
+      return 'bg-telegram-success/20 text-telegram-success'
+    case 'frozen':
+      return 'bg-yellow-500/20 text-yellow-600'
+    case 'deleted':
+      return 'bg-red-500/20 text-red-600'
+  }
+}
+
 const createService = () => {
   telegramStore.hapticFeedback('light')
   router.push('/tutor/services/create')
 }
 
-const editService = (service: any) => {
+const viewService = (service: Service) => {
+  if (service.status === 'deleted') return
+
+  telegramStore.hapticFeedback('light')
+  router.push(`/tutor/services/${service.id}/responses`)
+}
+
+const editService = (service: Service) => {
   telegramStore.hapticFeedback('light')
   console.log('Редактировать услугу:', service.title)
   // TODO: Навигация к форме редактирования
 }
 
-const toggleServiceStatus = (service: any) => {
+const toggleServiceStatus = (service: Service) => {
   telegramStore.hapticFeedback('medium')
-  service.isActive = !service.isActive
-  console.log(`Услуга "${service.title}" ${service.isActive ? 'активирована' : 'деактивирована'}`)
+
+  if (service.status === 'active') {
+    service.status = 'frozen'
+  } else if (service.status === 'frozen') {
+    service.status = 'active'
+  }
+
+  console.log(
+    `Услуга "${service.title}" ${service.status === 'active' ? 'активирована' : 'заморожена'}`,
+  )
 }
 
-const deleteService = (service: any) => {
+const deleteService = (service: Service) => {
+  if (service.hasActiveDeals) {
+    telegramStore.hapticFeedback('error')
+    // TODO: Показать уведомление о невозможности удаления
+    console.log('Нельзя удалить услугу с активными делами')
+    return
+  }
+
   telegramStore.hapticFeedback('heavy')
-  console.log('Удалить услугу:', service.title)
+  service.status = 'deleted'
+  console.log('Услуга удалена и все отклики отклонены:', service.title)
   // TODO: Подтверждение удаления
 }
 
-const viewStats = (service: any) => {
+const viewStats = (service: Service) => {
   telegramStore.hapticFeedback('light')
   console.log('Статистика услуги:', service.title)
   // TODO: Показать детальную статистику
 }
+
+// Фильтруем неудаленные услуги для основного списка
+const activeServices = ref(services.value.filter((s) => s.status !== 'deleted'))
 </script>
 
 <template>
@@ -148,12 +235,13 @@ const viewStats = (service: any) => {
     </div>
 
     <!-- Services List -->
-    <div v-if="services.length > 0" class="space-y-4">
+    <div v-if="activeServices.length > 0" class="space-y-4">
       <Card
-        v-for="service in services"
+        v-for="service in activeServices"
         :key="service.id"
-        class="p-6"
-        :class="{ 'opacity-60': !service.isActive }"
+        class="p-6 cursor-pointer hover:bg-telegram-secondary/50 transition-colors"
+        :class="{ 'opacity-60': service.status === 'frozen' }"
+        @click="viewService(service)"
       >
         <!-- Header -->
         <div class="flex items-start justify-between mb-4">
@@ -163,12 +251,16 @@ const viewStats = (service: any) => {
               <span
                 :class="[
                   'px-2 py-1 text-xs font-medium rounded-full',
-                  service.isActive
-                    ? 'bg-telegram-success/20 text-telegram-success'
-                    : 'bg-telegram-textSecondary/20 text-telegram-textSecondary',
+                  getStatusClass(service.status),
                 ]"
               >
-                {{ service.isActive ? 'Активна' : 'Неактивна' }}
+                {{ getStatusLabel(service.status) }}
+              </span>
+              <span
+                v-if="service.newResponsesCount > 0"
+                class="px-2 py-1 text-xs font-medium rounded-full bg-telegram-accent text-white"
+              >
+                {{ service.newResponsesCount }} новых
               </span>
             </div>
             <div class="flex items-center space-x-4 mb-3">
@@ -180,21 +272,25 @@ const viewStats = (service: any) => {
           </div>
 
           <!-- Actions -->
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-2" @click.stop>
             <button
+              v-if="service.status !== 'deleted'"
               @click="toggleServiceStatus(service)"
               class="p-2 rounded-lg hover:bg-telegram-secondary transition-colors"
-              :title="service.isActive ? 'Деактивировать' : 'Активировать'"
+              :title="service.status === 'active' ? 'Заморозить' : 'Активировать'"
             >
               <svg
                 class="w-4 h-4"
-                :class="service.isActive ? 'text-telegram-success' : 'text-telegram-textSecondary'"
+                :class="{
+                  'text-telegram-success': service.status === 'active',
+                  'text-yellow-600': service.status === 'frozen',
+                }"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path
-                  v-if="service.isActive"
+                  v-if="service.status === 'active'"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
@@ -205,7 +301,7 @@ const viewStats = (service: any) => {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  d="M10 9v6l4-2-4-2z"
                 />
               </svg>
             </button>
@@ -225,8 +321,12 @@ const viewStats = (service: any) => {
             </button>
             <button
               @click="deleteService(service)"
-              class="p-2 rounded-lg hover:bg-red-100 transition-colors text-red-500"
-              title="Удалить"
+              class="p-2 rounded-lg hover:bg-red-100 transition-colors"
+              :class="{
+                'text-red-500': !service.hasActiveDeals,
+                'text-red-300 cursor-not-allowed': service.hasActiveDeals,
+              }"
+              :title="service.hasActiveDeals ? 'Нельзя удалить - есть активные дела' : 'Удалить'"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -242,6 +342,45 @@ const viewStats = (service: any) => {
 
         <!-- Description -->
         <p class="text-telegram-text text-sm mb-4">{{ service.description }}</p>
+
+        <!-- Responses Info -->
+        <div class="mb-4 p-3 bg-telegram-secondary/50 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="text-center">
+                <div class="text-lg font-semibold text-telegram-text">
+                  {{ service.responsesCount }}
+                </div>
+                <div class="text-xs text-telegram-textSecondary">Всего откликов</div>
+              </div>
+              <div class="text-center">
+                <div class="text-lg font-semibold text-telegram-accent">
+                  {{ service.activeResponsesCount }}
+                </div>
+                <div class="text-xs text-telegram-textSecondary">Активных</div>
+              </div>
+              <div v-if="service.newResponsesCount > 0" class="text-center">
+                <div class="text-lg font-semibold text-telegram-success">
+                  {{ service.newResponsesCount }}
+                </div>
+                <div class="text-xs text-telegram-textSecondary">Новых</div>
+              </div>
+            </div>
+            <svg
+              class="w-5 h-5 text-telegram-textSecondary"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+        </div>
 
         <!-- Features -->
         <div class="mb-4">
@@ -271,7 +410,7 @@ const viewStats = (service: any) => {
         </div>
 
         <!-- Format & Stats -->
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <div>
               <span class="text-telegram-textSecondary text-xs">Формат:</span>
@@ -295,36 +434,10 @@ const viewStats = (service: any) => {
             </div>
           </div>
         </div>
-
-        <!-- Actions -->
-        <div class="flex space-x-3">
-          <Button @click="viewStats(service)" variant="secondary" size="sm" class="flex-1">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-            Статистика
-          </Button>
-          <Button @click="editService(service)" variant="secondary" size="sm" class="flex-1">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-              />
-            </svg>
-            Редактировать
-          </Button>
-        </div>
       </Card>
     </div>
 
-    <!-- Empty state (если услуг нет) -->
+    <!-- Empty state -->
     <div v-else class="text-center py-16">
       <div
         class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
