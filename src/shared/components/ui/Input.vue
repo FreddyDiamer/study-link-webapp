@@ -1,3 +1,29 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface Props {
+  modelValue: string
+  type?: 'text' | 'email' | 'password' | 'number' | 'tel'
+  label?: string
+  placeholder?: string
+  disabled?: boolean
+  required?: boolean
+  error?: string
+}
+
+withDefaults(defineProps<Props>(), {
+  type: 'text',
+  disabled: false,
+  required: false,
+})
+
+defineEmits<{
+  'update:modelValue': [value: string]
+}>()
+
+const inputId = computed(() => `input-${Math.random().toString(36).substring(2, 9)}`)
+</script>
+
 <template>
   <div class="space-y-2">
     <label v-if="label" :for="inputId" class="block text-sm font-medium text-telegram-text">
@@ -37,29 +63,3 @@
     </p>
   </div>
 </template>
-
-<script setup lang="ts">
-import { computed } from 'vue'
-
-interface Props {
-  modelValue: string
-  type?: 'text' | 'email' | 'password' | 'number' | 'tel'
-  label?: string
-  placeholder?: string
-  disabled?: boolean
-  required?: boolean
-  error?: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  type: 'text',
-  disabled: false,
-  required: false,
-})
-
-defineEmits<{
-  'update:modelValue': [value: string]
-}>()
-
-const inputId = computed(() => `input-${Math.random().toString(36).substr(2, 9)}`)
-</script>

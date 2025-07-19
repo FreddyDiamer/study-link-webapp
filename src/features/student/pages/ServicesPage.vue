@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+// Stores
 import { useTelegramStore } from '@/stores/telegram'
+
+// Components
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
+import { LoupeIcon } from '@/shared/components/icons'
 
 // Types
 interface Service {
@@ -363,19 +368,7 @@ onMounted(() => {
         class="w-full"
       >
         <template #prepend>
-          <svg
-            class="w-4 h-4 text-telegram-textSecondary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          <LoupeIcon />
         </template>
       </Input>
     </Card>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ArrowIcon, LoupeIcon } from '../icons'
+import { Input } from '.'
 
 interface SelectOption {
   value: string
@@ -143,56 +145,35 @@ onUnmounted(() => {
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" :for="selectId" class="block text-sm font-medium text-telegram-text">
-      {{ label }}
-      <span v-if="required" class="text-telegram-destructive">*</span>
-    </label>
-
     <div class="relative">
-      <div class="relative">
-        <input
-          :id="selectId"
-          ref="mainInput"
-          v-model="inputValue"
-          type="text"
-          :placeholder="placeholder"
-          :disabled="disabled"
-          :required="required"
-          class="input w-full pr-10"
-          :class="{
-            'opacity-50 cursor-not-allowed': disabled,
-            'border-telegram-accent': isOpen,
-          }"
-          @input="handleInput"
-          @focus="openDropdown"
-          @keydown.esc="closeDropdown"
-          @keydown.enter.prevent="selectFirstFiltered"
-          @keydown.up.prevent="navigateUp"
-          @keydown.down.prevent="navigateDown"
-          @keydown.tab="closeDropdown"
-        />
+      <Input
+        :id="selectId"
+        ref="mainInput"
+        v-model="inputValue"
+        type="text"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :required="required"
+        :class="{ 'opacity-50 cursor-not-allowed': disabled }"
+        @input="handleInput"
+        @click="toggleDropdown"
+        @keydown.esc="closeDropdown"
+        @keydown.enter.prevent="selectFirstFiltered"
+        @keydown.up.prevent="navigateUp"
+        @keydown.down.prevent="navigateDown"
+        @keydown.tab="closeDropdown"
+      >
+        <template v-if="$slots.prepend" #prepend>
+          <slot name="prepend" />
+        </template>
 
-        <button
-          @click="toggleDropdown"
-          :disabled="disabled"
-          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-telegram-textSecondary hover:text-telegram-text transition-colors"
-        >
-          <svg
+        <template #append>
+          <ArrowIcon
             class="w-5 h-5 transition-transform duration-200"
             :class="{ 'rotate-180': isOpen }"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
-      </div>
+          />
+        </template>
+      </Input>
 
       <!-- Dropdown -->
       <Transition
@@ -244,19 +225,7 @@ onUnmounted(() => {
         class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg"
       >
         <div class="px-4 py-6 text-center text-telegram-textSecondary">
-          <svg
-            class="w-8 h-8 mx-auto mb-2 opacity-50"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          <LoupeIcon class="w-8 h-8 mx-auto mb-2 opacity-50" />
           <p class="text-sm">Ничего не найдено</p>
           <p class="text-xs mt-1">Попробуйте изменить запрос</p>
         </div>

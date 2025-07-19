@@ -8,7 +8,7 @@ import { useTelegramStore } from '@/stores/telegram'
 
 // Components
 import { GroupIcon, InfoIcon, PlusIcon, ServiceIcon } from '@components/icons'
-import { Button, Card, Input } from '@components/ui'
+import { Button, Card, Input, Select } from '@components/ui'
 
 // Composables
 const router = useRouter()
@@ -163,11 +163,19 @@ const hideGroupCard = () => {
         </div>
 
         <div class="space-y-3">
-          <Input v-model="groupNumber" placeholder="4212, 6105..." class="w-full">
+          <Select
+            v-model="groupNumber"
+            :options="[
+              { label: '4212', value: '4212' },
+              { label: '6105', value: '6105' },
+            ]"
+            placeholder="4212, 6105..."
+            class="w-full"
+          >
             <template #prepend>
               <GroupIcon class="w-4 h-4 text-telegram-textSecondary" />
             </template>
-          </Input>
+          </Select>
 
           <div class="space-y-3">
             <Button
