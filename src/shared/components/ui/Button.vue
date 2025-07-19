@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Loader } from '.'
 
 interface Props {
   variant?: 'primary' | 'secondary' | 'ghost' | 'destructive'
   size?: 'sm' | 'md' | 'lg'
   disabled?: boolean
+  loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variant: 'primary',
   size: 'md',
   disabled: false,
+  loading: false,
 })
 
 defineEmits<{
@@ -29,8 +32,8 @@ const buttonClasses = computed(() => {
 
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
+    md: 'px-4 py-2 text-base font-semibold',
+    lg: 'px-6 py-3 text-lg font-semibold',
   }
 
   const disabledClasses = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
@@ -40,7 +43,9 @@ const buttonClasses = computed(() => {
 </script>
 
 <template>
-  <button :class="buttonClasses" :disabled="disabled" @click="$emit('click', $event)">
+  <button :class="buttonClasses" :disabled="disabled || loading" @click="$emit('click', $event)">
+    <Loader class="size-5 opacity-0 mr-2 -ml-7" :class="{ 'opacity-100': loading }" />
+
     <slot />
   </button>
 </template>

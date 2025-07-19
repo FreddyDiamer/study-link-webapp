@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
+import { PATHS } from '@/router/paths'
 
+const router = useRouter()
 const telegramStore = useTelegramStore()
 
 const stats = [
@@ -20,6 +23,15 @@ const notifications = [
 const openFeedback = () => {
   // Здесь будет логика открытия формы обратной связи
   console.log('Открыть форму обратной связи')
+}
+
+const openSupport = () => {
+  // TODO: Открыть чат с поддержкой или внешнюю ссылку
+  console.log('Открытие поддержки')
+}
+
+const editProfile = () => {
+  router.push(PATHS.TUTOR_EDIT_PROFILE)
 }
 </script>
 
@@ -58,52 +70,20 @@ const openFeedback = () => {
         </div>
       </div>
 
-      <Button variant="ghost" class="w-full"> Редактировать профиль </Button>
+      <Button variant="ghost" class="w-full" @click="editProfile"> Редактировать профиль </Button>
     </Card>
+
+    <!-- Stats grid -->
+    <div class="grid grid-cols-2 gap-4 mb-6 mt-6">
+      <Card v-for="stat in stats" :key="stat.label" class="p-4 text-center">
+        <div class="text-2xl mb-2">{{ stat.icon }}</div>
+        <div class="text-2xl font-bold text-telegram-text mb-1">{{ stat.value }}</div>
+        <div class="text-telegram-textSecondary text-sm">{{ stat.label }}</div>
+      </Card>
+    </div>
 
     <!-- Menu items -->
     <div class="space-y-3">
-      <Card class="p-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div
-              class="w-10 h-10 bg-telegram-secondary rounded-lg flex items-center justify-center"
-            >
-              <svg
-                class="w-5 h-5 text-telegram-text"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div>
-              <p class="text-telegram-text font-medium">Доходы</p>
-              <p class="text-telegram-textSecondary text-sm">Статистика заработка</p>
-            </div>
-          </div>
-          <svg
-            class="w-5 h-5 text-telegram-textSecondary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </div>
-      </Card>
-
       <Card class="p-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
@@ -166,8 +146,7 @@ const openFeedback = () => {
               </svg>
             </div>
             <div>
-              <p class="text-telegram-text font-medium">Настройки</p>
-              <p class="text-telegram-textSecondary text-sm">Уведомления и предпочтения</p>
+              <p class="text-telegram-text font-medium">Уведомления</p>
             </div>
           </div>
           <svg
@@ -187,69 +166,54 @@ const openFeedback = () => {
       </Card>
     </div>
 
-    <!-- Stats grid -->
-    <div class="grid grid-cols-2 gap-4 mb-6 mt-6">
-      <Card v-for="stat in stats" :key="stat.label" class="p-4 text-center">
-        <div class="text-2xl mb-2">{{ stat.icon }}</div>
-        <div class="text-2xl font-bold text-telegram-text mb-1">{{ stat.value }}</div>
-        <div class="text-telegram-textSecondary text-sm">{{ stat.label }}</div>
-      </Card>
-    </div>
-
-    <!-- Блок уведомлений -->
-    <Card class="p-4 mb-3">
-      <h3 class="text-lg font-medium text-telegram-text mb-4">Уведомления</h3>
-      <div class="space-y-3">
-        <div
-          v-for="notification in notifications"
-          :key="notification.id"
-          class="flex items-center justify-between p-2 rounded-lg"
-          :class="notification.isRead ? 'bg-telegram-secondary/20' : 'bg-telegram-secondary/40'"
-        >
-          <div class="flex items-center space-x-2">
-            <div
-              class="w-2 h-2 rounded-full"
-              :class="notification.isRead ? 'bg-telegram-textSecondary' : 'bg-telegram-success'"
-            ></div>
-            <p class="text-telegram-text">{{ notification.text }}</p>
-          </div>
-        </div>
-      </div>
-    </Card>
-
     <!-- Блок обратной связи -->
-    <Card class="p-4 cursor-pointer mt-6" @click="openFeedback">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 bg-telegram-secondary rounded-lg flex items-center justify-center">
-            <svg
-              class="w-5 h-5 text-telegram-text"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+    <div class="relative mt-6 group cursor-pointer" @click="openFeedback">
+      <!-- Градиентный фон с анимацией -->
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-xl opacity-75 group-hover:opacity-100 transition-all duration-300 blur-sm group-hover:blur-none"
+      ></div>
+
+      <!-- Основная карточка -->
+      <Card
+        class="relative p-6 backdrop-blur-sm bg-white/10 border border-white/20 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <!-- Анимированная иконка -->
+            <div
+              class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-300"
             >
+              <div class="text-xl">🌟</div>
+            </div>
+            <div>
+              <h3 class="text-white font-semibold text-lg mb-1">Сделаем платформу лучше!</h3>
+              <p class="text-white/80 text-sm">Поделись опытом • Предложи улучшения 💪</p>
+            </div>
+          </div>
+
+          <!-- Стрелка с анимацией -->
+          <div
+            class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300"
+          >
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                d="M9 5l7 7-7 7"
               />
             </svg>
           </div>
-          <div>
-            <p class="text-telegram-text font-medium">Обратная связь</p>
-            <p class="text-telegram-textSecondary text-sm">Жалобы и предложения</p>
+        </div>
+
+        <!-- Дополнительная мотивация -->
+        <div class="mt-4 pt-4 border-t border-white/20">
+          <div class="flex items-center justify-between text-white/70 text-xs">
+            <span>🎓 Твой опыт ценен</span>
+            <span>🚀 Влияй на развитие</span>
           </div>
         </div>
-        <svg
-          class="w-5 h-5 text-telegram-textSecondary"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </div>
-    </Card>
+      </Card>
+    </div>
   </div>
 </template>

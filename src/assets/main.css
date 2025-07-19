@@ -61,9 +61,11 @@
 
   /* Кнопки */
   .btn {
+    @apply relative px-4 py-2 rounded-xl;
     @apply flex items-center justify-center;
-    @apply px-4 py-2 rounded-xl font-medium transition-all duration-200;
+    @apply transition-all duration-200 font-medium;
     @apply focus:outline-none;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
   }
 
   .btn-primary {
@@ -146,6 +148,10 @@
 @layer utilities {
   .text-gradient {
     @apply bg-gradient-to-r from-telegram-accent to-telegram-button bg-clip-text text-transparent;
+  }
+
+  .absolute-center {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
   }
 
   .safe-area-top {

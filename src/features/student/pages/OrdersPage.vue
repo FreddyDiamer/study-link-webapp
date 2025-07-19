@@ -15,7 +15,6 @@ const myOrders = ref([
     subject: 'Математика',
     description: 'Подготовка к ЕГЭ по математике, особенно задачи с параметрами',
     budget: 2000,
-    format: 'Онлайн',
     urgency: 'normal',
     schedule: 'Вторник, четверг вечером',
     createdAt: '2024-01-18T10:30:00',
@@ -28,7 +27,6 @@ const myOrders = ref([
     subject: 'Физика',
     description: 'Подготовка к олимпиаде, нужна помощь с механикой и термодинамикой',
     budget: 2500,
-    format: 'Очно',
     urgency: 'urgent',
     schedule: 'Выходные',
     createdAt: '2024-01-17T16:15:00',
@@ -41,7 +39,6 @@ const myOrders = ref([
     subject: 'Химия',
     description: 'Школьная программа 10 класс, органическая химия',
     budget: 1800,
-    format: 'Любой',
     urgency: 'normal',
     schedule: 'Будни вечером',
     createdAt: '2024-01-15T14:20:00',
@@ -143,7 +140,7 @@ const viewOrderDetails = (order: any) => {
                   getOrderStatusInfo(order.status).text
                 }}</span>
               </div>
-              <span class="text-telegram-success font-semibold">{{ order.budget }}₽/занятие</span>
+              <span class="text-telegram-success font-semibold">{{ order.budget }}₽</span>
             </div>
           </div>
           <div class="text-right">
@@ -164,25 +161,10 @@ const viewOrderDetails = (order: any) => {
         <p class="text-telegram-text text-sm mb-4">{{ order.description }}</p>
 
         <!-- Details -->
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <p class="text-telegram-textSecondary text-xs mb-1">Формат</p>
-            <p class="text-telegram-text font-medium">{{ order.format }}</p>
-          </div>
-          <div>
-            <p class="text-telegram-textSecondary text-xs mb-1">График</p>
-            <p class="text-telegram-text font-medium">{{ order.schedule }}</p>
-          </div>
-        </div>
-
         <div class="flex items-center justify-between">
           <div>
             <p class="text-telegram-textSecondary text-xs mb-1">Создана</p>
             <p class="text-telegram-text text-sm">{{ formatDate(order.createdAt) }}</p>
-          </div>
-          <div v-if="order.urgency === 'urgent'" class="flex items-center space-x-1">
-            <span class="text-red-500 text-sm">🔥</span>
-            <span class="text-red-500 text-sm font-medium">Срочно</span>
           </div>
         </div>
       </Card>

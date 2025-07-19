@@ -74,6 +74,11 @@ const router = createRouter({
       name: 'student-profile',
       component: () => import('../features/student/pages/ProfilePage.vue'),
     },
+    {
+      path: PATHS.STUDENT_EDIT_PROFILE,
+      name: 'student-edit-profile',
+      component: () => import('../features/student/pages/EditProfilePage.vue'),
+    },
 
     // Tutor routes
     {
@@ -110,6 +115,11 @@ const router = createRouter({
       path: PATHS.TUTOR_PROFILE,
       name: 'tutor-profile',
       component: () => import('../features/tutor/pages/ProfilePage.vue'),
+    },
+    {
+      path: PATHS.TUTOR_EDIT_PROFILE,
+      name: 'tutor-edit-profile',
+      component: () => import('../features/tutor/pages/EditProfilePage.vue'),
     },
   ],
 })

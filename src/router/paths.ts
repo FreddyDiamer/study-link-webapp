@@ -11,6 +11,7 @@ export const PATHS = {
   STUDENT_SERVICES: '/student/services',
   STUDENT_FAVORITES: '/student/favorites',
   STUDENT_PROFILE: '/student/profile',
+  STUDENT_EDIT_PROFILE: '/student/profile/edit',
 
   // Tutor paths
   TUTOR_MAIN: '/tutor',
@@ -20,6 +21,7 @@ export const PATHS = {
   TUTOR_ORDERS: '/tutor/orders',
   TUTOR_REQUESTS: '/tutor/requests',
   TUTOR_PROFILE: '/tutor/profile',
+  TUTOR_EDIT_PROFILE: '/tutor/profile/edit',
 } as const
 
 export type AppPath = (typeof PATHS)[keyof typeof PATHS]

@@ -3,7 +3,7 @@ import { computed } from 'vue'
 
 interface Props {
   modelValue: string
-  type?: 'text' | 'email' | 'password' | 'number' | 'tel'
+  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'date'
   label?: string
   placeholder?: string
   disabled?: boolean
@@ -63,3 +63,10 @@ const inputId = computed(() => `input-${Math.random().toString(36).substring(2, 
     </p>
   </div>
 </template>
+
+<style scoped>
+/* Стилизация значка календаря для input[type="date"] */
+input[type='date'] {
+  color-scheme: dark;
+}
+</style>

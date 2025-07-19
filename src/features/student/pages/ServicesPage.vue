@@ -9,7 +9,8 @@ import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
-import { LoupeIcon } from '@/shared/components/icons'
+import { ArrowIcon, FilterIcon, LoupeIcon } from '@/shared/components/icons'
+import { Select, type SelectOption } from '@/shared/components/ui'
 
 // Types
 interface Service {
@@ -34,9 +35,9 @@ interface Service {
 
 interface ServiceFilters {
   search: string
-  subject: string | null
+  subject: string
   teacher: string | null
-  format: 'all' | 'online' | 'offline' | 'both'
+  keywords: string
   availability: 'all' | 'available' | 'busy' | 'limited'
   sortBy: 'price' | 'rating' | 'experience' | 'date'
   sortOrder: 'asc' | 'desc'
@@ -51,16 +52,18 @@ const telegramStore = useTelegramStore()
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const services = ref<Service[]>([])
-const availableSubjects = ref<string[]>([])
-const availableTeachers = ref<Array<{ id: string; name: string }>>([])
+const availableSubjects = ref<SelectOption[]>([])
+const availableTeachers = ref<SelectOption[]>([])
+const sortOptions = ref<SelectOption[]>([])
+const sortOrderOptions = ref<SelectOption[]>([])
 const showFilters = ref(false)
 
 // Filters
 const filters = ref<ServiceFilters>({
   search: '',
-  subject: null,
+  subject: '',
   teacher: null,
-  format: 'all',
+  keywords: '',
   availability: 'all',
   sortBy: 'rating',
   sortOrder: 'desc',
@@ -97,13 +100,6 @@ const filteredServices = computed(() => {
   // Teacher filter
   if (filters.value.teacher) {
     result = result.filter((service) => service.teacher.id === filters.value.teacher)
-  }
-
-  // Format filter
-  if (filters.value.format !== 'all') {
-    result = result.filter(
-      (service) => service.format === filters.value.format || service.format === 'both',
-    )
   }
 
   // Availability filter
@@ -168,14 +164,22 @@ const loadServices = async () => {
 }
 
 const extractFiltersData = () => {
-  availableSubjects.value = [...new Set(services.value.map((s) => s.subject))]
+  availableSubjects.value = [...services.value.map((s) => ({ value: s.id, label: s.subject }))]
   availableTeachers.value = [
-    ...new Set(
-      services.value.map((s) => ({
-        id: s.teacher.id,
-        name: s.teacher.name,
-      })),
-    ),
+    ...services.value.map((s) => ({
+      value: s.teacher.id,
+      label: s.teacher.name,
+    })),
+  ]
+  sortOptions.value = [
+    { value: 'rating', label: 'По рейтингу' },
+    { value: 'price', label: 'По цене' },
+    { value: 'experience', label: 'По опыту' },
+    { value: 'date', label: 'По дате' },
+  ]
+  sortOrderOptions.value = [
+    { value: 'asc', label: 'По возрастанию' },
+    { value: 'desc', label: 'По убыванию' },
   ]
 }
 
@@ -208,9 +212,9 @@ const generateMockServices = (): Service[] => {
 const resetFilters = () => {
   filters.value = {
     search: '',
-    subject: null,
+    subject: '',
     teacher: null,
-    format: 'all',
+    keywords: '',
     availability: 'all',
     sortBy: 'rating',
     sortOrder: 'desc',
@@ -313,14 +317,7 @@ onMounted(() => {
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center">
         <Button variant="ghost" size="sm" @click="goBack" class="mr-3 p-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
+          <ArrowIcon direction="left" />
         </Button>
         <div>
           <h1 class="text-xl font-semibold text-telegram-text">{{ pageTitle }}</h1>
@@ -329,35 +326,8 @@ onMounted(() => {
       </div>
 
       <Button variant="ghost" size="sm" @click="toggleFilters" class="p-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
-          />
-        </svg>
+        <FilterIcon />
       </Button>
-    </div>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-4 gap-3 mb-6">
-      <Card class="p-3 text-center">
-        <div class="text-lg font-bold text-telegram-accent">{{ resultStats.total }}</div>
-        <div class="text-telegram-textSecondary text-xs">Услуг</div>
-      </Card>
-      <Card class="p-3 text-center">
-        <div class="text-lg font-bold text-telegram-success">{{ resultStats.subjects }}</div>
-        <div class="text-telegram-textSecondary text-xs">Предметов</div>
-      </Card>
-      <Card class="p-3 text-center">
-        <div class="text-lg font-bold text-telegram-text">{{ resultStats.teachers }}</div>
-        <div class="text-telegram-textSecondary text-xs">Учителей</div>
-      </Card>
-      <Card class="p-3 text-center">
-        <div class="text-lg font-bold text-telegram-text">{{ resultStats.averagePrice }}₽</div>
-        <div class="text-telegram-textSecondary text-xs">Средняя цена</div>
-      </Card>
     </div>
 
     <!-- Search -->
@@ -377,76 +347,57 @@ onMounted(() => {
     <div v-if="showFilters" class="mb-6">
       <Card class="p-4">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold text-telegram-text">Фильтры</h3>
+          <h3 class="font-semibold text-telegram-text text-lg">Фильтры</h3>
           <Button variant="ghost" size="sm" @click="resetFilters">Сбросить</Button>
         </div>
 
         <div class="space-y-4">
           <!-- Subject Filter -->
           <div>
-            <label class="block text-sm font-medium text-telegram-text mb-2">Предмет</label>
-            <select
+            <Select
+              label="Предмет"
               v-model="filters.subject"
-              class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-            >
-              <option :value="null">Все предметы</option>
-              <option v-for="subject in availableSubjects" :key="subject" :value="subject">
-                {{ subject }}
-              </option>
-            </select>
+              :options="availableSubjects"
+              placeholder="Выберите предмет"
+            />
           </div>
 
           <!-- Teacher Filter -->
           <div>
-            <label class="block text-sm font-medium text-telegram-text mb-2">Преподаватель</label>
-            <select
+            <Select
+              label="Преподаватель"
               v-model="filters.teacher"
-              class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-            >
-              <option :value="null">Все преподаватели</option>
-              <option v-for="teacher in availableTeachers" :key="teacher.id" :value="teacher.id">
-                {{ teacher.name }}
-              </option>
-            </select>
+              :options="availableTeachers"
+              placeholder="Выберите преподавателя"
+            />
           </div>
 
-          <!-- Format Filter -->
+          <!-- Key words -->
           <div>
-            <label class="block text-sm font-medium text-telegram-text mb-2">Формат обучения</label>
-            <select
-              v-model="filters.format"
-              class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-            >
-              <option value="all">Любой формат</option>
-              <option value="online">Онлайн</option>
-              <option value="offline">Очно</option>
-              <option value="both">Гибридный</option>
-            </select>
+            <Input
+              label="Ключевые слова"
+              v-model="filters.keywords"
+              placeholder="Введите ключевые слова"
+            />
           </div>
 
           <!-- Sort -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-sm font-medium text-telegram-text mb-2">Сортировать</label>
-              <select
+              <Select
+                label="Сортировать"
                 v-model="filters.sortBy"
-                class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-              >
-                <option value="rating">По рейтингу</option>
-                <option value="price">По цене</option>
-                <option value="experience">По опыту</option>
-                <option value="date">По дате</option>
-              </select>
+                :options="sortOptions"
+                placeholder="Выберите сортировку"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-telegram-text mb-2">Порядок</label>
-              <select
+              <Select
+                label="Порядок"
                 v-model="filters.sortOrder"
-                class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-              >
-                <option value="desc">По убыванию</option>
-                <option value="asc">По возрастанию</option>
-              </select>
+                :options="sortOrderOptions"
+                placeholder="Выберите порядок"
+              />
             </div>
           </div>
         </div>

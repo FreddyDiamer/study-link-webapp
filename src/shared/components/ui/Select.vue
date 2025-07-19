@@ -2,14 +2,15 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { ArrowIcon, LoupeIcon } from '../icons'
 import { Input } from '.'
+import { delay } from '@/shared/utils'
 
-interface SelectOption {
+export interface SelectOption {
   value: string
   label: string
 }
 
 interface Props {
-  modelValue: string
+  modelValue: string | null
   options: SelectOption[]
   label?: string
   placeholder?: string
@@ -25,12 +26,11 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string]
+  'update:modelValue': [value: string | null]
 }>()
 
 const isOpen = ref(false)
 const inputValue = ref('')
-const mainInput = ref<HTMLInputElement>()
 const highlightedIndex = ref(-1)
 const selectId = computed(() => `select-${Math.random().toString(36).substr(2, 9)}`)
 
@@ -39,12 +39,19 @@ const selectedOption = computed(() => {
 })
 
 const filteredOptions = computed(() => {
-  if (!inputValue.value) {
-    return props.options
+  let options = props.options
+
+  if (inputValue.value) {
+    const query = inputValue.value.toLowerCase()
+    options = options.filter((option) => option.label.toLowerCase().includes(query))
   }
 
-  const query = inputValue.value.toLowerCase()
-  return props.options.filter((option) => option.label.toLowerCase().includes(query))
+  // Добавляем опцию сброса если что-то выбрано
+  if (props.modelValue && !inputValue.value) {
+    return [{ value: '', label: 'Отменить выбор' }, ...options]
+  }
+
+  return options
 })
 
 // Синхронизация inputValue с выбранным значением
@@ -68,6 +75,8 @@ const openDropdown = () => {
   if (!props.disabled) {
     isOpen.value = true
     highlightedIndex.value = -1
+    // Очищаем поле поиска при открытии, чтобы показать все опции
+    inputValue.value = ''
   }
 }
 
@@ -77,7 +86,6 @@ const toggleDropdown = () => {
       closeDropdown()
     } else {
       openDropdown()
-      mainInput.value?.focus()
     }
   }
 }
@@ -92,8 +100,14 @@ const closeDropdown = () => {
 }
 
 const selectOption = (option: SelectOption) => {
-  emit('update:modelValue', option.value)
-  inputValue.value = option.label
+  if (option.value === '') {
+    // Отмена выбора
+    emit('update:modelValue', null)
+    inputValue.value = ''
+  } else {
+    emit('update:modelValue', option.value)
+    inputValue.value = option.label
+  }
   closeDropdown()
 }
 
@@ -144,91 +158,91 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="space-y-2">
-    <div class="relative">
-      <Input
-        :id="selectId"
-        ref="mainInput"
-        v-model="inputValue"
-        type="text"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :required="required"
-        :class="{ 'opacity-50 cursor-not-allowed': disabled }"
-        @input="handleInput"
-        @click="toggleDropdown"
-        @keydown.esc="closeDropdown"
-        @keydown.enter.prevent="selectFirstFiltered"
-        @keydown.up.prevent="navigateUp"
-        @keydown.down.prevent="navigateDown"
-        @keydown.tab="closeDropdown"
-      >
-        <template v-if="$slots.prepend" #prepend>
-          <slot name="prepend" />
-        </template>
+  <div class="relative">
+    <Input
+      v-model="inputValue"
+      type="text"
+      :id="selectId"
+      :label="label"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :required="required"
+      :class="{ 'opacity-50 cursor-not-allowed': disabled }"
+      @input="handleInput"
+      @click="toggleDropdown"
+      @keydown.esc="closeDropdown"
+      @keydown.enter.prevent="selectFirstFiltered"
+      @keydown.up.prevent="navigateUp"
+      @keydown.down.prevent="navigateDown"
+      @keydown.tab="closeDropdown"
+    >
+      <template v-if="$slots.prepend" #prepend>
+        <slot name="prepend" />
+      </template>
 
-        <template #append>
-          <ArrowIcon
-            class="w-5 h-5 transition-transform duration-200"
-            :class="{ 'rotate-180': isOpen }"
-          />
-        </template>
-      </Input>
+      <template #append>
+        <ArrowIcon
+          class="w-5 h-5 transition-transform duration-200"
+          :class="{ 'rotate-180': isOpen }"
+        />
+      </template>
+    </Input>
 
-      <!-- Dropdown -->
-      <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="transform scale-95 opacity-0"
-        enter-to-class="transform scale-100 opacity-100"
-        leave-active-class="transition duration-150 ease-in"
-        leave-from-class="transform scale-100 opacity-100"
-        leave-to-class="transform scale-95 opacity-0"
-      >
-        <div
-          v-if="isOpen && filteredOptions.length > 0"
-          class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg max-h-60 overflow-y-auto"
-        >
-          <button
-            v-for="(option, index) in filteredOptions"
-            :key="option.value"
-            @click="selectOption(option)"
-            class="w-full px-4 py-3 text-left hover:bg-telegram-secondary transition-colors border-b border-telegram-border last:border-b-0"
-            :class="{
-              'bg-telegram-accent/10 text-telegram-accent': modelValue === option.value,
-              'text-telegram-text': modelValue !== option.value,
-              'bg-telegram-secondary': highlightedIndex === index,
-            }"
-            @mouseenter="highlightedIndex = index"
-          >
-            <div class="flex items-center justify-between">
-              <span class="font-medium" v-html="highlightSearchText(option.label)"></span>
-              <svg
-                v-if="modelValue === option.value"
-                class="w-4 h-4 text-telegram-accent"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-          </button>
-        </div>
-      </Transition>
-
-      <!-- No results dropdown -->
+    <!-- Dropdown -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="transform scale-95 opacity-0"
+      enter-to-class="transform scale-100 opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="transform scale-100 opacity-100"
+      leave-to-class="transform scale-95 opacity-0"
+    >
       <div
-        v-if="isOpen && filteredOptions.length === 0 && inputValue"
-        class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg"
+        v-if="isOpen && filteredOptions.length > 0"
+        class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg max-h-60 overflow-y-auto"
       >
-        <div class="px-4 py-6 text-center text-telegram-textSecondary">
-          <LoupeIcon class="w-8 h-8 mx-auto mb-2 opacity-50" />
-          <p class="text-sm">Ничего не найдено</p>
-          <p class="text-xs mt-1">Попробуйте изменить запрос</p>
-        </div>
+        <button
+          v-for="(option, index) in filteredOptions"
+          :key="option.value"
+          @click="selectOption(option)"
+          class="w-full px-4 py-3 text-left hover:bg-telegram-secondary transition-colors border-b border-telegram-border last:border-b-0"
+          :class="{
+            'bg-telegram-accent/10 text-telegram-accent':
+              modelValue === option.value && option.value !== '',
+            'text-telegram-textSecondary italic': option.value === '',
+            'text-telegram-text': modelValue !== option.value && option.value !== '',
+            'bg-telegram-secondary': highlightedIndex === index,
+          }"
+          @mouseenter="highlightedIndex = index"
+        >
+          <div class="flex items-center justify-between">
+            <span class="font-medium" v-html="highlightSearchText(option.label)"></span>
+            <svg
+              v-if="modelValue === option.value && option.value !== ''"
+              class="w-4 h-4 text-telegram-accent"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+        </button>
+      </div>
+    </Transition>
+
+    <!-- No results dropdown -->
+    <div
+      v-if="isOpen && filteredOptions.length === 0 && inputValue"
+      class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg"
+    >
+      <div class="px-4 py-6 text-center text-telegram-textSecondary">
+        <LoupeIcon class="w-8 h-8 mx-auto mb-2 opacity-50" />
+        <p class="text-sm">Ничего не найдено</p>
+        <p class="text-xs mt-1">Попробуйте изменить запрос</p>
       </div>
     </div>
 
