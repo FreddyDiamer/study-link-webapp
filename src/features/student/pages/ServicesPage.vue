@@ -37,7 +37,6 @@ interface ServiceFilters {
   search: string
   subject: string
   teacher: string | null
-  keywords: string
   availability: 'all' | 'available' | 'busy' | 'limited'
   sortBy: 'price' | 'rating' | 'experience' | 'date'
   sortOrder: 'asc' | 'desc'
@@ -63,7 +62,6 @@ const filters = ref<ServiceFilters>({
   search: '',
   subject: '',
   teacher: null,
-  keywords: '',
   availability: 'all',
   sortBy: 'rating',
   sortOrder: 'desc',
@@ -214,7 +212,6 @@ const resetFilters = () => {
     search: '',
     subject: '',
     teacher: null,
-    keywords: '',
     availability: 'all',
     sortBy: 'rating',
     sortOrder: 'desc',
@@ -369,15 +366,6 @@ onMounted(() => {
               v-model="filters.teacher"
               :options="availableTeachers"
               placeholder="Выберите преподавателя"
-            />
-          </div>
-
-          <!-- Key words -->
-          <div>
-            <Input
-              label="Ключевые слова"
-              v-model="filters.keywords"
-              placeholder="Введите ключевые слова"
             />
           </div>
 

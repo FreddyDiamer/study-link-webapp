@@ -5,6 +5,7 @@ import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
+import { Select, type SelectOption } from '@/shared/components/ui'
 
 // Types
 interface Order {
@@ -14,6 +15,7 @@ interface Order {
   price: number
   priceType: 'hour' | 'task' | 'month'
   subject: string
+  teacher: string
   student: {
     id: string
     name: string
@@ -31,6 +33,7 @@ interface Order {
 interface OrderFilters {
   search: string
   subject: string | null
+  teacher: string | null
   status: 'all' | 'pending' | 'in_progress' | 'completed' | 'cancelled'
   urgency: 'all' | 'today' | 'this_week' | 'not_urgent'
   format: 'all' | 'online' | 'offline' | 'both'
@@ -47,13 +50,17 @@ const telegramStore = useTelegramStore()
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const orders = ref<Order[]>([])
-const availableSubjects = ref<string[]>([])
+const availableSubjects = ref<SelectOption[]>([])
+const availableTeachers = ref<SelectOption[]>([])
+const sortOptions = ref<SelectOption[]>([])
+const sortOrderOptions = ref<SelectOption[]>([])
 const showFilters = ref(false)
 
 // Filters
 const filters = ref<OrderFilters>({
   search: '',
   subject: null,
+  teacher: null,
   status: 'all',
   urgency: 'all',
   format: 'all',
@@ -87,6 +94,11 @@ const filteredOrders = computed(() => {
   // Subject filter
   if (filters.value.subject) {
     result = result.filter((order) => order.subject === filters.value.subject)
+  }
+
+  // Teacher filter
+  if (filters.value.teacher) {
+    result = result.filter((order) => order.student.name === filters.value.teacher)
   }
 
   // Status filter
@@ -165,7 +177,21 @@ const loadOrders = async () => {
 }
 
 const extractFiltersData = () => {
-  availableSubjects.value = [...new Set(orders.value.map((o) => o.subject))]
+  availableSubjects.value = [...orders.value.map((o) => ({ value: o.id, label: o.subject }))]
+  availableTeachers.value = [...new Set(orders.value.map((o) => o.teacher))].map((teacher) => ({
+    value: teacher,
+    label: teacher,
+  }))
+  sortOptions.value = [
+    { value: 'rating', label: 'По рейтингу' },
+    { value: 'price', label: 'По цене' },
+    { value: 'experience', label: 'По опыту' },
+    { value: 'date', label: 'По дате' },
+  ]
+  sortOrderOptions.value = [
+    { value: 'asc', label: 'По возрастанию' },
+    { value: 'desc', label: 'По убыванию' },
+  ]
 }
 
 const generateMockOrders = (): Order[] => {
@@ -173,6 +199,14 @@ const generateMockOrders = (): Order[] => {
   const formats = ['online', 'offline', 'both'] as const
   const urgencies = ['today', 'this_week', 'not_urgent'] as const
   const statuses = ['pending', 'in_progress', 'completed', 'cancelled'] as const
+  const teachers = [
+    'Анна Петрова',
+    'Елена Иванова',
+    'Мария Сидорова',
+    'Ксения Козлова',
+    'Дарья Морозова',
+    'София Волкова',
+  ] as const
 
   return Array.from({ length: 32 }, (_, i) => {
     const createdDate = new Date()
@@ -192,6 +226,7 @@ const generateMockOrders = (): Order[] => {
       price: Math.floor(Math.random() * 3000) + 1000,
       priceType: priceTypes[i % 3],
       subject: subjects[i % subjects.length],
+      teacher: teachers[i % teachers.length],
       student: {
         id: `student-${i + 1}`,
         name: `${['Анна', 'Елена', 'Мария', 'Ксения', 'Дарья', 'София'][i % 6]} ${['Петрова', 'Иванова', 'Сидорова', 'Козлова', 'Морозова', 'Волкова'][i % 6]}`,
@@ -215,6 +250,7 @@ const resetFilters = () => {
   filters.value = {
     search: '',
     subject: null,
+    teacher: null,
     status: 'all',
     urgency: 'all',
     format: 'all',
@@ -232,10 +268,6 @@ const toggleFilters = () => {
 const goBack = () => {
   telegramStore.hapticFeedback('light')
   router.back()
-}
-
-const formatPrice = (price: number, type: string) => {
-  return `${price.toLocaleString('ru-RU')} ₽/${type === 'hour' ? 'час' : type === 'task' ? 'задание' : 'мес'}`
 }
 
 const formatUrgency = (urgency: string) => {
@@ -365,26 +397,6 @@ onMounted(() => {
       </Button>
     </div>
 
-    <!-- Stats -->
-    <div class="grid grid-cols-4 gap-3 mb-6">
-      <Card class="p-3 text-center">
-        <div class="text-lg font-bold text-telegram-accent">{{ resultStats.total }}</div>
-        <div class="text-telegram-textSecondary text-xs">Заказов</div>
-      </Card>
-      <Card class="p-3 text-center">
-        <div class="text-lg font-bold text-yellow-600">{{ resultStats.pending }}</div>
-        <div class="text-telegram-textSecondary text-xs">Ожидают</div>
-      </Card>
-      <Card class="p-3 text-center">
-        <div class="text-lg font-bold text-blue-600">{{ resultStats.inProgress }}</div>
-        <div class="text-telegram-textSecondary text-xs">В работе</div>
-      </Card>
-      <Card class="p-3 text-center">
-        <div class="text-lg font-bold text-telegram-text">{{ resultStats.averagePrice }}₽</div>
-        <div class="text-telegram-textSecondary text-xs">Средняя цена</div>
-      </Card>
-    </div>
-
     <!-- Search -->
     <Card class="p-4 mb-4">
       <Input
@@ -421,84 +433,41 @@ onMounted(() => {
         <div class="space-y-4">
           <!-- Subject Filter -->
           <div>
-            <label class="block text-sm font-medium text-telegram-text mb-2">Предмет</label>
-            <select
+            <Select
+              label="Предмет"
               v-model="filters.subject"
-              class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-            >
-              <option :value="null">Все предметы</option>
-              <option v-for="subject in availableSubjects" :key="subject" :value="subject">
-                {{ subject }}
-              </option>
-            </select>
+              :options="availableSubjects"
+              placeholder="Выберите предмет"
+            />
           </div>
 
-          <!-- Status Filter -->
+          <!-- Teacher Filter -->
           <div>
-            <label class="block text-sm font-medium text-telegram-text mb-2">Статус</label>
-            <select
-              v-model="filters.status"
-              class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-            >
-              <option value="all">Все статусы</option>
-              <option value="pending">Ожидание</option>
-              <option value="in_progress">В работе</option>
-              <option value="completed">Завершен</option>
-              <option value="cancelled">Отменен</option>
-            </select>
-          </div>
-
-          <!-- Urgency Filter -->
-          <div>
-            <label class="block text-sm font-medium text-telegram-text mb-2">Срочность</label>
-            <select
-              v-model="filters.urgency"
-              class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-            >
-              <option value="all">Любая срочность</option>
-              <option value="today">Сегодня</option>
-              <option value="this_week">На этой неделе</option>
-              <option value="not_urgent">Не срочно</option>
-            </select>
-          </div>
-
-          <!-- Format Filter -->
-          <div>
-            <label class="block text-sm font-medium text-telegram-text mb-2">Формат</label>
-            <select
-              v-model="filters.format"
-              class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-            >
-              <option value="all">Любой формат</option>
-              <option value="online">Онлайн</option>
-              <option value="offline">Очно</option>
-              <option value="both">Гибридный</option>
-            </select>
+            <Select
+              label="Преподаватель"
+              v-model="filters.teacher"
+              :options="availableTeachers"
+              placeholder="Выберите преподавателя"
+            />
           </div>
 
           <!-- Sort -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-sm font-medium text-telegram-text mb-2">Сортировать</label>
-              <select
+              <Select
+                label="Сортировать"
                 v-model="filters.sortBy"
-                class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-              >
-                <option value="date">По дате</option>
-                <option value="price">По цене</option>
-                <option value="urgency">По срочности</option>
-                <option value="deadline">По дедлайну</option>
-              </select>
+                :options="sortOptions"
+                placeholder="Выберите сортировку"
+              />
             </div>
             <div>
-              <label class="block text-sm font-medium text-telegram-text mb-2">Порядок</label>
-              <select
+              <Select
+                label="Порядок"
                 v-model="filters.sortOrder"
-                class="w-full p-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:ring-2 focus:ring-telegram-accent focus:border-transparent"
-              >
-                <option value="desc">По убыванию</option>
-                <option value="asc">По возрастанию</option>
-              </select>
+                :options="sortOrderOptions"
+                placeholder="Выберите порядок"
+              />
             </div>
           </div>
         </div>
@@ -530,24 +499,14 @@ onMounted(() => {
         <!-- Header -->
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1">
-            <h3 class="font-semibold text-telegram-text mb-1">{{ order.title }}</h3>
+            <h3 class="font-semibold text-telegram-text mb-1">{{ order.subject }}</h3>
             <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
-              <span>{{ order.subject }}</span>
-              <span>•</span>
-              <span>{{ formatFormat(order.format) }}</span>
+              <span>{{ order.teacher }}</span>
             </div>
           </div>
           <div class="text-right">
             <div class="font-bold text-telegram-accent">
-              {{ formatPrice(order.price, order.priceType) }}
-            </div>
-            <div class="flex items-center gap-2 mt-1">
-              <span
-                :class="[formatUrgency(order.urgency).color, formatUrgency(order.urgency).bg]"
-                class="text-xs px-2 py-0.5 rounded-full"
-              >
-                {{ formatUrgency(order.urgency).text }}
-              </span>
+              {{ order.price }}
             </div>
           </div>
         </div>

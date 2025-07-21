@@ -169,7 +169,7 @@ const viewOrderDetails = (order: any) => {
         </div>
       </Card>
 
-      <div class="pt-4">
+      <div>
         <Button @click="createOrder" class="w-full">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

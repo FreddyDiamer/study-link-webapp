@@ -2,7 +2,8 @@
 import { ref } from 'vue'
 import { useTelegramStore } from '@/stores/telegram'
 import { useRouter } from 'vue-router'
-import { Input, Card, Button } from '@components/ui'
+import { Card, Input, Button } from '@components/ui'
+import { LoupeIcon } from '@/shared/components/icons'
 
 const telegramStore = useTelegramStore()
 const router = useRouter()
@@ -31,15 +32,40 @@ const quickActions = [
     },
   },
   {
-    title: 'Редактировать профиль',
-    description: 'Обновить информацию',
-    icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z',
-    color: 'bg-telegram-secondary',
+    title: 'Мои услуги',
+    description: 'Управление предложениями',
+    icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
+    color: 'bg-purple-500',
     action: () => {
       telegramStore.hapticFeedback('light')
-      router.push('/tutor/profile')
+      router.push('/tutor/services')
     },
   },
+]
+
+const activeServices = [
+  {
+    id: 1,
+    subject: 'Математика',
+    teacher: 'ЕГЭ подготовка',
+    price: '1000₽/час',
+    responses: 3,
+    status: 'active',
+  },
+  {
+    id: 2,
+    subject: 'Физика',
+    teacher: 'Школьная программа',
+    price: '800₽/час',
+    responses: 5,
+    status: 'active',
+  },
+]
+
+const recentActivity = [
+  { text: 'Новый отклик на услугу "Математика ЕГЭ"', time: '10 мин', isNew: true },
+  { text: 'Студент принял ваше предложение', time: '1 час', isNew: false },
+  { text: 'Заявка "Помощь с алгеброй" требует ответа', time: '2 часа', isNew: true },
 ]
 </script>
 
@@ -48,29 +74,24 @@ const quickActions = [
     <!-- Search -->
     <Card class="p-4 mb-6">
       <div class="space-y-3">
-        <Input v-model="searchQuery" placeholder="Поиск репетиторов, предметов..." class="w-full">
+        <Input
+          v-model="searchQuery"
+          placeholder="Поиск заявок по предметам, преподователям..."
+          class="w-full"
+        >
           <template #prepend>
-            <svg
-              class="w-4 h-4 text-telegram-textSecondary"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <LoupeIcon />
           </template>
         </Input>
-        <Button class="w-full" size="sm"> Найти репетиторов </Button>
+        <Button class="w-full" size="sm" @click="router.push('/tutor/requests')">
+          Найти заявки
+        </Button>
       </div>
     </Card>
+
     <!-- Quick actions -->
-    <div class="mb-8">
-      <h2 class="text-xl font-semibold text-telegram-text mb-4">Быстрые действия</h2>
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-telegram-text mb-3">Быстрые действия</h2>
 
       <div class="space-y-3">
         <Card
@@ -114,30 +135,54 @@ const quickActions = [
       </div>
     </div>
 
-    <!-- Tips -->
-    <Card class="p-6 bg-telegram-success/5 border-telegram-success/20">
-      <div class="flex items-start space-x-3">
-        <div
-          class="w-8 h-8 bg-telegram-success rounded-full flex items-center justify-center flex-shrink-0"
+    <!-- Active Services -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold text-telegram-text">Активные услуги</h2>
+        <button
+          @click="router.push('/tutor/services')"
+          class="text-telegram-accent text-sm font-medium"
         >
-          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-
-        <div>
-          <h3 class="text-telegram-success font-semibold mb-2">Совет для начала работы</h3>
-          <p class="text-telegram-text text-sm leading-relaxed">
-            Добавьте подробное описание ваших услуг с указанием предметов, опыта и стоимости.
-            Студенты чаще выбирают репетиторов с полной информацией о себе.
-          </p>
-        </div>
+          Все услуги
+        </button>
       </div>
-    </Card>
+
+      <div class="space-y-3">
+        <Card v-for="service in activeServices" :key="service.id" class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="flex items-center space-x-2">
+                <h3 class="font-medium text-telegram-text">{{ service.subject }}</h3>
+                <span
+                  class="px-2 py-1 bg-telegram-success/10 text-telegram-success text-xs rounded-full"
+                >
+                  Активно
+                </span>
+              </div>
+              <p class="text-sm text-telegram-textSecondary mt-1">{{ service.teacher }}</p>
+              <div class="flex items-center space-x-4 mt-2">
+                <span class="text-sm font-medium text-telegram-text">{{ service.price }}</span>
+                <span class="text-xs text-telegram-textSecondary">
+                  {{ service.responses }} откликов
+                </span>
+              </div>
+            </div>
+            <svg
+              class="w-5 h-5 text-telegram-textSecondary"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+        </Card>
+      </div>
+    </div>
   </div>
 </template>
