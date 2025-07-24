@@ -11,6 +11,7 @@ import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
 import { ArrowIcon, FilterIcon, LoupeIcon } from '@/shared/components/icons'
 import { Select, type SelectOption } from '@/shared/components/ui'
+import RequestModal from '../components/RequestModal.vue'
 
 // Types
 interface Service {
@@ -56,6 +57,8 @@ const availableTeachers = ref<SelectOption[]>([])
 const sortOptions = ref<SelectOption[]>([])
 const sortOrderOptions = ref<SelectOption[]>([])
 const showFilters = ref(false)
+const showRequestModal = ref(false)
+const selectedService = ref<Service | null>(null)
 
 // Filters
 const filters = ref<ServiceFilters>({
@@ -256,26 +259,28 @@ const formatFormat = (format: string) => {
   return map[format as keyof typeof map] || format
 }
 
-const contactTeacher = (service: Service) => {
+const submitRequest = (service: Service) => {
   telegramStore.hapticFeedback('medium')
-  console.log('Связаться с преподавателем:', service.teacher.name)
+  selectedService.value = service
+  showRequestModal.value = true
+}
+
+const handleRequestSubmit = async (requestData: any) => {
+  try {
+    // TODO: API call для отправки заявки
+    console.log('Отправка заявки:', requestData)
+
+    // Показать уведомление об успешной отправке
+    telegramStore.showAlert('Заявка отправлена! Репетитор ответит в ближайшее время.')
+  } catch (error) {
+    console.error('Ошибка отправки заявки:', error)
+    telegramStore.showAlert('Ошибка отправки заявки. Попробуйте еще раз.')
+  }
 }
 
 const viewServiceDetails = (service: Service) => {
   telegramStore.hapticFeedback('light')
   console.log('Просмотр деталей услуги:', service.title)
-}
-
-const createOrderForService = (service: Service) => {
-  telegramStore.hapticFeedback('medium')
-  router.push({
-    path: '/student/orders/create',
-    query: {
-      subject: service.subject,
-      teacherId: service.teacher.id,
-      serviceId: service.id,
-    },
-  })
 }
 
 // Watchers
@@ -417,20 +422,13 @@ onMounted(() => {
         <!-- Header -->
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1">
-            <h3 class="font-semibold text-telegram-text mb-1">{{ service.title }}</h3>
+            <h3 class="font-semibold text-telegram-text mb-1">{{ service.subject }}</h3>
             <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
-              <span>{{ service.subject }}</span>
-              <span>•</span>
-              <span>{{ formatFormat(service.format) }}</span>
+              <span>{{ service.teacher.name }}</span>
             </div>
           </div>
           <div class="text-right">
-            <div class="font-bold text-telegram-accent">
-              {{ formatPrice(service.price, service.priceType) }}
-            </div>
-            <div :class="formatAvailability(service.availability).color" class="text-xs">
-              {{ formatAvailability(service.availability).text }}
-            </div>
+            <div class="font-bold text-telegram-accent">{{ service.price }} ₽</div>
           </div>
         </div>
 
@@ -449,7 +447,7 @@ onMounted(() => {
           <div class="flex-1">
             <div class="font-medium text-telegram-text">{{ service.teacher.name }}</div>
             <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
-              <span>{{ service.teacher.experience }} лет опыта</span>
+              <span>{{ service.teacher.experience }} услуг</span>
               <span>•</span>
               <div class="flex items-center space-x-1">
                 <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -465,40 +463,21 @@ onMounted(() => {
         </div>
 
         <!-- Description -->
-        <p class="text-telegram-textSecondary text-sm mb-3 line-clamp-2">
+        <p class="text-telegram-textSecondary text-sm mb-3 line-clamp-5">
           {{ service.description }}
         </p>
 
-        <!-- Tags -->
-        <div class="flex flex-wrap gap-2 mb-3">
-          <span
-            v-for="tag in service.tags"
-            :key="tag"
-            class="px-2 py-1 bg-telegram-secondary text-telegram-text text-xs rounded-lg"
-          >
-            {{ tag }}
-          </span>
-        </div>
-
         <!-- Actions -->
-        <div class="flex space-x-2 pt-3 border-t border-telegram-border">
-          <Button
-            @click.stop="contactTeacher(service)"
-            variant="secondary"
-            size="sm"
-            class="flex-1"
-          >
-            Связаться
-          </Button>
-          <Button @click.stop="createOrderForService(service)" size="sm" class="flex-1">
-            Заказать
+        <div class="pt-3">
+          <Button @click.stop="submitRequest(service)" size="sm" class="w-full">
+            Оставить заявку
           </Button>
         </div>
       </Card>
     </div>
 
     <!-- Empty State -->
-    <div v-else class="text-center py-12">
+    <div v-else class="text-center py-12 flex flex-col items-center justify-center">
       <div
         class="w-16 h-16 bg-telegram-secondary rounded-full mx-auto mb-4 flex items-center justify-center"
       >
@@ -520,14 +499,12 @@ onMounted(() => {
       <p class="text-telegram-textSecondary mb-4">Попробуйте изменить параметры поиска</p>
       <Button @click="resetFilters" variant="secondary">Сбросить фильтры</Button>
     </div>
+
+    <!-- Request Modal -->
+    <RequestModal
+      v-model="showRequestModal"
+      :service="selectedService"
+      @submit="handleRequestSubmit"
+    />
   </div>
 </template>
-
-<style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

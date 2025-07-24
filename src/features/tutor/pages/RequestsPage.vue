@@ -6,79 +6,121 @@ import Button from '@/shared/components/ui/Button.vue'
 
 const telegramStore = useTelegramStore()
 
-// Моковые данные заявок от студентов
+// Моковые данные заявок студентов (Request)
 const requests = ref([
   {
-    id: 1,
-    student: {
-      name: 'Мария Васильева',
-      avatar: 'МВ',
-      rating: 4.8,
-    },
-    subject: 'Математика',
+    id: '1',
+    studentId: 'student-1',
+    subjectId: 'math-1',
+    teacherId: 'teacher-1',
     description:
       'Нужна помощь с подготовкой к ЕГЭ по математике. Особенно сложно даются задачи с параметрами и геометрия.',
-    budget: 2000,
-    format: 'Онлайн',
-    urgency: 'normal',
-    schedule: 'Вторник, четверг вечером',
+    urgency: 'HIGH',
+    budget: 200000, // в копейках (2000 рублей)
+    status: 'OPEN',
+    deadline: '2024-01-25T18:00:00',
     createdAt: '2024-01-18T14:30:00',
-    status: 'new',
-    teacherName: null,
+    updatedAt: '2024-01-18T14:30:00',
+    // Связанные данные
+    student: {
+      name: 'Мария Васильева',
+      rating: 4.8,
+    },
+    subject: {
+      name: 'Математика',
+    },
+    teacher: {
+      fullName: 'Подготовка к ЕГЭ',
+    },
+    // Для репетитора - есть ли его отклик
+    myResponseId: null,
+    responsesCount: 3,
   },
   {
-    id: 2,
-    student: {
-      name: 'Алексей Козлов',
-      avatar: 'АК',
-      rating: 4.5,
-    },
-    subject: 'Физика',
+    id: '2',
+    studentId: 'student-2',
+    subjectId: 'physics-1',
+    teacherId: 'teacher-2',
     description:
       'Подготовка к экзамену в университете. Нужно разобрать электричество и магнетизм, оптику.',
-    budget: 1800,
-    format: 'Очно',
-    urgency: 'urgent',
-    schedule: 'Выходные днем',
+    urgency: 'HIGH',
+    budget: 180000, // в копейках (1800 рублей)
+    status: 'OPEN',
+    deadline: '2024-01-22T16:00:00',
     createdAt: '2024-01-18T16:15:00',
-    status: 'viewed',
-    teacherName: null,
+    updatedAt: '2024-01-18T16:15:00',
+    // Связанные данные
+    student: {
+      name: 'Алексей Козлов',
+      rating: 4.5,
+    },
+    subject: {
+      name: 'Физика',
+    },
+    teacher: {
+      fullName: 'Университетская физика',
+    },
+    // Для репетитора - есть ли его отклик (просмотрено)
+    myResponseId: null,
+    responsesCount: 5,
+    viewedByMe: true,
   },
   {
-    id: 3,
-    student: {
-      name: 'София Петрова',
-      avatar: 'СП',
-      rating: 5.0,
-    },
-    subject: 'Химия',
+    id: '3',
+    studentId: 'student-3',
+    subjectId: 'chemistry-1',
+    teacherId: 'teacher-3',
     description:
       'Помощь с органической химией для подготовки к олимпиаде. Нужны задачи повышенной сложности.',
-    budget: 2500,
-    format: 'Любой формат',
-    urgency: 'normal',
-    schedule: 'Будни вечером',
+    urgency: 'MEDIUM',
+    budget: 250000, // в копейках (2500 рублей)
+    status: 'MATCHED',
+    deadline: '2024-01-30T14:00:00',
     createdAt: '2024-01-17T20:45:00',
-    status: 'responded',
-    teacherName: null,
+    updatedAt: '2024-01-18T10:30:00',
+    // Связанные данные
+    student: {
+      name: 'София Петрова',
+      rating: 5.0,
+    },
+    subject: {
+      name: 'Химия',
+    },
+    teacher: {
+      fullName: 'Олимпиадная химия',
+    },
+    // Для репетитора - есть ли его отклик (отправлен)
+    myResponseId: 'response-2',
+    responsesCount: 8,
+    viewedByMe: true,
   },
   {
-    id: 4,
-    student: {
-      name: 'Денис Смирнов',
-      avatar: 'ДС',
-      rating: 4.2,
-    },
-    subject: 'Математика',
+    id: '4',
+    studentId: 'student-4',
+    subjectId: 'math-1',
+    teacherId: 'teacher-4',
     description:
       'Подготовка к поступлению в технический вуз. Нужна помощь с алгеброй и началами анализа.',
-    budget: 1500,
-    format: 'Онлайн',
-    urgency: 'normal',
-    schedule: 'Гибкий график',
+    urgency: 'MEDIUM',
+    budget: 150000, // в копейках (1500 рублей)
+    status: 'OPEN',
+    deadline: '2024-01-28T12:00:00',
     createdAt: '2024-01-17T11:20:00',
-    status: 'new',
-    teacherName: 'Иванов И.И.',
+    updatedAt: '2024-01-17T11:20:00',
+    // Связанные данные
+    student: {
+      name: 'Денис Смирнов',
+      rating: 4.2,
+    },
+    subject: {
+      name: 'Математика',
+    },
+    teacher: {
+      fullName: 'Высшая математика',
+    },
+    // Для репетитора - есть ли его отклик
+    myResponseId: null,
+    responsesCount: 2,
   },
 ])
 
@@ -86,16 +128,28 @@ const selectedFilter = ref<'all' | 'new' | 'viewed' | 'responded'>('all')
 
 const filteredRequests = computed(() => {
   if (selectedFilter.value === 'all') return requests.value
-  return requests.value.filter((request) => request.status === selectedFilter.value)
+
+  return requests.value.filter((request) => {
+    switch (selectedFilter.value) {
+      case 'new':
+        return !request.myResponseId && !request.viewedByMe
+      case 'viewed':
+        return !request.myResponseId && request.viewedByMe
+      case 'responded':
+        return !!request.myResponseId
+      default:
+        return true
+    }
+  })
 })
 
-const newRequestsCount = computed(() => requests.value.filter((r) => r.status === 'new').length)
+const newRequestsCount = computed(
+  () => requests.value.filter((r) => !r.myResponseId && !r.viewedByMe).length,
+)
 const viewedRequestsCount = computed(
-  () => requests.value.filter((r) => r.status === 'viewed').length,
+  () => requests.value.filter((r) => !r.myResponseId && r.viewedByMe).length,
 )
-const respondedRequestsCount = computed(
-  () => requests.value.filter((r) => r.status === 'responded').length,
-)
+const respondedRequestsCount = computed(() => requests.value.filter((r) => !!r.myResponseId).length)
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
@@ -110,36 +164,61 @@ const formatDate = (dateString: string) => {
   return `${diffDays} дн. назад`
 }
 
-const getStatusInfo = (status: string) => {
+const getRequestStatusInfo = (status: string) => {
   switch (status) {
-    case 'new':
-      return { color: 'bg-telegram-accent', text: 'Новая' }
-    case 'viewed':
-      return { color: 'bg-orange-500', text: 'Просмотрена' }
-    case 'responded':
-      return { color: 'bg-telegram-success', text: 'Отклик отправлен' }
+    case 'OPEN':
+      return { color: 'bg-telegram-success', text: 'Открыта' }
+    case 'MATCHED':
+      return { color: 'bg-blue-500', text: 'Найден репетитор' }
+    case 'CLOSED':
+      return { color: 'bg-telegram-textSecondary', text: 'Закрыта' }
+    case 'CANCELLED':
+      return { color: 'bg-red-500', text: 'Отменена' }
     default:
       return { color: 'bg-telegram-textSecondary', text: 'Неизвестно' }
   }
 }
 
+const getMyStatusInfo = (request: any) => {
+  if (request.myResponseId) {
+    return { color: 'bg-telegram-success', text: 'Отклик отправлен' }
+  } else if (request.viewedByMe) {
+    return { color: 'bg-orange-500', text: 'Просмотрена' }
+  } else {
+    return { color: 'bg-telegram-accent', text: 'Новая' }
+  }
+}
+
 const getUrgencyInfo = (urgency: string) => {
-  return urgency === 'urgent'
-    ? { color: 'text-red-500', text: 'Срочно', icon: '🔥' }
-    : { color: 'text-telegram-textSecondary', text: 'Обычная', icon: '⏰' }
+  switch (urgency) {
+    case 'HIGH':
+      return { color: 'text-red-500', text: 'Высокая', icon: '🔥' }
+    case 'MEDIUM':
+      return { color: 'text-orange-500', text: 'Средняя', icon: '⚡' }
+    case 'LOW':
+      return { color: 'text-telegram-textSecondary', text: 'Низкая', icon: '⏰' }
+    default:
+      return { color: 'text-telegram-textSecondary', text: 'Не указана', icon: '⏰' }
+  }
+}
+
+const formatPrice = (priceInKopecks: number) => {
+  return Math.round(priceInKopecks / 100)
 }
 
 const viewRequest = (request: any) => {
   telegramStore.hapticFeedback('light')
-  if (request.status === 'new') {
-    request.status = 'viewed'
+  if (!request.viewedByMe) {
+    request.viewedByMe = true
   }
   console.log('Просмотр заявки:', request.id)
 }
 
 const respondToRequest = (request: any) => {
   telegramStore.hapticFeedback('medium')
-  request.status = 'responded'
+  // Создаем RequestResponse
+  request.myResponseId = `response-${Date.now()}`
+  request.viewedByMe = true
   console.log('Отклик на заявку:', request.id)
 }
 
@@ -245,12 +324,14 @@ const contactStudent = (request: any) => {
             <div
               class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-semibold"
             >
-              {{ request.student.avatar }}
+              {{ request.student.name.charAt(0) }}
             </div>
             <div>
               <h3 class="text-telegram-text font-semibold">{{ request.student.name }}</h3>
               <div class="flex items-center space-x-2">
-                <p class="text-telegram-textSecondary text-sm">{{ request.subject }}</p>
+                <p class="text-telegram-textSecondary text-sm">
+                  {{ request.subject.name }} • {{ request.teacher.fullName }}
+                </p>
                 <div class="flex items-center space-x-1">
                   <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                     <path
@@ -266,9 +347,9 @@ const contactStudent = (request: any) => {
           </div>
           <div class="flex flex-col items-end space-y-2">
             <div class="flex items-center space-x-2">
-              <div :class="[getStatusInfo(request.status).color, 'w-2 h-2 rounded-full']"></div>
+              <div :class="[getMyStatusInfo(request).color, 'w-2 h-2 rounded-full']"></div>
               <span class="text-telegram-textSecondary text-xs">{{
-                getStatusInfo(request.status).text
+                getMyStatusInfo(request).text
               }}</span>
             </div>
             <div class="flex items-center space-x-1">
@@ -287,18 +368,25 @@ const contactStudent = (request: any) => {
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>
             <p class="text-telegram-textSecondary text-xs mb-1">Бюджет</p>
-            <p class="text-telegram-success font-semibold">{{ request.budget }}₽/занятие</p>
+            <p class="text-telegram-success font-semibold">до {{ formatPrice(request.budget) }}₽</p>
           </div>
           <div>
-            <p class="text-telegram-textSecondary text-xs mb-1">Формат</p>
-            <p class="text-telegram-text font-semibold">{{ request.format }}</p>
+            <p class="text-telegram-textSecondary text-xs mb-1">Статус заявки</p>
+            <div class="flex items-center space-x-2">
+              <div
+                :class="[getRequestStatusInfo(request.status).color, 'w-2 h-2 rounded-full']"
+              ></div>
+              <span class="text-telegram-text text-sm">{{
+                getRequestStatusInfo(request.status).text
+              }}</span>
+            </div>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <p class="text-telegram-textSecondary text-xs mb-1">График</p>
-            <p class="text-telegram-text text-sm">{{ request.schedule }}</p>
+            <p class="text-telegram-textSecondary text-xs mb-1">Откликов</p>
+            <p class="text-telegram-text text-sm">{{ request.responsesCount }}</p>
           </div>
           <div>
             <p class="text-telegram-textSecondary text-xs mb-1">Опубликована</p>
@@ -306,39 +394,14 @@ const contactStudent = (request: any) => {
           </div>
         </div>
 
-        <!-- Teacher requirement -->
-        <div
-          v-if="request.teacherName"
-          class="bg-telegram-accent/10 border border-telegram-accent/20 rounded-lg p-3 mb-4"
-        >
-          <div class="flex items-center space-x-2">
-            <svg
-              class="w-4 h-4 text-telegram-accent"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-            <span class="text-telegram-accent font-medium text-sm">
-              Нужен преподаватель: {{ request.teacherName }}
-            </span>
-          </div>
-        </div>
-
         <!-- Urgency badge -->
         <div
-          v-if="request.urgency === 'urgent'"
+          v-if="request.urgency === 'HIGH'"
           class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4"
         >
           <div class="flex items-center space-x-2">
             <span class="text-lg">🔥</span>
-            <span class="text-red-600 font-medium text-sm">Срочная заявка (+200₽)</span>
+            <span class="text-red-600 font-medium text-sm">Высокая срочность</span>
           </div>
         </div>
 
@@ -348,16 +411,16 @@ const contactStudent = (request: any) => {
             @click="viewRequest(request)"
             variant="secondary"
             class="flex-1"
-            :disabled="request.status === 'responded'"
+            :disabled="!!request.myResponseId"
           >
-            {{ request.status === 'responded' ? 'Просмотрено' : 'Подробнее' }}
+            {{ request.myResponseId ? 'Просмотрено' : 'Подробнее' }}
           </Button>
           <Button
             @click="respondToRequest(request)"
             class="flex-1"
-            :disabled="request.status === 'responded'"
+            :disabled="!!request.myResponseId || request.status !== 'OPEN'"
           >
-            {{ request.status === 'responded' ? 'Отклик отправлен' : 'Откликнуться' }}
+            {{ request.myResponseId ? 'Отклик отправлен' : 'Откликнуться' }}
           </Button>
         </div>
       </Card>

@@ -41,6 +41,7 @@ export interface Service {
   description?: string
   format: ServiceFormat[]
   availableTime: string[]
+  deadline?: string
   isActive: boolean
   createdAt: string
 }
@@ -60,8 +61,8 @@ export interface Order {
   budget: number
   urgency: OrderUrgency
   status: OrderStatus
-  createdAt: string
   deadline?: string
+  createdAt: string
 }
 
 export type OrderUrgency = 'today' | 'this_week' | 'not_urgent'

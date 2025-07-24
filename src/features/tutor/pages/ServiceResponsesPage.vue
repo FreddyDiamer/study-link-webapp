@@ -12,91 +12,122 @@ const telegramStore = useTelegramStore()
 const serviceId = ref(Number(route.params.id))
 const activeTab = ref<'new' | 'active' | 'completed'>('new')
 
-// Тестовые данные услуги
+// Данные услуги (Service)
 const service = ref({
-  id: 1,
-  title: 'Подготовка к ЕГЭ по математике',
-  subject: 'Математика',
-  level: 'ЕГЭ',
-  price: 2200,
+  id: '1',
+  tutorId: 'tutor-1',
+  subjectId: 'math-1',
+  teacherId: 'teacher-1',
+  price: 220000, // в копейках (2200 рублей)
+  description: 'Подготовка к ЕГЭ по математике',
+  workingHours: 'Пн-Пт 18:00-22:00',
+  status: 'ACTIVE',
+  deadline: null,
+  createdAt: '2024-01-10T10:00:00',
+  updatedAt: '2024-01-18T10:00:00',
+  // Связанные данные
+  subject: {
+    name: 'Математика',
+  },
+  teacher: {
+    fullName: 'Подготовка к ЕГЭ',
+  },
 })
 
-// Тестовые данные откликов
+// Отклики студентов на услугу (ServiceResponse)
 const responses = ref([
   {
-    id: 1,
-    student: {
-      name: 'Анна Петрова',
-      avatar: null,
-      grade: '11 класс',
-      location: 'Москва',
-    },
+    id: '1',
+    studentId: 'student-1',
+    serviceId: 'service-1',
     message:
       'Здравствуйте! Мне нужна помощь в подготовке к ЕГЭ по математике. Особенно сложно даются задания по геометрии.',
-    requestedFormat: 'Онлайн',
-    budget: 2200,
-    urgency: 'В течение недели',
-    createdAt: '2024-01-15T10:30:00Z',
-    status: 'new',
-    rating: null,
-    completedLessons: 0,
+    price: 220000, // студент согласен с ценой услуги
+    proposedDeadline: '2024-01-22T18:00:00',
+    status: 'PENDING',
+    createdAt: '2024-01-15T10:30:00',
+    updatedAt: '2024-01-15T10:30:00',
+    // Связанные данные
+    student: {
+      name: 'Анна Петрова',
+      rating: 4.5,
+    },
+    service: {
+      price: 220000,
+      subject: {
+        name: 'Математика',
+      },
+      teacher: {
+        fullName: 'Подготовка к ЕГЭ',
+      },
+    },
   },
   {
-    id: 2,
-    student: {
-      name: 'Максим Иванов',
-      avatar: null,
-      grade: '10 класс',
-      location: 'Санкт-Петербург',
-    },
+    id: '2',
+    studentId: 'student-2',
+    serviceId: 'service-1',
     message:
       'Нужна помощь с алгеброй, готовлюсь к ЕГЭ заранее. Хотелось бы заниматься 2 раза в неделю.',
-    requestedFormat: 'Онлайн',
-    budget: 2000,
-    urgency: 'Срочно',
-    createdAt: '2024-01-14T15:20:00Z',
-    status: 'active',
-    rating: 4.8,
-    completedLessons: 5,
-  },
-  {
-    id: 3,
+    price: 200000, // студент предложил меньше
+    proposedDeadline: '2024-01-20T16:00:00',
+    status: 'ACCEPTED',
+    createdAt: '2024-01-14T15:20:00',
+    updatedAt: '2024-01-15T09:30:00',
+    // Связанные данные
     student: {
-      name: 'София Козлова',
-      avatar: null,
-      grade: '11 класс',
-      location: 'Екатеринбург',
+      name: 'Максим Иванов',
+      rating: 4.8,
     },
-    message: 'Занимались 3 месяца, очень довольна результатом! Спасибо за качественную подготовку.',
-    requestedFormat: 'Онлайн',
-    budget: 2200,
-    urgency: 'В течение месяца',
-    createdAt: '2024-01-10T09:15:00Z',
-    status: 'completed',
-    rating: 5.0,
-    completedLessons: 12,
+    service: {
+      price: 220000,
+      subject: {
+        name: 'Математика',
+      },
+      teacher: {
+        fullName: 'Подготовка к ЕГЭ',
+      },
+    },
   },
   {
-    id: 4,
+    id: '3',
+    studentId: 'student-3',
+    serviceId: 'service-1',
+    message: 'Мне нужна интенсивная подготовка к ЕГЭ, до экзамена осталось 3 месяца.',
+    price: 250000, // студент предложил больше
+    proposedDeadline: '2024-01-25T19:00:00',
+    status: 'PENDING',
+    createdAt: '2024-01-13T18:45:00',
+    updatedAt: '2024-01-13T18:45:00',
+    // Связанные данные
     student: {
       name: 'Дмитрий Волков',
-      avatar: null,
-      grade: '11 класс',
-      location: 'Новосибирск',
+      rating: 4.6,
     },
-    message: 'Мне нужна интенсивная подготовка к ЕГЭ, до экзамена осталось 3 месяца.',
-    requestedFormat: 'Онлайн',
-    budget: 2500,
-    urgency: 'Срочно',
-    createdAt: '2024-01-13T18:45:00Z',
-    status: 'new',
-    rating: null,
-    completedLessons: 0,
+    service: {
+      price: 220000,
+      subject: {
+        name: 'Математика',
+      },
+      teacher: {
+        fullName: 'Подготовка к ЕГЭ',
+      },
+    },
   },
 ])
 
 const filteredResponses = computed(() => {
-  return responses.value.filter((response) => response.status === activeTab.value)
+  switch (activeTab.value) {
+    case 'new':
+      return responses.value.filter((response) => response.status === 'PENDING')
+    case 'active':
+      return responses.value.filter((response) => response.status === 'ACCEPTED')
+    case 'completed':
+      return responses.value.filter(
+        (response) => response.status === 'REJECTED' || response.status === 'EXPIRED',
+      )
+    default:
+      return responses.value
+  }
 })
 
 const getStatusLabel = (status: string): string => {
@@ -135,6 +166,54 @@ const formatDate = (dateString: string): string => {
   })
 }
 
+const formatPrice = (priceInKopecks: number) => {
+  return Math.round(priceInKopecks / 100)
+}
+
+const getResponseStatusInfo = (status: string) => {
+  switch (status) {
+    case 'PENDING':
+      return { color: 'bg-orange-500', text: 'Ожидает ответа', textColor: 'text-orange-600' }
+    case 'ACCEPTED':
+      return { color: 'bg-telegram-success', text: 'Принят', textColor: 'text-telegram-success' }
+    case 'REJECTED':
+      return { color: 'bg-red-500', text: 'Отклонен', textColor: 'text-red-600' }
+    case 'EXPIRED':
+      return {
+        color: 'bg-telegram-textSecondary',
+        text: 'Истек',
+        textColor: 'text-telegram-textSecondary',
+      }
+    default:
+      return {
+        color: 'bg-telegram-textSecondary',
+        text: 'Неизвестно',
+        textColor: 'text-telegram-textSecondary',
+      }
+  }
+}
+
+const formatDeadline = (dateString: string | null) => {
+  if (!dateString) return null
+
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = date.getTime() - now.getTime()
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffHours / 24)
+
+  if (diffMs < 0) return 'Просрочен'
+  if (diffHours < 1) return 'Скоро'
+  if (diffHours < 24) return `Через ${diffHours} ч.`
+  if (diffDays === 1) return 'Завтра'
+  return date.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 const goBack = () => {
   telegramStore.hapticFeedback('light')
   router.back()
@@ -142,15 +221,18 @@ const goBack = () => {
 
 const acceptResponse = (response: any) => {
   telegramStore.hapticFeedback('medium')
-  response.status = 'active'
+  response.status = 'ACCEPTED'
+  response.updatedAt = new Date().toISOString()
   console.log('Отклик принят:', response.student.name)
-  // TODO: API call
+  // TODO: API call для создания Deal
 }
 
 const rejectResponse = (response: any) => {
   telegramStore.hapticFeedback('heavy')
+  response.status = 'REJECTED'
+  response.updatedAt = new Date().toISOString()
   console.log('Отклик отклонен:', response.student.name)
-  // TODO: API call и удаление из списка
+  // TODO: API call
 }
 
 const contactStudent = (response: any) => {
@@ -194,9 +276,11 @@ onMounted(() => {
         </svg>
       </button>
       <div class="flex-1">
-        <h1 class="text-xl font-bold text-telegram-text mb-1">{{ service.title }}</h1>
+        <h1 class="text-xl font-bold text-telegram-text mb-1">
+          {{ service.subject.name }} • {{ service.teacher.fullName }}
+        </h1>
         <p class="text-telegram-textSecondary text-sm">
-          {{ service.subject }} • {{ service.price }}₽
+          {{ service.description }} • {{ formatPrice(service.price) }}₽
         </p>
       </div>
     </div>
@@ -214,11 +298,11 @@ onMounted(() => {
       >
         Новые отклики
         <span
-          v-if="responses.filter((r) => r.status === 'new').length > 0"
+          v-if="responses.filter((r) => r.status === 'PENDING').length > 0"
           class="ml-2 px-2 py-0.5 rounded-full text-xs"
           :class="activeTab === 'new' ? 'bg-white/20' : 'bg-telegram-accent text-white'"
         >
-          {{ responses.filter((r) => r.status === 'new').length }}
+          {{ responses.filter((r) => r.status === 'PENDING').length }}
         </span>
       </button>
       <button
@@ -232,11 +316,11 @@ onMounted(() => {
       >
         Активные
         <span
-          v-if="responses.filter((r) => r.status === 'active').length > 0"
+          v-if="responses.filter((r) => r.status === 'ACCEPTED').length > 0"
           class="ml-2 px-2 py-0.5 rounded-full text-xs"
           :class="activeTab === 'active' ? 'bg-white/20' : 'bg-telegram-accent text-white'"
         >
-          {{ responses.filter((r) => r.status === 'active').length }}
+          {{ responses.filter((r) => r.status === 'ACCEPTED').length }}
         </span>
       </button>
       <button
@@ -250,11 +334,13 @@ onMounted(() => {
       >
         Завершенные
         <span
-          v-if="responses.filter((r) => r.status === 'completed').length > 0"
+          v-if="
+            responses.filter((r) => r.status === 'REJECTED' || r.status === 'EXPIRED').length > 0
+          "
           class="ml-2 px-2 py-0.5 rounded-full text-xs"
           :class="activeTab === 'completed' ? 'bg-white/20' : 'bg-telegram-accent text-white'"
         >
-          {{ responses.filter((r) => r.status === 'completed').length }}
+          {{ responses.filter((r) => r.status === 'REJECTED' || r.status === 'EXPIRED').length }}
         </span>
       </button>
     </div>
@@ -280,9 +366,12 @@ onMounted(() => {
             <div>
               <h3 class="font-semibold text-telegram-text">{{ response.student.name }}</h3>
               <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
-                <span>{{ response.student.grade }}</span>
-                <span>•</span>
-                <span>{{ response.student.location }}</span>
+                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                  />
+                </svg>
+                <span>{{ response.student.rating }}</span>
               </div>
             </div>
           </div>
@@ -291,14 +380,15 @@ onMounted(() => {
             <span class="text-xs text-telegram-textSecondary">{{
               formatDate(response.createdAt)
             }}</span>
-            <span
+            <div
               :class="[
                 'px-2 py-1 text-xs font-medium rounded-full',
-                getUrgencyClass(response.urgency),
+                getResponseStatusInfo(response.status).color,
+                'text-white',
               ]"
             >
-              {{ response.urgency }}
-            </span>
+              {{ getResponseStatusInfo(response.status).text }}
+            </div>
           </div>
         </div>
 
@@ -307,40 +397,36 @@ onMounted(() => {
           <p class="text-telegram-text text-sm">{{ response.message }}</p>
         </div>
 
-        <!-- Request Details -->
+        <!-- Price Details -->
         <div class="grid grid-cols-2 gap-4 mb-4 p-3 bg-telegram-secondary/50 rounded-lg">
           <div>
-            <span class="text-xs text-telegram-textSecondary">Формат:</span>
-            <div class="text-sm font-medium text-telegram-text">{{ response.requestedFormat }}</div>
+            <span class="text-xs text-telegram-textSecondary">Предложенная цена:</span>
+            <div class="text-sm font-medium text-telegram-success">
+              {{ formatPrice(response.price) }}₽
+            </div>
           </div>
           <div>
-            <span class="text-xs text-telegram-textSecondary">Бюджет:</span>
-            <div class="text-sm font-medium text-telegram-success">{{ response.budget }}₽</div>
+            <span class="text-xs text-telegram-textSecondary">Цена услуги:</span>
+            <div class="text-sm font-medium text-telegram-text">
+              {{ formatPrice(response.service.price) }}₽
+            </div>
           </div>
         </div>
 
-        <!-- Progress (for active and completed) -->
-        <div v-if="response.status !== 'new'" class="mb-4 p-3 bg-telegram-secondary/30 rounded-lg">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm text-telegram-textSecondary">Прогресс</span>
-            <span v-if="response.rating" class="flex items-center space-x-1">
-              <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                />
-              </svg>
-              <span class="text-sm font-medium text-telegram-text">{{ response.rating }}</span>
+        <!-- Deadline -->
+        <div v-if="response.proposedDeadline" class="mb-4 p-3 bg-telegram-secondary/30 rounded-lg">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-telegram-textSecondary">Предложенный дедлайн:</span>
+            <span class="text-sm font-medium text-telegram-text">
+              {{ formatDeadline(response.proposedDeadline) }}
             </span>
-          </div>
-          <div class="text-sm text-telegram-text">
-            Проведено уроков: <span class="font-medium">{{ response.completedLessons }}</span>
           </div>
         </div>
 
         <!-- Actions -->
         <div class="flex space-x-3">
-          <!-- New Response Actions -->
-          <template v-if="response.status === 'new'">
+          <!-- Pending Response Actions -->
+          <template v-if="response.status === 'PENDING'">
             <Button @click="acceptResponse(response)" class="flex-1">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path

@@ -5,39 +5,43 @@ import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
-import { Select, type SelectOption } from '@/shared/components/ui'
+import { Select, type SelectOption, Modal } from '@/shared/components/ui'
 
-// Types
-interface Order {
+// Types based on Prisma Deal model
+interface TutorDeal {
   id: string
-  title: string
+  studentId: string
+  tutorId: string
+  subjectId: string
+  teacherId: string
+  price: number // в копейках
+  deadline: string | null
+  status: 'PENDING' | 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+  serviceResponseId: string | null
+  requestResponseId: string | null
   description: string
-  price: number
-  priceType: 'hour' | 'task' | 'month'
-  subject: string
-  teacher: string
+  createdAt: string
+  updatedAt: string
+  // Связанные данные
   student: {
-    id: string
     name: string
     rating: number
-    completedOrders: number
   }
-  urgency: 'today' | 'this_week' | 'not_urgent'
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled'
-  format: 'online' | 'offline' | 'both'
-  deadline?: string
-  createdAt: string
-  tags: string[]
+  subject: {
+    name: string
+  }
+  teacher: {
+    fullName: string
+  }
 }
 
-interface OrderFilters {
+interface DealFilters {
   search: string
   subject: string | null
   teacher: string | null
-  status: 'all' | 'pending' | 'in_progress' | 'completed' | 'cancelled'
-  urgency: 'all' | 'today' | 'this_week' | 'not_urgent'
-  format: 'all' | 'online' | 'offline' | 'both'
-  sortBy: 'price' | 'urgency' | 'date' | 'deadline'
+  status: 'all' | 'PENDING' | 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+  source: 'all' | 'request' | 'service'
+  sortBy: 'price' | 'date' | 'deadline' | 'updated'
   sortOrder: 'asc' | 'desc'
 }
 
@@ -49,73 +53,175 @@ const telegramStore = useTelegramStore()
 // State
 const isLoading = ref(false)
 const error = ref<string | null>(null)
-const orders = ref<Order[]>([])
-const availableSubjects = ref<SelectOption[]>([])
-const availableTeachers = ref<SelectOption[]>([])
-const sortOptions = ref<SelectOption[]>([])
-const sortOrderOptions = ref<SelectOption[]>([])
 const showFilters = ref(false)
+const showAcceptModal = ref(false)
+const selectedDeal = ref<TutorDeal | null>(null)
+const isAccepting = ref(false)
+const tutorComment = ref('')
+
+// Mock data - активные сделки репетитора (Deal)
+const deals = ref<TutorDeal[]>([
+  {
+    id: '1',
+    studentId: 'student-1',
+    tutorId: 'tutor-1',
+    subjectId: 'math-1',
+    teacherId: 'teacher-1',
+    price: 120000, // в копейках (1200 рублей)
+    deadline: '2024-01-25T18:00:00',
+    status: 'IN_PROGRESS',
+    serviceResponseId: null,
+    requestResponseId: 'req-resp-1',
+    description:
+      'Нужна помощь в подготовке к ЕГЭ по математике. Особенно сложно даются задачи с параметрами и стереометрия. Хотелось бы разобрать типовые задания и научиться решать их самостоятельно.',
+    createdAt: '2024-01-15T10:30:00',
+    updatedAt: '2024-01-18T14:30:00',
+    // Связанные данные
+    student: {
+      name: 'Мария Васильева',
+      rating: 4.8,
+    },
+    subject: {
+      name: 'Математика',
+    },
+    teacher: {
+      fullName: 'Подготовка к ЕГЭ',
+    },
+  },
+  {
+    id: '2',
+    studentId: 'student-2',
+    tutorId: 'tutor-1',
+    subjectId: 'physics-1',
+    teacherId: 'teacher-2',
+    price: 150000, // в копейках (1500 рублей)
+    deadline: '2024-01-22T16:00:00',
+    status: 'ACCEPTED',
+    serviceResponseId: 'srv-resp-1',
+    requestResponseId: null,
+    description:
+      'Готовлюсь к поступлению в технический университет. Нужно подтянуть механику и термодинамику, а также разобрать задачи из сборника Чертова.',
+    createdAt: '2024-01-17T09:15:00',
+    updatedAt: '2024-01-17T14:20:00',
+    // Связанные данные
+    student: {
+      name: 'Алексей Козлов',
+      rating: 4.5,
+    },
+    subject: {
+      name: 'Физика',
+    },
+    teacher: {
+      fullName: 'Университетская физика',
+    },
+  },
+  {
+    id: '3',
+    studentId: 'student-3',
+    tutorId: 'tutor-1',
+    subjectId: 'chemistry-1',
+    teacherId: 'teacher-3',
+    price: 100000, // в копейках (1000 рублей)
+    deadline: null,
+    status: 'COMPLETED',
+    serviceResponseId: null,
+    requestResponseId: 'req-resp-2',
+    description:
+      'Изучаю органическую химию в 10 классе. Нужна помощь с механизмами реакций и номенклатурой органических соединений.',
+    createdAt: '2024-01-10T14:20:00',
+    updatedAt: '2024-01-18T18:30:00',
+    // Связанные данные
+    student: {
+      name: 'София Петрова',
+      rating: 5.0,
+    },
+    subject: {
+      name: 'Химия',
+    },
+    teacher: {
+      fullName: 'Органическая химия',
+    },
+  },
+])
 
 // Filters
-const filters = ref<OrderFilters>({
+const filters = ref<DealFilters>({
   search: '',
   subject: null,
   teacher: null,
   status: 'all',
-  urgency: 'all',
-  format: 'all',
+  source: 'all',
   sortBy: 'date',
   sortOrder: 'desc',
 })
 
-// Computed
-const pageTitle = computed(() => {
-  if (filters.value.subject) {
-    return `Заказы по ${filters.value.subject.toLowerCase()}`
-  }
-  return 'Все заказы'
-})
+// Filter options
+const availableSubjects = ref<SelectOption[]>([])
+const availableTeachers = ref<SelectOption[]>([])
+const sortOptions = ref<SelectOption[]>([
+  { value: 'price', label: 'По цене' },
+  { value: 'date', label: 'По дате создания' },
+  { value: 'deadline', label: 'По дедлайну' },
+  { value: 'updated', label: 'По обновлению' },
+])
+const sortOrderOptions = ref<SelectOption[]>([
+  { value: 'asc', label: 'По возрастанию' },
+  { value: 'desc', label: 'По убыванию' },
+])
 
-const filteredOrders = computed(() => {
-  let result = [...orders.value]
+// Simple filtering
+const activeTab = ref<'all' | 'active' | 'completed'>('all')
+
+const filteredDeals = computed(() => {
+  let result = [...deals.value]
+
+  // Tab filter
+  switch (activeTab.value) {
+    case 'active':
+      result = result.filter(
+        (deal) =>
+          deal.status === 'PENDING' || deal.status === 'ACCEPTED' || deal.status === 'IN_PROGRESS',
+      )
+      break
+    case 'completed':
+      result = result.filter((deal) => deal.status === 'COMPLETED' || deal.status === 'CANCELLED')
+      break
+  }
 
   // Search filter
   if (filters.value.search.trim()) {
     const searchTerm = filters.value.search.trim().toLowerCase()
     result = result.filter(
-      (order) =>
-        order.title.toLowerCase().includes(searchTerm) ||
-        order.description.toLowerCase().includes(searchTerm) ||
-        order.student.name.toLowerCase().includes(searchTerm) ||
-        order.subject.toLowerCase().includes(searchTerm),
+      (deal) =>
+        deal.subject.name.toLowerCase().includes(searchTerm) ||
+        deal.teacher.fullName.toLowerCase().includes(searchTerm) ||
+        deal.student.name.toLowerCase().includes(searchTerm) ||
+        deal.description.toLowerCase().includes(searchTerm),
     )
   }
 
   // Subject filter
   if (filters.value.subject) {
-    result = result.filter((order) => order.subject === filters.value.subject)
+    result = result.filter((deal) => deal.subject.name === filters.value.subject)
   }
 
   // Teacher filter
   if (filters.value.teacher) {
-    result = result.filter((order) => order.student.name === filters.value.teacher)
+    result = result.filter((deal) => deal.teacher.fullName === filters.value.teacher)
   }
 
   // Status filter
   if (filters.value.status !== 'all') {
-    result = result.filter((order) => order.status === filters.value.status)
+    result = result.filter((deal) => deal.status === filters.value.status)
   }
 
-  // Urgency filter
-  if (filters.value.urgency !== 'all') {
-    result = result.filter((order) => order.urgency === filters.value.urgency)
-  }
-
-  // Format filter
-  if (filters.value.format !== 'all') {
-    result = result.filter(
-      (order) => order.format === filters.value.format || order.format === 'both',
-    )
+  // Source filter
+  if (filters.value.source !== 'all') {
+    if (filters.value.source === 'request') {
+      result = result.filter((deal) => deal.requestResponseId !== null)
+    } else if (filters.value.source === 'service') {
+      result = result.filter((deal) => deal.serviceResponseId !== null)
+    }
   }
 
   // Sorting
@@ -126,10 +232,6 @@ const filteredOrders = computed(() => {
       case 'price':
         comparison = a.price - b.price
         break
-      case 'urgency':
-        const urgencyOrder = { today: 3, this_week: 2, not_urgent: 1 }
-        comparison = urgencyOrder[a.urgency] - urgencyOrder[b.urgency]
-        break
       case 'date':
         comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         break
@@ -137,6 +239,9 @@ const filteredOrders = computed(() => {
         const aDeadline = a.deadline ? new Date(a.deadline).getTime() : Infinity
         const bDeadline = b.deadline ? new Date(b.deadline).getTime() : Infinity
         comparison = aDeadline - bDeadline
+        break
+      case 'updated':
+        comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
         break
     }
 
@@ -146,15 +251,96 @@ const filteredOrders = computed(() => {
   return result
 })
 
+// Utility functions
+const formatPrice = (priceInKopecks: number) => {
+  return Math.round(priceInKopecks / 100)
+}
+
+const getDealStatusInfo = (status: string) => {
+  switch (status) {
+    case 'PENDING':
+      return {
+        color: 'bg-orange-500',
+        text: 'Ожидает подтверждения',
+        textColor: 'text-orange-600',
+        bg: 'bg-orange-100',
+      }
+    case 'ACCEPTED':
+      return {
+        color: 'bg-blue-500',
+        text: 'Принята',
+        textColor: 'text-blue-600',
+        bg: 'bg-blue-100',
+      }
+    case 'IN_PROGRESS':
+      return {
+        color: 'bg-telegram-success',
+        text: 'В процессе',
+        textColor: 'text-telegram-success',
+        bg: 'bg-green-100',
+      }
+    case 'COMPLETED':
+      return {
+        color: 'bg-telegram-textSecondary',
+        text: 'Завершена',
+        textColor: 'text-telegram-textSecondary',
+        bg: 'bg-gray-100',
+      }
+    case 'CANCELLED':
+      return { color: 'bg-red-500', text: 'Отменена', textColor: 'text-red-600', bg: 'bg-red-100' }
+    default:
+      return {
+        color: 'bg-telegram-textSecondary',
+        text: 'Неизвестно',
+        textColor: 'text-telegram-textSecondary',
+        bg: 'bg-gray-100',
+      }
+  }
+}
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffHours / 24)
+
+  if (diffHours < 1) return 'Только что'
+  if (diffHours < 24) return `${diffHours} ч. назад`
+  if (diffDays === 1) return 'Вчера'
+  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+}
+
+const viewDealDetails = (deal: TutorDeal) => {
+  telegramStore.hapticFeedback('light')
+  console.log('Просмотр сделки:', deal.id)
+}
+
+const startLesson = (deal: TutorDeal) => {
+  telegramStore.hapticFeedback('light')
+  console.log('Начать урок с:', deal.student.name)
+}
+
+// Computed
+const pageTitle = computed(() => {
+  if (filters.value.subject) {
+    return `Заказы по ${filters.value.subject.toLowerCase()}`
+  }
+  return 'Все заказы'
+})
+
+const filteredOrders = computed(() => filteredDeals.value)
+
 const resultStats = computed(() => ({
-  total: filteredOrders.value.length,
-  pending: filteredOrders.value.filter((o) => o.status === 'pending').length,
-  inProgress: filteredOrders.value.filter((o) => o.status === 'in_progress').length,
-  subjects: [...new Set(filteredOrders.value.map((o) => o.subject))].length,
+  total: filteredDeals.value.length,
+  pending: filteredDeals.value.filter((d) => d.status === 'PENDING').length,
+  inProgress: filteredDeals.value.filter((d) => d.status === 'IN_PROGRESS').length,
+  subjects: [...new Set(filteredDeals.value.map((d) => d.subject.name))].length,
   averagePrice:
-    filteredOrders.value.length > 0
+    filteredDeals.value.length > 0
       ? Math.round(
-          filteredOrders.value.reduce((sum, o) => sum + o.price, 0) / filteredOrders.value.length,
+          filteredDeals.value.reduce((sum, d) => sum + formatPrice(d.price), 0) /
+            filteredDeals.value.length,
         )
       : 0,
 }))
@@ -166,8 +352,6 @@ const loadOrders = async () => {
 
   try {
     await new Promise((resolve) => setTimeout(resolve, 800))
-
-    orders.value = generateMockOrders()
     extractFiltersData()
   } catch (err: any) {
     error.value = err.message || 'Ошибка загрузки заказов'
@@ -177,73 +361,16 @@ const loadOrders = async () => {
 }
 
 const extractFiltersData = () => {
-  availableSubjects.value = [...orders.value.map((o) => ({ value: o.id, label: o.subject }))]
-  availableTeachers.value = [...new Set(orders.value.map((o) => o.teacher))].map((teacher) => ({
-    value: teacher,
-    label: teacher,
+  availableSubjects.value = [...new Set(deals.value.map((d) => d.subject.name))].map((subject) => ({
+    value: subject,
+    label: subject,
   }))
-  sortOptions.value = [
-    { value: 'rating', label: 'По рейтингу' },
-    { value: 'price', label: 'По цене' },
-    { value: 'experience', label: 'По опыту' },
-    { value: 'date', label: 'По дате' },
-  ]
-  sortOrderOptions.value = [
-    { value: 'asc', label: 'По возрастанию' },
-    { value: 'desc', label: 'По убыванию' },
-  ]
-}
-
-const generateMockOrders = (): Order[] => {
-  const subjects = ['Математика', 'Физика', 'Химия', 'Английский язык', 'История', 'Биология']
-  const formats = ['online', 'offline', 'both'] as const
-  const urgencies = ['today', 'this_week', 'not_urgent'] as const
-  const statuses = ['pending', 'in_progress', 'completed', 'cancelled'] as const
-  const teachers = [
-    'Анна Петрова',
-    'Елена Иванова',
-    'Мария Сидорова',
-    'Ксения Козлова',
-    'Дарья Морозова',
-    'София Волкова',
-  ] as const
-
-  return Array.from({ length: 32 }, (_, i) => {
-    const createdDate = new Date()
-    createdDate.setDate(createdDate.getDate() - Math.floor(Math.random() * 30))
-
-    const hasDeadline = Math.random() > 0.3
-    const deadline = hasDeadline
-      ? new Date(createdDate.getTime() + Math.random() * 14 * 24 * 60 * 60 * 1000)
-      : undefined
-
-    const priceTypes: ('hour' | 'task' | 'month')[] = ['hour', 'task', 'month']
-
-    return {
-      id: `order-${i + 1}`,
-      title: `${['Помощь с ДЗ', 'Подготовка к экзамену', 'Разбор темы', 'Консультация'][i % 4]} по ${subjects[i % subjects.length]}`,
-      description: `Требуется помощь с ${subjects[i % subjects.length].toLowerCase()}. ${['Срочное задание', 'Подготовка к контрольной', 'Разбор сложных задач', 'Объяснение теории'][i % 4]}.`,
-      price: Math.floor(Math.random() * 3000) + 1000,
-      priceType: priceTypes[i % 3],
-      subject: subjects[i % subjects.length],
-      teacher: teachers[i % teachers.length],
-      student: {
-        id: `student-${i + 1}`,
-        name: `${['Анна', 'Елена', 'Мария', 'Ксения', 'Дарья', 'София'][i % 6]} ${['Петрова', 'Иванова', 'Сидорова', 'Козлова', 'Морозова', 'Волкова'][i % 6]}`,
-        rating: Math.round((Math.random() * 2 + 3) * 10) / 10,
-        completedOrders: Math.floor(Math.random() * 20) + 1,
-      },
-      urgency: urgencies[i % urgencies.length],
-      status: statuses[i % statuses.length],
-      format: formats[i % formats.length],
-      deadline: deadline?.toISOString(),
-      createdAt: createdDate.toISOString(),
-      tags: ['Срочно', 'ЕГЭ', 'ОГЭ', 'Контрольная', 'Олимпиада'].slice(
-        0,
-        Math.floor(Math.random() * 3) + 1,
-      ),
-    }
-  })
+  availableTeachers.value = [...new Set(deals.value.map((d) => d.teacher.fullName))].map(
+    (teacher) => ({
+      value: teacher,
+      label: teacher,
+    }),
+  )
 }
 
 const resetFilters = () => {
@@ -252,8 +379,7 @@ const resetFilters = () => {
     subject: null,
     teacher: null,
     status: 'all',
-    urgency: 'all',
-    format: 'all',
+    source: 'all',
     sortBy: 'date',
     sortOrder: 'desc',
   }
@@ -270,69 +396,60 @@ const goBack = () => {
   router.back()
 }
 
-const formatUrgency = (urgency: string) => {
-  const map = {
-    today: { text: 'Сегодня', color: 'text-red-500', bg: 'bg-red-100' },
-    this_week: { text: 'На этой неделе', color: 'text-yellow-600', bg: 'bg-yellow-100' },
-    not_urgent: { text: 'Не срочно', color: 'text-telegram-success', bg: 'bg-green-100' },
-  }
-  return (
-    map[urgency as keyof typeof map] || {
-      text: 'Неизвестно',
-      color: 'text-telegram-textSecondary',
-      bg: 'bg-telegram-secondary',
-    }
-  )
-}
-
 const formatStatus = (status: string) => {
-  const map = {
-    pending: { text: 'Ожидание', color: 'text-yellow-600', bg: 'bg-yellow-100' },
-    in_progress: { text: 'В работе', color: 'text-blue-600', bg: 'bg-blue-100' },
-    completed: { text: 'Завершен', color: 'text-telegram-success', bg: 'bg-green-100' },
-    cancelled: { text: 'Отменен', color: 'text-red-500', bg: 'bg-red-100' },
-  }
-  return (
-    map[status as keyof typeof map] || {
-      text: 'Неизвестно',
-      color: 'text-telegram-textSecondary',
-      bg: 'bg-telegram-secondary',
+  return getDealStatusInfo(status)
+}
+
+const respondToOrder = (deal: TutorDeal) => {
+  telegramStore.hapticFeedback('medium')
+  selectedDeal.value = deal
+  showAcceptModal.value = true
+}
+
+const handleAcceptDeal = async () => {
+  if (!selectedDeal.value) return
+
+  isAccepting.value = true
+  telegramStore.hapticFeedback('medium')
+
+  try {
+    // Simulate API call with tutor comment
+    const responseData = {
+      dealId: selectedDeal.value.id,
+      tutorComment: tutorComment.value.trim(),
     }
-  )
-}
 
-const formatFormat = (format: string) => {
-  const map = {
-    online: '💻 Онлайн',
-    offline: '🏫 Очно',
-    both: '🔄 Любой формат',
+    console.log('Отклик репетитора:', responseData)
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+
+    // Update deal status in mock data
+    const dealIndex = deals.value.findIndex((d) => d.id === selectedDeal.value!.id)
+    if (dealIndex !== -1) {
+      deals.value[dealIndex].status = 'ACCEPTED'
+      deals.value[dealIndex].updatedAt = new Date().toISOString()
+    }
+
+    telegramStore.hapticFeedback('success')
+    showAcceptModal.value = false
+    selectedDeal.value = null
+    tutorComment.value = ''
+
+    // Show success message
+    telegramStore.showAlert('Отклик отправлен! Студент получит уведомление.')
+  } catch (error) {
+    console.error('Ошибка отправки отклика:', error)
+    telegramStore.hapticFeedback('error')
+  } finally {
+    isAccepting.value = false
   }
-  return map[format as keyof typeof map] || format
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date)
-}
-
-const respondToOrder = (order: Order) => {
-  telegramStore.hapticFeedback('medium')
-  console.log('Откликнуться на заказ:', order.title)
-}
-
-const viewOrderDetails = (order: Order) => {
-  telegramStore.hapticFeedback('light')
-  console.log('Просмотр деталей заказа:', order.title)
-}
-
-const contactStudent = (order: Order) => {
-  telegramStore.hapticFeedback('medium')
-  console.log('Связаться со студентом:', order.student.name)
+const handleCloseAcceptModal = () => {
+  if (!isAccepting.value) {
+    showAcceptModal.value = false
+    selectedDeal.value = null
+    tutorComment.value = ''
+  }
 }
 
 // Watchers
@@ -347,6 +464,14 @@ watch(
     }, 300)
   },
 )
+
+// Reset selected deal when modal closes
+watch(showAcceptModal, (isOpen) => {
+  if (!isOpen) {
+    selectedDeal.value = null
+    tutorComment.value = ''
+  }
+})
 
 // Lifecycle
 onMounted(() => {
@@ -401,7 +526,7 @@ onMounted(() => {
     <Card class="p-4 mb-4">
       <Input
         v-model="filters.search"
-        placeholder="Поиск заказов, предметов, студентов..."
+        placeholder="Поиск заказов по предметам, студентам, описанию..."
         class="w-full"
       >
         <template #prepend>
@@ -490,24 +615,17 @@ onMounted(() => {
 
     <!-- Orders List -->
     <div v-else-if="filteredOrders.length > 0" class="space-y-4">
-      <Card
-        v-for="order in filteredOrders"
-        :key="order.id"
-        class="p-4 hover:border-telegram-accent transition-colors cursor-pointer"
-        @click="viewOrderDetails(order)"
-      >
+      <Card v-for="order in filteredOrders" :key="order.id" class="p-4">
         <!-- Header -->
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1">
-            <h3 class="font-semibold text-telegram-text mb-1">{{ order.subject }}</h3>
-            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
-              <span>{{ order.teacher }}</span>
+            <h3 class="font-semibold text-telegram-text mb-1">{{ order.subject.name }}</h3>
+            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary mb-2">
+              <span>{{ order.teacher.fullName }}</span>
             </div>
           </div>
           <div class="text-right">
-            <div class="font-bold text-telegram-accent">
-              {{ order.price }}
-            </div>
+            <div class="font-bold text-telegram-accent">{{ formatPrice(order.price) }} ₽</div>
           </div>
         </div>
 
@@ -526,8 +644,6 @@ onMounted(() => {
           <div class="flex-1">
             <div class="font-medium text-telegram-text">{{ order.student.name }}</div>
             <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
-              <span>{{ order.student.completedOrders }} заказов</span>
-              <span>•</span>
               <div class="flex items-center space-x-1">
                 <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                   <path
@@ -540,7 +656,7 @@ onMounted(() => {
           </div>
           <div class="text-right">
             <span
-              :class="[formatStatus(order.status).color, formatStatus(order.status).bg]"
+              :class="[formatStatus(order.status).textColor, formatStatus(order.status).bg]"
               class="text-xs px-2 py-1 rounded-full font-medium"
             >
               {{ formatStatus(order.status).text }}
@@ -548,8 +664,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Description -->
-        <p class="text-telegram-textSecondary text-sm mb-3 line-clamp-2">
+        <p class="text-sm line-clamp-5 leading-relaxed mb-3">
           {{ order.description }}
         </p>
 
@@ -559,43 +674,10 @@ onMounted(() => {
           <span v-if="order.deadline">Дедлайн: {{ formatDate(order.deadline) }}</span>
         </div>
 
-        <!-- Tags -->
-        <div class="flex flex-wrap gap-2 mb-3">
-          <span
-            v-for="tag in order.tags"
-            :key="tag"
-            class="px-2 py-1 bg-telegram-secondary text-telegram-text text-xs rounded-lg"
-          >
-            {{ tag }}
-          </span>
-        </div>
-
         <!-- Actions -->
-        <div class="flex space-x-2 pt-3 border-t border-telegram-border">
-          <Button
-            v-if="order.status === 'pending'"
-            @click.stop="respondToOrder(order)"
-            size="sm"
-            class="flex-1"
-          >
+        <div class="pt-3">
+          <Button @click.stop="respondToOrder(order)" size="sm" class="w-full">
             Откликнуться
-          </Button>
-          <Button
-            v-else
-            @click.stop="contactStudent(order)"
-            variant="secondary"
-            size="sm"
-            class="flex-1"
-          >
-            Связаться
-          </Button>
-          <Button
-            @click.stop="viewOrderDetails(order)"
-            variant="secondary"
-            size="sm"
-            class="flex-1"
-          >
-            Подробнее
           </Button>
         </div>
       </Card>
@@ -624,6 +706,98 @@ onMounted(() => {
       <p class="text-telegram-textSecondary mb-4">Попробуйте изменить параметры поиска</p>
       <Button @click="resetFilters" variant="secondary">Сбросить фильтры</Button>
     </div>
+
+    <!-- Accept Modal -->
+    <Modal v-model="showAcceptModal" title="Откликнуться на заказ" max-width="lg">
+      <div v-if="selectedDeal" class="space-y-5">
+        <!-- Student Info -->
+        <div class="flex items-center space-x-3 p-4 bg-telegram-secondary/20 rounded-xl">
+          <div
+            class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-semibold"
+          >
+            {{
+              selectedDeal.student.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+            }}
+          </div>
+          <div class="flex-1">
+            <h3 class="font-semibold text-telegram-text">{{ selectedDeal.student.name }}</h3>
+            <p class="text-telegram-textSecondary text-sm">
+              {{ selectedDeal.subject.name }} • {{ selectedDeal.teacher.fullName }}
+            </p>
+          </div>
+          <div class="text-right">
+            <div class="font-bold text-telegram-accent text-lg">
+              {{ formatPrice(selectedDeal.price) }} ₽
+            </div>
+            <div class="text-xs text-telegram-textSecondary">за урок</div>
+          </div>
+        </div>
+
+        <!-- Order Description -->
+        <div>
+          <h4 class="font-medium text-telegram-text mb-3">Что нужно студенту:</h4>
+          <p
+            class="text-telegram-textSecondary leading-relaxed bg-telegram-bg border border-telegram-border rounded-lg p-4"
+          >
+            {{ selectedDeal.description }}
+          </p>
+        </div>
+
+        <!-- Meta Info -->
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="flex items-center space-x-2">
+            <div class="w-2 h-2 bg-telegram-accent rounded-full"></div>
+            <span class="text-telegram-textSecondary">
+              Дедлайн:
+              <span class="text-telegram-text">{{
+                selectedDeal.deadline ? formatDate(selectedDeal.deadline) : 'Не установлен'
+              }}</span>
+            </span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-2 h-2 bg-telegram-textSecondary rounded-full"></div>
+            <span class="text-telegram-textSecondary">
+              Создан:
+              <span class="text-telegram-text">{{ formatDate(selectedDeal.createdAt) }}</span>
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-telegram-text mb-2">
+            Ваш комментарий (необязательно)
+          </label>
+          <textarea
+            v-model="tutorComment"
+            rows="3"
+            placeholder="Напишите ваши предложения, условия или дополнительную информацию..."
+            class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
+          />
+          <p class="text-xs text-telegram-textSecondary mt-1">
+            Студент увидит ваш комментарий вместе с откликом
+          </p>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex space-x-3">
+          <Button
+            variant="secondary"
+            @click="handleCloseAcceptModal"
+            class="flex-1"
+            :disabled="isAccepting"
+          >
+            Отмена
+          </Button>
+          <Button :loading="isAccepting" @click="handleAcceptDeal" class="flex-1">
+            Отправить отклик
+          </Button>
+        </div>
+      </template>
+    </Modal>
   </div>
 </template>
 
