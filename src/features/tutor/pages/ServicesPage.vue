@@ -19,6 +19,7 @@ interface Service {
   id: number
   title: string
   subject: string
+  teacher: string
   level: string
   description: string
   price: number
@@ -43,6 +44,9 @@ interface ActiveDeal {
   studentAvatar?: string
   serviceTitle: string
   subject: string
+  teacher: string
+  taskDescription: string
+  tutorComment?: string
   price: number
   deadline?: Date
   status: 'pending' | 'accepted' | 'in_progress' | 'completed'
@@ -80,6 +84,7 @@ const services = ref<Service[]>([
     id: 1,
     title: 'Подготовка к ЕГЭ по математике',
     subject: 'Математика',
+    teacher: 'Иван Иванов',
     level: 'ЕГЭ',
     description:
       'Комплексная подготовка к ЕГЭ по математике профильного уровня. Разбор всех типов заданий, работа с ошибками, решение вариантов.',
@@ -105,6 +110,7 @@ const services = ref<Service[]>([
     id: 2,
     title: 'Алгебра для 8-9 классов',
     subject: 'Математика',
+    teacher: 'Иван Иванов',
     level: 'ОГЭ',
     description:
       'Помощь с изучением алгебры в 8-9 классах, подготовка к ОГЭ. Работа с уравнениями, неравенствами, функциями.',
@@ -130,6 +136,7 @@ const services = ref<Service[]>([
     id: 3,
     title: 'Геометрия с нуля',
     subject: 'Математика',
+    teacher: 'Иван Иванов',
     level: 'Школьная программа',
     description:
       'Изучение геометрии с основ. Подходит для учеников 7-11 классов, которые хотят разобраться в предмете.',
@@ -155,6 +162,7 @@ const services = ref<Service[]>([
     id: 4,
     title: 'Олимпиадная математика',
     subject: 'Математика',
+    teacher: 'Иван Иванов',
     level: 'Олимпиады',
     description:
       'Подготовка к математическим олимпиадам различного уровня. Нестандартные задачи, развитие логического мышления.',
@@ -187,6 +195,11 @@ const activeDeals = ref<ActiveDeal[]>([
     studentAvatar: undefined,
     serviceTitle: 'Геометрия с нуля',
     subject: 'Математика',
+    teacher: 'Иванов Петр Сергеевич',
+    taskDescription:
+      'Совсем не понимаю геометрию, нужна помощь с основами. Особенно сложно с теоремами и доказательствами.',
+    tutorComment:
+      'Готов помочь разобраться с геометрией пошагово. Начнем с основных понятий и постепенно перейдем к более сложным темам.',
     price: 2000,
     deadline: new Date('2024-03-15'),
     status: 'in_progress',
@@ -200,6 +213,10 @@ const activeDeals = ref<ActiveDeal[]>([
     studentAvatar: undefined,
     serviceTitle: 'Алгебра для 8-9 классов',
     subject: 'Математика',
+    teacher: 'Смирнова Анна Владимировна',
+    taskDescription:
+      'Нужна подготовка к ОГЭ по алгебре. Сложности с решением уравнений и неравенств.',
+    tutorComment: 'Занятия будут включать разбор типовых заданий ОГЭ и практические упражнения.',
     price: 1800,
     deadline: new Date('2024-02-28'),
     status: 'accepted',
@@ -380,36 +397,7 @@ const viewService = (service: Service) => {
 
 const editService = (service: Service) => {
   telegramStore.hapticFeedback('light')
-  console.log('Редактировать услугу:', service.title)
-  // TODO: Навигация к форме редактирования
-}
-
-const toggleServiceStatus = (service: Service) => {
-  telegramStore.hapticFeedback('medium')
-
-  if (service.status === 'active') {
-    service.status = 'frozen'
-  } else if (service.status === 'frozen') {
-    service.status = 'active'
-  }
-
-  console.log(
-    `Услуга "${service.title}" ${service.status === 'active' ? 'активирована' : 'заморожена'}`,
-  )
-}
-
-const deleteService = (service: Service) => {
-  if (service.hasActiveDeals) {
-    telegramStore.hapticFeedback('error')
-    // TODO: Показать уведомление о невозможности удаления
-    console.log('Нельзя удалить услугу с активными делами')
-    return
-  }
-
-  telegramStore.hapticFeedback('heavy')
-  service.status = 'deleted'
-  console.log('Услуга удалена и все отклики отклонены:', service.title)
-  // TODO: Подтверждение удаления
+  router.push(`/tutor/services/${service.id}/edit`)
 }
 
 // Действия с активными сделками
@@ -458,17 +446,6 @@ const activeDealsCount = ref(
         <h1 class="text-2xl font-bold text-telegram-text mb-2">Управление услугами</h1>
         <p class="text-telegram-textSecondary">Услуги, отклики и активные занятия</p>
       </div>
-      <Button v-if="activeTab === 'services'" @click="createService" size="sm">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-        Добавить
-      </Button>
     </div>
 
     <!-- Tabs -->
@@ -488,219 +465,16 @@ const activeDealsCount = ref(
         <span>{{ tab.label }}</span>
       </button>
     </div>
+
     <!-- Services Tab -->
     <div v-if="activeTab === 'services'">
-      <div v-if="activeServices.length > 0" class="space-y-4">
-        <Card
-          v-for="service in activeServices"
-          :key="service.id"
-          class="p-6 cursor-pointer hover:bg-telegram-secondary/50 transition-colors"
-          :class="{ 'opacity-60': service.status === 'frozen' }"
-          @click="viewService(service)"
-        >
-          <!-- Header -->
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex-1">
-              <div class="flex items-center space-x-3 mb-2">
-                <h3 class="text-lg font-semibold text-telegram-text">{{ service.title }}</h3>
-                <span
-                  :class="[
-                    'px-2 py-1 text-xs font-medium rounded-full',
-                    getStatusClass(service.status),
-                  ]"
-                >
-                  {{ getStatusLabel(service.status) }}
-                </span>
-                <span
-                  v-if="service.newResponsesCount > 0"
-                  class="px-2 py-1 text-xs font-medium rounded-full bg-telegram-accent text-white"
-                >
-                  {{ service.newResponsesCount }} новых
-                </span>
-              </div>
-              <div class="flex items-center space-x-4 mb-3">
-                <span class="text-telegram-accent font-medium">{{ service.subject }}</span>
-                <span class="text-telegram-textSecondary">{{ service.level }}</span>
-                <span class="text-telegram-success font-semibold">{{ service.price }}₽</span>
-                <span class="text-telegram-textSecondary text-sm">{{ service.duration }} мин</span>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex items-center space-x-2" @click.stop>
-              <button
-                v-if="service.status !== 'deleted'"
-                @click="toggleServiceStatus(service)"
-                class="p-2 rounded-lg hover:bg-telegram-secondary transition-colors"
-                :title="service.status === 'active' ? 'Заморозить' : 'Активировать'"
-              >
-                <svg
-                  class="w-4 h-4"
-                  :class="{
-                    'text-telegram-success': service.status === 'active',
-                    'text-yellow-600': service.status === 'frozen',
-                  }"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    v-if="service.status === 'active'"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                  <path
-                    v-else
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M10 9v6l4-2-4-2z"
-                  />
-                </svg>
-              </button>
-              <button
-                @click="editService(service)"
-                class="p-2 rounded-lg hover:bg-telegram-secondary transition-colors text-telegram-textSecondary"
-                title="Редактировать"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-              </button>
-              <button
-                @click="deleteService(service)"
-                class="p-2 rounded-lg hover:bg-red-100 transition-colors"
-                :class="{
-                  'text-red-500': !service.hasActiveDeals,
-                  'text-red-300 cursor-not-allowed': service.hasActiveDeals,
-                }"
-                :title="service.hasActiveDeals ? 'Нельзя удалить - есть активные дела' : 'Удалить'"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Description -->
-          <p class="text-telegram-text text-sm mb-4">{{ service.description }}</p>
-
-          <!-- Responses Info -->
-          <div class="mb-4 p-3 bg-telegram-secondary/50 rounded-lg">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-4">
-                <div class="text-center">
-                  <div class="text-lg font-semibold text-telegram-text">
-                    {{ service.responsesCount }}
-                  </div>
-                  <div class="text-xs text-telegram-textSecondary">Всего откликов</div>
-                </div>
-                <div class="text-center">
-                  <div class="text-lg font-semibold text-telegram-accent">
-                    {{ service.activeResponsesCount }}
-                  </div>
-                  <div class="text-xs text-telegram-textSecondary">Активных</div>
-                </div>
-                <div v-if="service.newResponsesCount > 0" class="text-center">
-                  <div class="text-lg font-semibold text-telegram-success">
-                    {{ service.newResponsesCount }}
-                  </div>
-                  <div class="text-xs text-telegram-textSecondary">Новых</div>
-                </div>
-              </div>
-              <svg
-                class="w-5 h-5 text-telegram-textSecondary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Features -->
-          <div class="mb-4">
-            <h4 class="text-telegram-text font-medium mb-2">Что включено:</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div
-                v-for="feature in service.features"
-                :key="feature"
-                class="flex items-center space-x-2"
-              >
-                <svg
-                  class="w-4 h-4 text-telegram-success flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span class="text-telegram-textSecondary text-sm">{{ feature }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Format & Stats -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-              <div>
-                <span class="text-telegram-textSecondary text-xs">Формат:</span>
-                <span class="text-telegram-text text-sm ml-1">{{ service.format.join(', ') }}</span>
-              </div>
-              <div>
-                <span class="text-telegram-textSecondary text-xs">Учеников:</span>
-                <span class="text-telegram-text text-sm ml-1">{{ service.studentsCount }}</span>
-              </div>
-            </div>
-
-            <div class="flex items-center space-x-2">
-              <div class="flex items-center space-x-1">
-                <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                  />
-                </svg>
-                <span class="text-telegram-text font-medium">{{ service.rating }}</span>
-                <span class="text-telegram-textSecondary text-sm"
-                  >({{ service.reviewsCount }})</span
-                >
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <!-- Empty state для услуг -->
-      <div v-else class="text-center py-16">
+      <!-- Empty State when no services -->
+      <div v-if="activeServices.length === 0" class="text-center py-16">
         <div
-          class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
+          class="w-24 h-24 bg-gradient-to-br from-telegram-accent/20 to-telegram-accent/10 rounded-full mx-auto mb-6 flex items-center justify-center"
         >
           <svg
-            class="w-10 h-10 text-telegram-textSecondary"
+            class="w-12 h-12 text-telegram-accent"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -714,91 +488,231 @@ const activeDealsCount = ref(
           </svg>
         </div>
 
-        <h2 class="text-xl font-semibold text-telegram-text mb-3">Добавьте первую услугу</h2>
+        <h2 class="text-2xl font-bold text-telegram-text mb-3">Создайте свои услуги</h2>
 
-        <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
-          Создайте описание ваших услуг репетиторства с указанием предметов и стоимости
+        <p class="text-telegram-textSecondary mb-12 max-w-md mx-auto leading-relaxed">
+          Добавьте описания ваших услуг репетиторства с указанием предметов, стоимости и условий.
+          Студенты смогут найти и выбрать подходящие занятия.
         </p>
 
-        <Button @click="createService" class="mx-auto">Добавить услугу</Button>
+        <div class="flex justify-center">
+          <Button
+            @click="createService"
+            class="bg-gradient-to-r from-telegram-accent to-telegram-accent/80 hover:from-telegram-accent/90 hover:to-telegram-accent/70 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-white/20"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Создать услугу
+          </Button>
+        </div>
+      </div>
+
+      <!-- Services List when has services -->
+      <div v-else class="space-y-4">
+        <!-- Create Service Card -->
+        <Card
+          class="p-4 cursor-pointer hover:bg-telegram-accent/5 transition-colors border-2 border-dashed border-telegram-accent/30 hover:border-telegram-accent/50"
+          @click="createService"
+        >
+          <div class="flex items-center space-x-4">
+            <div
+              class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <svg
+                class="w-5 h-5 text-telegram-accent"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-telegram-accent">Добавить услугу</h3>
+              <p class="text-telegram-textSecondary text-sm">Создайте новую услугу для студентов</p>
+            </div>
+          </div>
+        </Card>
+
+        <!-- Existing Services -->
+        <template v-if="activeServices.length > 0">
+          <Card
+            v-for="service in activeServices"
+            :key="service.id"
+            class="p-6 cursor-pointer hover:bg-telegram-secondary/50 transition-colors"
+            :class="{ 'opacity-60': service.status === 'frozen' }"
+            @click="viewService(service)"
+          >
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <div class="flex items-start justify-between">
+                  <h3 class="text-xl font-semibold text-telegram-text">{{ service.title }}</h3>
+                  <button
+                    @click.stop="editService(service)"
+                    class="-mr-5 flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-telegram-secondary transition-colors text-telegram-textSecondary text-sm"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    <span>Настроить</span>
+                  </button>
+                </div>
+
+                <p class="text-telegram-textSecondary text-sm mb-3">
+                  {{ service.teacher }}
+                </p>
+
+                <div class="flex items-center flex-wrap gap-2 mb-3">
+                  <span
+                    :class="[
+                      'px-2 py-1 text-xs font-medium rounded-full',
+                      getStatusClass(service.status),
+                    ]"
+                  >
+                    {{ getStatusLabel(service.status) }}
+                  </span>
+                  <span
+                    class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-medium"
+                  >
+                    {{ service.price }}₽
+                  </span>
+                  <span
+                    v-if="service.newResponsesCount > 0"
+                    class="px-2 py-1 text-xs font-medium rounded-full bg-telegram-accent text-white animate-pulse"
+                  >
+                    +{{ service.newResponsesCount }} новых
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <p class="text-telegram-text text-sm mb-4">{{ service.description }}</p>
+
+            <!-- Responses Info -->
+            <div class="mb-4 p-3 bg-telegram-secondary/50 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div class="text-center">
+                  <div class="text-lg font-semibold text-telegram-text">
+                    {{ service.responsesCount }}
+                  </div>
+                  <div class="text-xs text-telegram-textSecondary">Всего откликов</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-lg font-semibold text-telegram-accent">
+                    {{ service.activeResponsesCount }}
+                  </div>
+                  <div class="text-xs text-telegram-textSecondary">Активных</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-lg font-semibold text-telegram-success">
+                    {{ service.newResponsesCount }}
+                  </div>
+                  <div class="text-xs text-telegram-textSecondary">Новых</div>
+                </div>
+                <svg
+                  class="w-5 h-5 text-telegram-textSecondary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </div>
+            </div>
+          </Card>
+        </template>
       </div>
     </div>
 
     <!-- Responses Tab -->
     <div v-if="activeTab === 'responses'">
       <div v-if="requestResponses.length > 0" class="space-y-4">
-        <Card v-for="response in requestResponses" :key="response.id" class="p-6">
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex items-start space-x-4">
-              <div
-                class="w-12 h-12 bg-telegram-accent/20 rounded-full flex items-center justify-center"
+        <Card v-for="response in requestResponses" :key="response.id" class="p-4">
+          <!-- Header -->
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-telegram-text mb-1">
+                {{ response.requestTitle }}
+              </h3>
+              <p class="text-telegram-textSecondary text-sm mb-2">{{ response.studentName }}</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span
+                :class="[
+                  'px-2 py-1 text-xs font-medium rounded-full',
+                  getResponseStatusClass(response.status),
+                ]"
               >
-                <span class="text-telegram-accent font-semibold text-lg">
-                  {{ response.studentName.charAt(0) }}
-                </span>
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center space-x-3 mb-2">
-                  <h3 class="text-lg font-semibold text-telegram-text">
-                    {{ response.studentName }}
-                  </h3>
-                  <span
-                    :class="[
-                      'px-2 py-1 text-xs font-medium rounded-full',
-                      getResponseStatusClass(response.status),
-                    ]"
-                  >
-                    {{ getResponseStatusLabel(response.status) }}
-                  </span>
-                  <span
-                    v-if="response.urgency"
-                    :class="[
-                      'px-2 py-1 text-xs font-medium rounded-full',
-                      getUrgencyClass(response.urgency),
-                    ]"
-                  >
-                    {{ getUrgencyLabel(response.urgency) }}
-                  </span>
-                </div>
-                <p class="text-telegram-textSecondary text-sm mb-2">{{ response.requestTitle }}</p>
-                <p class="text-telegram-text text-sm mb-2 italic">
-                  {{ response.requestDescription }}
-                </p>
-                <p class="text-telegram-text text-sm font-medium">
-                  Мой отклик: {{ response.message }}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="mb-4 p-3 bg-telegram-secondary/30 rounded-lg">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div v-if="response.price">
-                <div class="text-telegram-textSecondary text-xs mb-1">Моя цена</div>
-                <div class="text-telegram-success font-semibold">{{ response.price }}₽</div>
-              </div>
-              <div v-if="response.budget">
-                <div class="text-telegram-textSecondary text-xs mb-1">Бюджет студента</div>
-                <div class="text-telegram-text font-semibold">{{ response.budget }}₽</div>
-              </div>
-              <div v-if="response.proposedDeadline">
-                <div class="text-telegram-textSecondary text-xs mb-1">Предложенный срок</div>
-                <div class="text-telegram-text text-sm">
-                  {{ response.proposedDeadline.toLocaleDateString() }}
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 pt-3 border-t border-telegram-secondary/50">
-              <span class="text-telegram-textSecondary text-xs">
-                Отклик отправлен: {{ response.createdAt.toLocaleDateString() }}
+                {{ getResponseStatusLabel(response.status) }}
               </span>
             </div>
           </div>
 
-          <div v-if="response.status === 'pending'" class="flex justify-center">
-            <Button @click="withdrawResponse(response)" variant="destructive" size="sm">
-              Отозвать отклик
-            </Button>
+          <!-- Description -->
+          <p class="text-telegram-text text-sm mb-3 leading-relaxed">
+            {{ response.requestDescription }}
+          </p>
+
+          <!-- Response Info -->
+          <div
+            class="flex items-center justify-between p-3 bg-telegram-secondary/20 rounded-lg mb-3"
+          >
+            <div class="flex items-center space-x-4">
+              <div v-if="response.price" class="text-center">
+                <div class="text-telegram-success font-semibold">{{ response.price }}₽</div>
+                <div class="text-xs text-telegram-textSecondary">Моя цена</div>
+              </div>
+              <div v-if="response.budget" class="text-center">
+                <div class="text-telegram-text font-semibold">{{ response.budget }}₽</div>
+                <div class="text-xs text-telegram-textSecondary">Бюджет</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-telegram-textSecondary text-xs">
+                отправлен {{ response.createdAt.toLocaleDateString('ru-RU') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- My Response -->
+          <div class="border-l-4 border-telegram-accent/30 pl-3 mb-4">
+            <p class="text-telegram-text text-sm italic">"{{ response.message }}"</p>
+          </div>
+
+          <!-- Action -->
+          <div
+            v-if="response.status === 'pending'"
+            class="pt-2 border-t border-telegram-secondary/30 text-center"
+          >
+            <button
+              @click="withdrawResponse(response)"
+              class="text-xs text-red-500 hover:underline transition-colors"
+            >
+              отозвать отклик
+            </button>
           </div>
         </Card>
       </div>
@@ -840,7 +754,7 @@ const activeDealsCount = ref(
           class="p-6 cursor-pointer hover:bg-telegram-secondary/50 transition-colors"
           @click="viewDealDetails(deal)"
         >
-          <div class="flex items-start justify-between mb-4">
+          <div class="mb-4">
             <div class="flex items-start space-x-4">
               <div
                 class="w-12 h-12 bg-telegram-accent/20 rounded-full flex items-center justify-center"
@@ -854,40 +768,99 @@ const activeDealsCount = ref(
                   <h3 class="text-lg font-semibold text-telegram-text">{{ deal.studentName }}</h3>
                   <span
                     :class="[
-                      'px-2 py-1 text-xs font-medium rounded-full',
+                      'px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap',
                       getDealStatusClass(deal.status),
                     ]"
                   >
                     {{ getDealStatusLabel(deal.status) }}
                   </span>
                 </div>
-                <p class="text-telegram-textSecondary text-sm mb-1">{{ deal.serviceTitle }}</p>
-                <p class="text-telegram-accent text-sm">{{ deal.subject }}</p>
               </div>
+            </div>
+
+            <div class="space-y-1">
+              <h4 class="text-lg font-semibold text-telegram-accent">
+                {{ deal.subject }}
+              </h4>
+              <p class="text-telegram-textSecondary text-sm">
+                {{ deal.teacher }}
+              </p>
             </div>
           </div>
 
-          <!-- Deal Info Grid -->
-          <div class="grid grid-cols-2 gap-4 mb-4 p-3 bg-telegram-secondary/30 rounded-lg">
-            <div>
-              <div class="text-telegram-textSecondary text-xs mb-1">Стоимость занятия</div>
-              <div class="text-telegram-success font-semibold">{{ deal.price }}₽</div>
+          <!-- Task Description -->
+          <div class="mb-4">
+            <div class="flex items-center mb-2">
+              <svg
+                class="w-4 h-4 text-blue-600 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              <span class="text-telegram-textSecondary text-xs font-medium uppercase tracking-wide"
+                >Задача студента</span
+              >
             </div>
-            <div v-if="deal.deadline">
-              <div class="text-telegram-textSecondary text-xs mb-1">Крайний срок</div>
-              <div class="text-telegram-text text-sm">{{ deal.deadline.toLocaleDateString() }}</div>
+            <p class="text-telegram-text text-sm leading-relaxed pl-6">
+              {{ deal.taskDescription }}
+            </p>
+          </div>
+
+          <!-- Tutor Comment -->
+          <div v-if="deal.tutorComment" class="mb-4">
+            <div class="flex items-center mb-2">
+              <svg
+                class="w-4 h-4 text-telegram-accent mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                />
+              </svg>
+              <span class="text-telegram-textSecondary text-xs font-medium uppercase tracking-wide"
+                >Мой комментарий</span
+              >
             </div>
-            <div>
-              <div class="text-telegram-textSecondary text-xs mb-1">Начато</div>
-              <div class="text-telegram-text text-sm">
-                {{ deal.createdAt.toLocaleDateString() }}
+            <div class="border-l-4 border-telegram-accent/30 pl-3 ml-3">
+              <p class="text-telegram-text text-sm leading-relaxed">
+                {{ deal.tutorComment }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Deal Info -->
+          <div
+            class="bg-telegram-success/10 border-telegram-success text-telegram-success font-bold text-xl px-4 py-2 rounded-lg text-center mb-3"
+          >
+            {{ deal.price }}₽
+          </div>
+          <div
+            class="flex items-center justify-around mb-4 p-3 bg-telegram-secondary/30 rounded-lg"
+          >
+            <div v-if="deal.deadline" class="text-center">
+              <div class="text-telegram-text font-medium">
+                {{ deal.deadline.toLocaleDateString('ru-RU') }}
               </div>
+              <div class="text-telegram-textSecondary text-xs">крайний срок</div>
             </div>
-            <div>
-              <div class="text-telegram-textSecondary text-xs mb-1">Активность</div>
-              <div class="text-telegram-text text-sm">
-                {{ deal.lastActivity.toLocaleDateString() }}
+            <div v-if="deal.deadline" class="w-px h-8 bg-telegram-secondary"></div>
+            <div class="text-center">
+              <div class="text-telegram-text font-medium">
+                {{ deal.createdAt.toLocaleDateString('ru-RU') }}
               </div>
+              <div class="text-telegram-textSecondary text-xs">начато</div>
             </div>
           </div>
 

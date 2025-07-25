@@ -26,6 +26,7 @@ interface TutorDeal {
   student: {
     name: string
     rating: number
+    ordersCount: number
   }
   subject: {
     name: string
@@ -58,6 +59,8 @@ const showAcceptModal = ref(false)
 const selectedDeal = ref<TutorDeal | null>(null)
 const isAccepting = ref(false)
 const tutorComment = ref('')
+const proposedDate = ref('')
+const proposedPrice = ref<number | null>(null)
 
 // Mock data - активные сделки репетитора (Deal)
 const deals = ref<TutorDeal[]>([
@@ -80,12 +83,13 @@ const deals = ref<TutorDeal[]>([
     student: {
       name: 'Мария Васильева',
       rating: 4.8,
+      ordersCount: 10,
     },
     subject: {
       name: 'Математика',
     },
     teacher: {
-      fullName: 'Подготовка к ЕГЭ',
+      fullName: 'Анна Петрова',
     },
   },
   {
@@ -107,6 +111,7 @@ const deals = ref<TutorDeal[]>([
     student: {
       name: 'Алексей Козлов',
       rating: 4.5,
+      ordersCount: 10,
     },
     subject: {
       name: 'Физика',
@@ -134,6 +139,7 @@ const deals = ref<TutorDeal[]>([
     student: {
       name: 'София Петрова',
       rating: 5.0,
+      ordersCount: 10,
     },
     subject: {
       name: 'Химия',
@@ -311,16 +317,6 @@ const formatDate = (dateString: string) => {
   return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
 }
 
-const viewDealDetails = (deal: TutorDeal) => {
-  telegramStore.hapticFeedback('light')
-  console.log('Просмотр сделки:', deal.id)
-}
-
-const startLesson = (deal: TutorDeal) => {
-  telegramStore.hapticFeedback('light')
-  console.log('Начать урок с:', deal.student.name)
-}
-
 // Computed
 const pageTitle = computed(() => {
   if (filters.value.subject) {
@@ -403,20 +399,45 @@ const formatStatus = (status: string) => {
 const respondToOrder = (deal: TutorDeal) => {
   telegramStore.hapticFeedback('medium')
   selectedDeal.value = deal
+
+  // Auto-set proposed date from deal deadline
+  if (deal.deadline) {
+    const date = new Date(deal.deadline)
+    proposedDate.value = date.toISOString().slice(0, 16) // Format for datetime-local
+  } else {
+    // Set to next day if no deadline
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    tomorrow.setHours(18, 0) // Default to 6 PM
+    proposedDate.value = tomorrow.toISOString().slice(0, 16)
+  }
+
+  // Auto-set proposed price from deal
+  proposedPrice.value = formatPrice(deal.price)
+
   showAcceptModal.value = true
 }
 
 const handleAcceptDeal = async () => {
   if (!selectedDeal.value) return
 
+  // Validate required fields
+  if (!proposedDate.value.trim()) {
+    telegramStore.hapticFeedback('error')
+    telegramStore.showAlert('Пожалуйста, укажите дату и время проведения занятия')
+    return
+  }
+
   isAccepting.value = true
   telegramStore.hapticFeedback('medium')
 
   try {
-    // Simulate API call with tutor comment
+    // Simulate API call with tutor response
     const responseData = {
       dealId: selectedDeal.value.id,
       tutorComment: tutorComment.value.trim(),
+      proposedDate: proposedDate.value,
+      proposedPrice: proposedPrice.value,
     }
 
     console.log('Отклик репетитора:', responseData)
@@ -433,6 +454,8 @@ const handleAcceptDeal = async () => {
     showAcceptModal.value = false
     selectedDeal.value = null
     tutorComment.value = ''
+    proposedDate.value = ''
+    proposedPrice.value = null
 
     // Show success message
     telegramStore.showAlert('Отклик отправлен! Студент получит уведомление.')
@@ -449,6 +472,8 @@ const handleCloseAcceptModal = () => {
     showAcceptModal.value = false
     selectedDeal.value = null
     tutorComment.value = ''
+    proposedDate.value = ''
+    proposedPrice.value = null
   }
 }
 
@@ -470,6 +495,8 @@ watch(showAcceptModal, (isOpen) => {
   if (!isOpen) {
     selectedDeal.value = null
     tutorComment.value = ''
+    proposedDate.value = ''
+    proposedPrice.value = null
   }
 })
 
@@ -644,6 +671,8 @@ onMounted(() => {
           <div class="flex-1">
             <div class="font-medium text-telegram-text">{{ order.student.name }}</div>
             <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
+              <span>{{ order.student.ordersCount }} заказов</span>
+              <span>•</span>
               <div class="flex items-center space-x-1">
                 <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                   <path
@@ -653,14 +682,6 @@ onMounted(() => {
                 <span>{{ order.student.rating }}</span>
               </div>
             </div>
-          </div>
-          <div class="text-right">
-            <span
-              :class="[formatStatus(order.status).textColor, formatStatus(order.status).bg]"
-              class="text-xs px-2 py-1 rounded-full font-medium"
-            >
-              {{ formatStatus(order.status).text }}
-            </span>
           </div>
         </div>
 
@@ -709,66 +730,99 @@ onMounted(() => {
 
     <!-- Accept Modal -->
     <Modal v-model="showAcceptModal" title="Откликнуться на заказ" max-width="lg">
-      <div v-if="selectedDeal" class="space-y-5">
-        <!-- Student Info -->
-        <div class="flex items-center space-x-3 p-4 bg-telegram-secondary/20 rounded-xl">
-          <div
-            class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-semibold"
-          >
-            {{
-              selectedDeal.student.name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-            }}
+      <div v-if="selectedDeal" class="space-y-5 max-h-[60vh] overflow-y-auto pr-2">
+        <div class="space-y-3 mb-7 mt-2">
+          <!-- Student Info -->
+          <div class="flex items-center space-x-3 bg-telegram-secondary/20 rounded-xl">
+            <div
+              class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-semibold"
+            >
+              {{
+                selectedDeal.student.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+              }}
+            </div>
+            <div class="flex-1">
+              <h3 class="font-semibold text-telegram-text">{{ selectedDeal.student.name }}</h3>
+            </div>
+            <div class="text-right">
+              <div class="font-bold text-telegram-accent text-lg">
+                {{ formatPrice(selectedDeal.price) }} ₽
+              </div>
+            </div>
           </div>
-          <div class="flex-1">
-            <h3 class="font-semibold text-telegram-text">{{ selectedDeal.student.name }}</h3>
-            <p class="text-telegram-textSecondary text-sm">
-              {{ selectedDeal.subject.name }} • {{ selectedDeal.teacher.fullName }}
+          <!-- Order Description -->
+          <div class="bg-telegram-bg/50 border-l-4 border-telegram-accent p-4 rounded-r-lg">
+            <p class="text-telegram-text leading-relaxed italic">
+              {{ selectedDeal.description }}
             </p>
           </div>
-          <div class="text-right">
-            <div class="font-bold text-telegram-accent text-lg">
-              {{ formatPrice(selectedDeal.price) }} ₽
+          <!-- Meta Info -->
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 bg-telegram-accent rounded-full"></div>
+              <span class="text-telegram-textSecondary">
+                Дедлайн:
+                <span class="text-telegram-text">{{
+                  selectedDeal.deadline ? formatDate(selectedDeal.deadline) : 'Не установлен'
+                }}</span>
+              </span>
             </div>
-            <div class="text-xs text-telegram-textSecondary">за урок</div>
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 bg-telegram-textSecondary rounded-full"></div>
+              <span class="text-telegram-textSecondary">
+                Создан:
+                <span class="text-telegram-text">{{ formatDate(selectedDeal.createdAt) }}</span>
+              </span>
+            </div>
           </div>
         </div>
 
-        <!-- Order Description -->
-        <div>
-          <h4 class="font-medium text-telegram-text mb-3">Что нужно студенту:</h4>
-          <p
-            class="text-telegram-textSecondary leading-relaxed bg-telegram-bg border border-telegram-border rounded-lg p-4"
-          >
-            {{ selectedDeal.description }}
-          </p>
+        <!-- Proposed Date and Price -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-telegram-text mb-2">
+              Предложить дату и время *
+            </label>
+            <input
+              v-model="proposedDate"
+              type="datetime-local"
+              required
+              class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:outline-none focus:border-telegram-accent transition-colors"
+            />
+            <p class="text-xs text-telegram-textSecondary mt-1">Когда вы готовы провести занятие</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-telegram-text mb-2">
+              Ваша цена <span class="text-telegram-textSecondary">(необязательно)</span>
+            </label>
+            <div class="relative">
+              <input
+                v-model="proposedPrice"
+                type="number"
+                min="0"
+                step="50"
+                placeholder="₽"
+                class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors"
+              />
+              <span
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-telegram-textSecondary text-sm"
+                >₽</span
+              >
+            </div>
+            <p class="text-xs text-telegram-textSecondary mt-1">
+              Оставьте пустым, если согласны с указанной ценой
+            </p>
+          </div>
         </div>
 
-        <!-- Meta Info -->
-        <div class="grid grid-cols-2 gap-4 text-sm">
-          <div class="flex items-center space-x-2">
-            <div class="w-2 h-2 bg-telegram-accent rounded-full"></div>
-            <span class="text-telegram-textSecondary">
-              Дедлайн:
-              <span class="text-telegram-text">{{
-                selectedDeal.deadline ? formatDate(selectedDeal.deadline) : 'Не установлен'
-              }}</span>
-            </span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <div class="w-2 h-2 bg-telegram-textSecondary rounded-full"></div>
-            <span class="text-telegram-textSecondary">
-              Создан:
-              <span class="text-telegram-text">{{ formatDate(selectedDeal.createdAt) }}</span>
-            </span>
-          </div>
-        </div>
-
+        <!-- Tutor Comment -->
         <div>
           <label class="block text-sm font-medium text-telegram-text mb-2">
-            Ваш комментарий (необязательно)
+            Ваш комментарий <span class="text-telegram-textSecondary">(необязательно)</span>
           </label>
           <textarea
             v-model="tutorComment"
@@ -800,12 +854,3 @@ onMounted(() => {
     </Modal>
   </div>
 </template>
-
-<style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

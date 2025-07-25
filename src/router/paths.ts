@@ -17,6 +17,7 @@ export const PATHS = {
   TUTOR_MAIN: '/tutor',
   TUTOR_SERVICES: '/tutor/services',
   TUTOR_CREATE_SERVICE: '/tutor/services/create',
+  TUTOR_EDIT_SERVICE: '/tutor/services/:id/edit',
   TUTOR_SERVICE_RESPONSES: '/tutor/services/:id/responses',
   TUTOR_ORDERS: '/tutor/orders',
   TUTOR_REQUESTS: '/tutor/requests',

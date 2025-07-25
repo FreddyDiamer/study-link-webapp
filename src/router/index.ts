@@ -97,6 +97,11 @@ const router = createRouter({
       component: () => import('../features/tutor/pages/CreateServicePage.vue'),
     },
     {
+      path: PATHS.TUTOR_EDIT_SERVICE,
+      name: 'tutor-edit-service',
+      component: () => import('../features/tutor/pages/EditServicePage.vue'),
+    },
+    {
       path: PATHS.TUTOR_SERVICE_RESPONSES,
       name: 'tutor-service-responses',
       component: () => import('../features/tutor/pages/ServiceResponsesPage.vue'),
