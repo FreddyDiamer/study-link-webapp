@@ -55,6 +55,11 @@ const router = createRouter({
       component: () => import('../features/student/pages/CreateOrderPage.vue'),
     },
     {
+      path: PATHS.STUDENT_EDIT_ORDER,
+      name: 'student-edit-order',
+      component: () => import('../features/student/pages/EditOrderPage.vue'),
+    },
+    {
       path: PATHS.STUDENT_ORDER_DETAILS,
       name: 'student-order-details',
       component: () => import('../features/student/pages/OrderDetailsPage.vue'),

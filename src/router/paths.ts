@@ -6,6 +6,7 @@ export const PATHS = {
   STUDENT_MAIN: '/student',
   STUDENT_ORDERS: '/student/orders',
   STUDENT_CREATE_ORDER: '/student/orders/create',
+  STUDENT_EDIT_ORDER: '/student/orders/:id/edit',
   STUDENT_ORDER_DETAILS: '/student/orders/:id',
   STUDENT_TUTORS: '/student/tutors',
   STUDENT_SERVICES: '/student/services',

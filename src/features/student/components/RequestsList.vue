@@ -134,6 +134,12 @@ const viewRequestDetails = (request: any) => {
   telegramStore.hapticFeedback('light')
   router.push(`/student/orders/${request.id}`)
 }
+
+const editRequest = (request: any, event: Event) => {
+  event.stopPropagation()
+  telegramStore.hapticFeedback('light')
+  router.push(`/student/orders/${request.id}/edit`)
+}
 </script>
 
 <template>
@@ -166,6 +172,37 @@ const viewRequestDetails = (request: any) => {
 
     <!-- Requests List -->
     <div v-else class="space-y-4">
+      <!-- Create Request Card -->
+      <Card
+        class="p-4 cursor-pointer hover:bg-telegram-accent/5 transition-colors border-2 border-dashed border-telegram-accent/30 hover:border-telegram-accent/50"
+        @click="createRequest"
+      >
+        <div class="flex items-center space-x-4">
+          <div
+            class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
+          >
+            <svg
+              class="w-5 h-5 text-telegram-accent"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-semibold text-telegram-accent">Создать заявку</h3>
+            <p class="text-telegram-textSecondary text-sm">Найдите репетитора для ваших задач</p>
+          </div>
+        </div>
+      </Card>
+
+      <!-- Existing Requests -->
       <Card
         v-for="request in myRequests"
         :key="request.id"
@@ -173,40 +210,31 @@ const viewRequestDetails = (request: any) => {
         class="p-6 cursor-pointer hover:border-telegram-accent transition-colors duration-200"
       >
         <!-- Header -->
-        <div class="flex items-start justify-between mb-4">
-          <div>
-            <h3 class="text-telegram-text font-semibold text-lg mb-1">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex-1 pr-3">
+            <h3 class="text-lg font-semibold text-telegram-text mb-1">
               {{ request.subject.name }} • {{ request.teacher.fullName }}
             </h3>
             <div class="flex items-center space-x-3">
-              <div class="flex items-center space-x-2">
-                <div
-                  :class="[getRequestStatusInfo(request.status).color, 'w-2 h-2 rounded-full']"
-                ></div>
-                <span class="text-telegram-textSecondary text-sm">{{
-                  getRequestStatusInfo(request.status).text
-                }}</span>
-              </div>
-              <span class="text-telegram-textSecondary text-sm">
-                {{ getUrgencyText(request.urgency) }}
-              </span>
               <span class="text-telegram-success font-semibold"
                 >до {{ formatPrice(request.budget) }}₽</span
               >
             </div>
           </div>
-          <div class="text-right">
-            <div class="text-telegram-textSecondary text-xs mb-1">Откликов</div>
-            <div class="flex items-center space-x-1">
-              <span class="text-telegram-text text-lg font-bold">{{ request.responsesCount }}</span>
-              <div
-                v-if="request.newResponsesCount > 0"
-                class="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
-              >
-                {{ request.newResponsesCount }}
-              </div>
-            </div>
-          </div>
+          <button
+            @click="editRequest(request, $event)"
+            class="p-2 text-telegram-textSecondary hover:text-telegram-text hover:bg-telegram-secondary/50 rounded-lg transition-colors flex-shrink-0"
+            title="Редактировать заявку"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+          </button>
         </div>
 
         <!-- Description -->
@@ -218,23 +246,20 @@ const viewRequestDetails = (request: any) => {
             <p class="text-telegram-textSecondary text-xs mb-1">Создана</p>
             <p class="text-telegram-text text-sm">{{ formatDate(request.createdAt) }}</p>
           </div>
+          <div class="text-right">
+            <p class="text-telegram-textSecondary text-xs mb-1">Откликов</p>
+            <div class="flex items-center justify-end space-x-2">
+              <span class="text-telegram-text text-lg font-bold">{{ request.responsesCount }}</span>
+              <div
+                v-if="request.newResponsesCount > 0"
+                class="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
+              >
+                {{ request.newResponsesCount }}
+              </div>
+            </div>
+          </div>
         </div>
       </Card>
-
-      <!-- Create New Request Button -->
-      <div class="pt-4">
-        <Button @click="createRequest" class="w-full">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          Создать новую заявку
-        </Button>
-      </div>
     </div>
   </div>
 </template>
