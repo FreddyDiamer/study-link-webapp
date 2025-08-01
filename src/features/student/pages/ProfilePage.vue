@@ -1,12 +1,29 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
+import { userService } from '@/services/business'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import { PATHS } from '@/router/paths'
+import type { User } from '@/shared/types'
 
 const router = useRouter()
 const telegramStore = useTelegramStore()
+
+const user = ref<User | null>(null)
+const isLoading = ref(false)
+
+const loadProfile = async () => {
+  isLoading.value = true
+  try {
+    user.value = await userService.getProfile()
+  } catch (error) {
+    console.error('Ошибка загрузки профиля:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const editProfile = () => {
   router.push(PATHS.STUDENT_EDIT_PROFILE)
@@ -16,6 +33,10 @@ const openFeedback = () => {
   // TODO: Открыть чат с поддержкой или внешнюю ссылку
   console.log('Открытие поддержки')
 }
+
+onMounted(() => {
+  loadProfile()
+})
 </script>
 
 <template>
@@ -27,18 +48,24 @@ const openFeedback = () => {
 
     <!-- Profile info -->
     <Card class="p-6 mb-6">
-      <div class="flex items-center space-x-4 mb-6">
+      <div v-if="isLoading" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+      </div>
+
+      <div v-else-if="user" class="flex items-center space-x-4 mb-6">
         <div
           class="w-16 h-16 bg-telegram-accent rounded-full flex items-center justify-center text-white text-xl font-bold"
         >
-          {{ telegramStore.firstName?.charAt(0) || 'У' }}
+          {{ user.name?.charAt(0) || telegramStore.firstName?.charAt(0) || 'У' }}
         </div>
 
         <div class="flex-1">
           <h2 class="text-xl font-semibold text-telegram-text">
-            {{ telegramStore.firstName || 'Пользователь' }} {{ telegramStore.lastName || '' }}
+            {{ user.name || telegramStore.firstName || 'Пользователь' }}
           </h2>
-          <p class="text-telegram-textSecondary">@{{ telegramStore.username || 'username' }}</p>
+          <p class="text-telegram-textSecondary">
+            @{{ user.telegramUsername || telegramStore.username || 'username' }}
+          </p>
           <div class="inline-flex items-center mt-2 px-2 py-1 bg-telegram-button/10 rounded-lg">
             <svg
               class="w-4 h-4 text-telegram-button mr-1"

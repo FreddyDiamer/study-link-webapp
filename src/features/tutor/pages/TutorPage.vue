@@ -1,14 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useTelegramStore } from '@/stores/telegram'
 import { useRouter } from 'vue-router'
+import { useService } from '@/shared/composables'
+import { useTutor } from '@/shared/composables'
 import { Card, Input, Button } from '@components/ui'
 import { LoupeIcon } from '@/shared/components/icons'
+import StatsCard from '../components/StatsCard.vue'
+import ActiveServicesList from '../components/ActiveServicesList.vue'
+import type { Service } from '@/shared/types'
 
 const telegramStore = useTelegramStore()
 const router = useRouter()
+const { getMyServices } = useService()
+const { getTutorStats } = useTutor()
 
 const searchQuery = ref('')
+const isLoading = ref(false)
+const activeServices = ref<Service[]>([])
+const stats = ref({
+  activeServices: 0,
+  monthlyRequests: 0,
+  totalStudents: 0,
+  averageRating: 0,
+})
 
 const quickActions = [
   {
@@ -43,30 +58,32 @@ const quickActions = [
   },
 ]
 
-const activeServices = [
-  {
-    id: 1,
-    subject: 'Математика',
-    teacher: 'ЕГЭ подготовка',
-    price: '1000₽/час',
-    responses: 3,
-    status: 'active',
-  },
-  {
-    id: 2,
-    subject: 'Физика',
-    teacher: 'Школьная программа',
-    price: '800₽/час',
-    responses: 5,
-    status: 'active',
-  },
-]
+const loadData = async () => {
+  isLoading.value = true
+  try {
+    // Загружаем активные услуги
+    const servicesResponse = await getMyServices()
+    activeServices.value = servicesResponse.items
+      .filter((service) => service.status === 'ACTIVE')
+      .slice(0, 3)
 
-const recentActivity = [
-  { text: 'Новый отклик на услугу "Математика ЕГЭ"', time: '10 мин', isNew: true },
-  { text: 'Студент принял ваше предложение', time: '1 час', isNew: false },
-  { text: 'Заявка "Помощь с алгеброй" требует ответа', time: '2 часа', isNew: true },
-]
+    // Загружаем статистику
+    const statsResponse = await getTutorStats()
+    stats.value = statsResponse
+  } catch (error) {
+    console.error('Ошибка загрузки данных:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const formatPrice = (price: number) => {
+  return `${price} ₽`
+}
+
+onMounted(() => {
+  loadData()
+})
 </script>
 
 <template>
@@ -137,52 +154,7 @@ const recentActivity = [
 
     <!-- Active Services -->
     <div class="mb-6">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-semibold text-telegram-text">Активные услуги</h2>
-        <button
-          @click="router.push('/tutor/services')"
-          class="text-telegram-accent text-sm font-medium"
-        >
-          Все услуги
-        </button>
-      </div>
-
-      <div class="space-y-3">
-        <Card v-for="service in activeServices" :key="service.id" class="p-4">
-          <div class="flex items-center justify-between">
-            <div class="flex-1">
-              <div class="flex items-center space-x-2">
-                <h3 class="font-medium text-telegram-text">{{ service.subject }}</h3>
-                <span
-                  class="px-2 py-1 bg-telegram-success/10 text-telegram-success text-xs rounded-full"
-                >
-                  Активно
-                </span>
-              </div>
-              <p class="text-sm text-telegram-textSecondary mt-1">{{ service.teacher }}</p>
-              <div class="flex items-center space-x-4 mt-2">
-                <span class="text-sm font-medium text-telegram-text">{{ service.price }}</span>
-                <span class="text-xs text-telegram-textSecondary">
-                  {{ service.responses }} откликов
-                </span>
-              </div>
-            </div>
-            <svg
-              class="w-5 h-5 text-telegram-textSecondary"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </div>
-        </Card>
-      </div>
+      <ActiveServicesList :services="activeServices" :is-loading="isLoading" />
     </div>
   </div>
 </template>

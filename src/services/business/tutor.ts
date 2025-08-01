@@ -1,8 +1,11 @@
-import { tutorsApi, type TutorSearchParams, type Tutor } from '@/services/api/tutors'
+import { tutorsApi } from '@/services/api/tutors'
 import { useTelegramStore } from '@/stores/telegram'
+import type { TutorSearchParams, Tutor } from '@/shared/types'
 
 export class TutorService {
-  private telegramStore = useTelegramStore()
+  private get telegramStore() {
+    return useTelegramStore()
+  }
 
   /**
    * Поиск репетиторов с валидацией и кешированием
@@ -124,6 +127,18 @@ export class TutorService {
       return await tutorsApi.getSubjects()
     } catch (error: any) {
       console.error('Ошибка получения предметов:', error)
+      throw new Error(this.getErrorMessage(error))
+    }
+  }
+
+  /**
+   * Получение статистики репетитора
+   */
+  async getStats() {
+    try {
+      return await tutorsApi.getTutorStats()
+    } catch (error: any) {
+      console.error('Ошибка получения статистики репетитора:', error)
       throw new Error(this.getErrorMessage(error))
     }
   }

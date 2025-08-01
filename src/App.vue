@@ -3,26 +3,33 @@ import { RouterView } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import BottomNav from '@/shared/components/layout/BottomNav.vue'
-import { useAppStore } from '@/stores/app'
+import { useAppStore, useEducationStore } from '@/stores'
+import { MOCK_INIT_DATA } from './shared/constants'
 
 const appStore = useAppStore()
+const educationStore = useEducationStore()
 
 const loading = ref(true)
 
-const authUser = async () => {
+const initializeApp = async () => {
   loading.value = true
 
   try {
-    const { authService } = await import('@/services')
+    // Инициализируем авторизацию и образовательные данные параллельно
+    const { authService } = await import('@/services/business')
 
-    await authService.loginWithTelegram()
+    const initData = window.Telegram?.WebApp?.initData || MOCK_INIT_DATA
+    await authService.loginWithTelegram(initData)
+    await educationStore.initialize()
+  } catch (error) {
+    console.error('Ошибка инициализации приложения:', error)
   } finally {
     loading.value = false
   }
 }
 
 onMounted(() => {
-  authUser()
+  initializeApp()
 })
 </script>
 

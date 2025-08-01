@@ -1,262 +1,546 @@
-import {
-  ordersApi,
-  type CreateOrderData,
-  type Order,
-  type OrderResponse,
-} from '@/services/api/orders'
-import { useTelegramStore } from '@/stores/telegram'
-import { useAuthStore } from '@/stores/auth'
+import { ordersApi } from '@/services/api'
+import { useTelegramStore } from '@/stores'
+import type {
+  Request,
+  Deal,
+  ServiceResponse,
+  RequestResponse,
+  CreateRequestDto,
+  UpdateRequestDto,
+  CreateServiceResponseDto,
+  CreateRequestResponseDto,
+  PaginatedResponse,
+} from '@/shared/types'
+import { convertRublesToKopeks, convertKopeksToRubles } from '@/shared/types'
 
 export class OrderService {
-  private telegramStore = useTelegramStore()
-  private authStore = useAuthStore()
+  private get telegramStore() {
+    return useTelegramStore()
+  }
 
-  /**
-   * Создание заказа с валидацией
-   */
-  async createOrder(data: CreateOrderData) {
-    // Валидация данных
-    this.validateOrderData(data)
+  // =============================================================================
+  // REQUESTS (Заявки студентов)
+  // =============================================================================
 
+  async getRequests(params?: any): Promise<PaginatedResponse<Request>> {
     try {
-      const order = await ordersApi.create(data)
+      const response = await ordersApi.getRequests(params)
+      return this.convertRequestsToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении заявок')
+      throw error
+    }
+  }
 
-      // Тактильная обратная связь
+  async getMyRequests(): Promise<PaginatedResponse<Request>> {
+    try {
+      const response = await ordersApi.getMyRequests()
+      return this.convertRequestsToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении ваших заявок')
+      throw error
+    }
+  }
+
+  async getRequest(id: string): Promise<Request> {
+    try {
+      const request = await ordersApi.getRequest(id)
+      return this.convertRequestToRubles(request)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении заявки')
+      throw error
+    }
+  }
+
+  async createRequest(
+    data: Omit<CreateRequestDto, 'budget'> & { budget?: number },
+  ): Promise<Request> {
+    try {
+      this.validateRequestData(data)
+
+      const requestData: CreateRequestDto = {
+        ...data,
+        budget: data.budget ? convertRublesToKopeks(data.budget) : undefined,
+      }
+
+      this.telegramStore.hapticFeedback('light')
+
+      const request = await ordersApi.createRequest(requestData)
+
+      this.telegramStore.showAlert('Заявка создана!')
+
+      return this.convertRequestToRubles(request)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при создании заявки')
+      throw error
+    }
+  }
+
+  async updateRequest(
+    id: string,
+    data: Omit<UpdateRequestDto, 'budget'> & { budget?: number },
+  ): Promise<Request> {
+    try {
+      this.validateUpdateRequestData(data)
+
+      const updateData: UpdateRequestDto = {
+        ...data,
+        budget: data.budget ? convertRublesToKopeks(data.budget) : undefined,
+      }
+
+      this.telegramStore.hapticFeedback('light')
+
+      const request = await ordersApi.updateRequest(id, updateData)
+
+      this.telegramStore.showAlert('Заявка обновлена!')
+
+      return this.convertRequestToRubles(request)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при обновлении заявки')
+      throw error
+    }
+  }
+
+  async deleteRequest(id: string): Promise<void> {
+    try {
       this.telegramStore.hapticFeedback('medium')
 
-      // Показываем уведомление
-      this.showNotification('Заказ успешно создан')
+      await ordersApi.deleteRequest(id)
 
-      return order
-    } catch (error: any) {
-      console.error('Ошибка создания заказа:', error)
-      throw new Error(this.getErrorMessage(error))
+      this.telegramStore.showAlert('Заявка удалена!')
+    } catch (error) {
+      this.handleError(error, 'Ошибка при удалении заявки')
+      throw error
     }
   }
 
-  /**
-   * Получение заказов студента
-   */
-  async getStudentOrders() {
-    const user = this.authStore.user
-    if (!user || !this.authStore.isStudent) {
-      throw new Error('Пользователь не является студентом')
-    }
+  // =============================================================================
+  // DEALS (Сделки)
+  // =============================================================================
 
+  async getDeals(params?: any): Promise<PaginatedResponse<Deal>> {
     try {
-      return await ordersApi.getStudentOrders(user.id)
-    } catch (error: any) {
-      console.error('Ошибка получения заказов студента:', error)
-      throw new Error(this.getErrorMessage(error))
+      const response = await ordersApi.getDeals(params)
+      return this.convertDealsToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении сделок')
+      throw error
     }
   }
 
-  /**
-   * Получение заказов репетитора
-   */
-  async getTutorOrders() {
-    const user = this.authStore.user
-    if (!user || !this.authStore.isTutor) {
-      throw new Error('Пользователь не является репетитором')
-    }
-
+  async getMyStudentDeals(): Promise<PaginatedResponse<Deal>> {
     try {
-      return await ordersApi.getTutorOrders(user.id)
-    } catch (error: any) {
-      console.error('Ошибка получения заказов репетитора:', error)
-      throw new Error(this.getErrorMessage(error))
+      const response = await ordersApi.getMyStudentDeals()
+      return this.convertDealsToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении ваших сделок как студента')
+      throw error
     }
   }
 
-  /**
-   * Получение откликов на заказ
-   */
-  async getOrderResponses(orderId: string) {
-    if (!orderId) {
-      throw new Error('ID заказа обязателен')
-    }
-
+  async getMyTutorDeals(): Promise<PaginatedResponse<Deal>> {
     try {
-      return await ordersApi.getResponses(orderId)
-    } catch (error: any) {
-      console.error('Ошибка получения откликов:', error)
-      throw new Error(this.getErrorMessage(error))
+      const response = await ordersApi.getMyTutorDeals()
+      return this.convertDealsToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении ваших сделок как репетитора')
+      throw error
     }
   }
 
-  /**
-   * Отклик на заказ (репетитор)
-   */
-  async respondToOrder(orderId: string, message: string, price: number) {
-    if (!orderId || !message.trim() || price <= 0) {
-      throw new Error('Все поля обязательны для заполнения')
-    }
-
-    if (!this.authStore.isTutor) {
-      throw new Error('Только репетиторы могут откликаться на заказы')
-    }
-
+  async getDeal(id: string): Promise<Deal> {
     try {
-      const response = await ordersApi.respond(orderId, { message, price })
+      const deal = await ordersApi.getDeal(id)
+      return this.convertDealToRubles(deal)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении сделки')
+      throw error
+    }
+  }
 
+  async acceptDeal(id: string): Promise<Deal> {
+    try {
+      this.telegramStore.hapticFeedback('light')
+
+      const deal = await ordersApi.acceptDeal(id)
+
+      this.telegramStore.showAlert('Сделка принята!')
+
+      return this.convertDealToRubles(deal)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при принятии сделки')
+      throw error
+    }
+  }
+
+  async rejectDeal(id: string): Promise<Deal> {
+    try {
       this.telegramStore.hapticFeedback('medium')
-      this.showNotification('Отклик отправлен')
 
-      return response
-    } catch (error: any) {
-      console.error('Ошибка отправки отклика:', error)
-      throw new Error(this.getErrorMessage(error))
+      const deal = await ordersApi.rejectDeal(id)
+
+      this.telegramStore.showAlert('Сделка отклонена!')
+
+      return this.convertDealToRubles(deal)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при отклонении сделки')
+      throw error
     }
   }
 
-  /**
-   * Принятие отклика (студент)
-   */
-  async acceptResponse(orderId: string, responseId: string) {
-    if (!orderId || !responseId) {
-      throw new Error('ID заказа и отклика обязательны')
-    }
-
-    if (!this.authStore.isStudent) {
-      throw new Error('Только студенты могут принимать отклики')
-    }
-
+  async completeDeal(id: string): Promise<Deal> {
     try {
-      await ordersApi.acceptResponse(orderId, responseId)
+      this.telegramStore.hapticFeedback('success')
 
+      const deal = await ordersApi.completeDeal(id)
+
+      this.telegramStore.showAlert('Сделка завершена!')
+
+      return this.convertDealToRubles(deal)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при завершении сделки')
+      throw error
+    }
+  }
+
+  async cancelDeal(id: string): Promise<Deal> {
+    try {
       this.telegramStore.hapticFeedback('medium')
-      this.showNotification('Отклик принят')
 
-      return true
-    } catch (error: any) {
-      console.error('Ошибка принятия отклика:', error)
-      throw new Error(this.getErrorMessage(error))
+      const deal = await ordersApi.cancelDeal(id)
+
+      this.telegramStore.showAlert('Сделка отменена!')
+
+      return this.convertDealToRubles(deal)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при отмене сделки')
+      throw error
     }
   }
 
-  /**
-   * Отклонение отклика (студент)
-   */
-  async declineResponse(orderId: string, responseId: string) {
-    if (!orderId || !responseId) {
-      throw new Error('ID заказа и отклика обязательны')
-    }
+  // =============================================================================
+  // SERVICE RESPONSES (Отклики студентов на услуги)
+  // =============================================================================
 
-    if (!this.authStore.isStudent) {
-      throw new Error('Только студенты могут отклонять отклики')
-    }
-
+  async getServiceResponses(serviceId: string): Promise<ServiceResponse[]> {
     try {
-      await ordersApi.declineResponse(orderId, responseId)
+      const responses = await ordersApi.getServiceResponses(serviceId)
+      return responses.map((response) => this.convertServiceResponseToRubles(response))
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении откликов на услугу')
+      throw error
+    }
+  }
 
+  async getMyServiceResponses(): Promise<PaginatedResponse<ServiceResponse>> {
+    try {
+      const response = await ordersApi.getMyServiceResponses()
+      return this.convertServiceResponsesToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении ваших откликов на услуги')
+      throw error
+    }
+  }
+
+  async createServiceResponse(
+    data: Omit<CreateServiceResponseDto, 'price'> & { price?: number },
+  ): Promise<ServiceResponse> {
+    try {
+      this.validateServiceResponseData(data)
+
+      const responseData: CreateServiceResponseDto = {
+        ...data,
+        price: data.price ? convertRublesToKopeks(data.price) : undefined,
+      }
+
+      this.telegramStore.hapticFeedback('light')
+
+      const response = await ordersApi.createServiceResponse(responseData)
+
+      this.telegramStore.showAlert('Отклик отправлен!')
+
+      return this.convertServiceResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при отправке отклика')
+      throw error
+    }
+  }
+
+  async updateServiceResponse(
+    id: string,
+    data: Partial<CreateServiceResponseDto> & { price?: number },
+  ): Promise<ServiceResponse> {
+    try {
+      const updateData: Partial<CreateServiceResponseDto> = {
+        ...data,
+        price: data.price ? convertRublesToKopeks(data.price) : undefined,
+      }
+
+      this.telegramStore.hapticFeedback('light')
+
+      const response = await ordersApi.updateServiceResponse(id, updateData)
+
+      this.telegramStore.showAlert('Отклик обновлен!')
+
+      return this.convertServiceResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при обновлении отклика')
+      throw error
+    }
+  }
+
+  async deleteServiceResponse(id: string): Promise<void> {
+    try {
       this.telegramStore.hapticFeedback('medium')
-      this.showNotification('Отклик отклонен')
 
-      return true
-    } catch (error: any) {
-      console.error('Ошибка отклонения отклика:', error)
-      throw new Error(this.getErrorMessage(error))
+      await ordersApi.deleteServiceResponse(id)
+
+      this.telegramStore.showAlert('Отклик удален!')
+    } catch (error) {
+      this.handleError(error, 'Ошибка при удалении отклика')
+      throw error
     }
   }
 
-  /**
-   * Отмена заказа
-   */
-  async cancelOrder(orderId: string) {
-    if (!orderId) {
-      throw new Error('ID заказа обязателен')
-    }
+  // =============================================================================
+  // REQUEST RESPONSES (Отклики репетиторов на заявки)
+  // =============================================================================
 
+  async getRequestResponses(requestId: string): Promise<RequestResponse[]> {
     try {
-      const order = await ordersApi.cancel(orderId)
-
-      this.telegramStore.hapticFeedback('heavy')
-      this.showNotification('Заказ отменен')
-
-      return order
-    } catch (error: any) {
-      console.error('Ошибка отмены заказа:', error)
-      throw new Error(this.getErrorMessage(error))
+      const responses = await ordersApi.getRequestResponses(requestId)
+      return responses.map((response) => this.convertRequestResponseToRubles(response))
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении откликов на заявку')
+      throw error
     }
   }
 
-  /**
-   * Пометить отклик как прочитанный
-   */
-  async markResponseAsRead(orderId: string, responseId: string) {
-    if (!orderId || !responseId) {
-      throw new Error('ID заказа и отклика обязательны')
-    }
-
+  async getMyRequestResponses(): Promise<PaginatedResponse<RequestResponse>> {
     try {
-      await ordersApi.markResponseAsRead(orderId, responseId)
-      return true
-    } catch (error: any) {
-      console.error('Ошибка пометки отклика как прочитанного:', error)
-      // Не показываем ошибку пользователю для этой операции
-      return false
+      const response = await ordersApi.getMyRequestResponses()
+      return this.convertRequestResponsesToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении ваших откликов на заявки')
+      throw error
     }
   }
 
-  /**
-   * Валидация данных заказа
-   */
-  private validateOrderData(data: CreateOrderData) {
-    if (!data.subject?.trim()) {
-      throw new Error('Предмет обязателен')
-    }
+  async createRequestResponse(
+    data: Omit<CreateRequestResponseDto, 'price'> & { price?: number },
+  ): Promise<RequestResponse> {
+    try {
+      this.validateRequestResponseData(data)
 
-    if (!data.description?.trim()) {
-      throw new Error('Описание обязательно')
-    }
+      const responseData: CreateRequestResponseDto = {
+        ...data,
+        price: data.price ? convertRublesToKopeks(data.price) : undefined,
+      }
 
-    if (data.description.length < 10) {
+      this.telegramStore.hapticFeedback('light')
+
+      const response = await ordersApi.createRequestResponse(responseData)
+
+      this.telegramStore.showAlert('Отклик отправлен!')
+
+      return this.convertRequestResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при отправке отклика')
+      throw error
+    }
+  }
+
+  async updateRequestResponse(
+    id: string,
+    data: Partial<CreateRequestResponseDto> & { price?: number },
+  ): Promise<RequestResponse> {
+    try {
+      const updateData: Partial<CreateRequestResponseDto> = {
+        ...data,
+        price: data.price ? convertRublesToKopeks(data.price) : undefined,
+      }
+
+      this.telegramStore.hapticFeedback('light')
+
+      const response = await ordersApi.updateRequestResponse(id, updateData)
+
+      this.telegramStore.showAlert('Отклик обновлен!')
+
+      return this.convertRequestResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при обновлении отклика')
+      throw error
+    }
+  }
+
+  async deleteRequestResponse(id: string): Promise<void> {
+    try {
+      this.telegramStore.hapticFeedback('medium')
+
+      await ordersApi.deleteRequestResponse(id)
+
+      this.telegramStore.showAlert('Отклик удален!')
+    } catch (error) {
+      this.handleError(error, 'Ошибка при удалении отклика')
+      throw error
+    }
+  }
+
+  // =============================================================================
+  // VALIDATION METHODS
+  // =============================================================================
+
+  private validateRequestData(data: any): void {
+    if (!data.subjectId) {
+      throw new Error('Выберите предмет')
+    }
+    if (!data.teacherId) {
+      throw new Error('Выберите преподавателя')
+    }
+    if (!data.description || data.description.trim().length < 10) {
       throw new Error('Описание должно содержать минимум 10 символов')
     }
-
-    if (!data.budget || data.budget <= 0) {
-      throw new Error('Бюджет должен быть больше 0')
+    if (data.description && data.description.length > 500) {
+      throw new Error('Описание не должно превышать 500 символов')
     }
-
-    if (!data.format?.trim()) {
-      throw new Error('Формат обучения обязателен')
+    if (data.budget && data.budget < 100) {
+      throw new Error('Бюджет должен быть не менее 100 рублей')
     }
-
-    if (!data.schedule?.trim()) {
-      throw new Error('Расписание обязательно')
+    if (data.budget && data.budget > 10000) {
+      throw new Error('Бюджет не должен превышать 10000 рублей')
     }
   }
 
-  /**
-   * Показ уведомления пользователю
-   */
-  private showNotification(message: string) {
-    // В реальном приложении здесь был бы toast или другое уведомление
-    console.log('Notification:', message)
+  private validateUpdateRequestData(data: any): void {
+    if (data.description && data.description.trim().length < 10) {
+      throw new Error('Описание должно содержать минимум 10 символов')
+    }
+    if (data.description && data.description.length > 500) {
+      throw new Error('Описание не должно превышать 500 символов')
+    }
+    if (data.budget && data.budget < 100) {
+      throw new Error('Бюджет должен быть не менее 100 рублей')
+    }
+    if (data.budget && data.budget > 10000) {
+      throw new Error('Бюджет не должен превышать 10000 рублей')
+    }
   }
 
-  /**
-   * Получение понятного сообщения об ошибке
-   */
-  private getErrorMessage(error: any): string {
-    if (error.response?.status === 404) {
-      return 'Заказ не найден'
+  private validateServiceResponseData(data: any): void {
+    if (!data.serviceId) {
+      throw new Error('Укажите услугу')
     }
+    if (data.price && data.price < 100) {
+      throw new Error('Цена должна быть не менее 100 рублей')
+    }
+    if (data.price && data.price > 10000) {
+      throw new Error('Цена не должна превышать 10000 рублей')
+    }
+    if (data.message && data.message.length > 500) {
+      throw new Error('Сообщение не должно превышать 500 символов')
+    }
+  }
+
+  private validateRequestResponseData(data: any): void {
+    if (!data.requestId) {
+      throw new Error('Укажите заявку')
+    }
+    if (data.price && data.price < 100) {
+      throw new Error('Цена должна быть не менее 100 рублей')
+    }
+    if (data.price && data.price > 10000) {
+      throw new Error('Цена не должна превышать 10000 рублей')
+    }
+    if (data.message && data.message.length > 500) {
+      throw new Error('Сообщение не должно превышать 500 символов')
+    }
+  }
+
+  // =============================================================================
+  // CONVERSION METHODS
+  // =============================================================================
+
+  private convertRequestToRubles(request: Request): Request {
+    return {
+      ...request,
+      budget: request.budget ? convertKopeksToRubles(request.budget) : undefined,
+    }
+  }
+
+  private convertRequestsToRubles(
+    response: PaginatedResponse<Request>,
+  ): PaginatedResponse<Request> {
+    return {
+      ...response,
+      items: response.items.map((request) => this.convertRequestToRubles(request)),
+    }
+  }
+
+  private convertDealToRubles(deal: Deal): Deal {
+    return {
+      ...deal,
+      price: convertKopeksToRubles(deal.price),
+    }
+  }
+
+  private convertDealsToRubles(response: PaginatedResponse<Deal>): PaginatedResponse<Deal> {
+    return {
+      ...response,
+      items: response.items.map((deal) => this.convertDealToRubles(deal)),
+    }
+  }
+
+  private convertServiceResponseToRubles(response: ServiceResponse): ServiceResponse {
+    return {
+      ...response,
+      price: response.price ? convertKopeksToRubles(response.price) : undefined,
+    }
+  }
+
+  private convertServiceResponsesToRubles(
+    response: PaginatedResponse<ServiceResponse>,
+  ): PaginatedResponse<ServiceResponse> {
+    return {
+      ...response,
+      items: response.items.map((resp) => this.convertServiceResponseToRubles(resp)),
+    }
+  }
+
+  private convertRequestResponseToRubles(response: RequestResponse): RequestResponse {
+    return {
+      ...response,
+      price: response.price ? convertKopeksToRubles(response.price) : undefined,
+    }
+  }
+
+  private convertRequestResponsesToRubles(
+    response: PaginatedResponse<RequestResponse>,
+  ): PaginatedResponse<RequestResponse> {
+    return {
+      ...response,
+      items: response.items.map((resp) => this.convertRequestResponseToRubles(resp)),
+    }
+  }
+
+  // =============================================================================
+  // ERROR HANDLING
+  // =============================================================================
+
+  private handleError(error: any, defaultMessage: string): void {
+    let message = defaultMessage
+
     if (error.response?.status === 403) {
-      return 'Недостаточно прав для выполнения операции'
+      message = 'Недостаточно прав для выполнения операции'
+    } else if (error.response?.status === 404) {
+      message = 'Запись не найдена'
+    } else if (error.response?.status >= 500) {
+      message = 'Проблемы на сервере. Попробуйте позже'
+    } else if (error.message) {
+      message = error.message
     }
-    if (error.response?.status === 409) {
-      return 'Конфликт данных. Возможно, заказ уже обработан'
-    }
-    if (error.response?.status >= 500) {
-      return 'Проблемы на сервере. Попробуйте позже'
-    }
-    if (error.response?.data?.message) {
-      return error.response.data.message
-    }
-    return 'Произошла ошибка при работе с заказами'
+
+    this.telegramStore.showAlert(message)
   }
 }
 
-// Создаем единственный экземпляр
 export const orderService = new OrderService()

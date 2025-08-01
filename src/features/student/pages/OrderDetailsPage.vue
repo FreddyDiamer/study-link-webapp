@@ -1,213 +1,272 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
+import { useEducation } from '@/shared/composables'
+import { useOrder } from '@/shared/composables'
 import Card from '@/shared/components/ui/Card.vue'
 import OrderResponseCard from '../components/OrderResponseCard.vue'
 import { ArrowIcon } from '@/shared/components/icons'
+import { type Request, type RequestResponse, ResponseStatus } from '@/shared/types'
 
+const route = useRoute()
 const router = useRouter()
 const telegramStore = useTelegramStore()
+const { getRequest, getRequestResponses } = useOrder()
+const {
+  activeSubjects,
+  isLoading: educationLoading,
+  error: educationError,
+  isInitialized,
+  initialize,
+} = useEducation()
 
 // Данные заказа
-const order = ref({
-  id: 1,
-  subject: 'Математика',
-  description: 'Подготовка к ЕГЭ по математике, особенно задачи с параметрами',
-  budget: 2000,
-  urgency: 'normal',
-  schedule: 'Вторник, четверг вечером',
-  createdAt: '2024-01-18T10:30:00',
-  status: 'active',
-})
-
-// Отклики на заказ
-const responses = ref([
+const order = ref<Request | null>(null)
+const responses = ref<RequestResponse[]>([
   {
-    id: 1,
+    id: '1',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    tutorId: '1',
+    requestId: '1',
+    request: {
+      id: '1',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      studentId: '1',
+      subjectId: '1',
+      teacherId: '1',
+      description: 'Описание заказа',
+      budget: 1000,
+      deadline: new Date().toISOString(),
+      student: {
+        id: '1',
+        telegramUsername: 'annapetrova',
+        telegramId: '1234567890',
+        balance: 1000,
+        name: 'Анна Петрова',
+        createdAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      subject: {
+        id: '1',
+        name: 'Математика',
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      teacher: {
+        id: '1',
+        fullName: 'Анна Петрова',
+        foreignId: '1234567890',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    },
     tutor: {
+      id: '1',
+      telegramUsername: 'annapetrova',
+      telegramId: '1234567890',
+      balance: 1000,
       name: 'Анна Петрова',
-      avatar: 'АП',
-      rating: 4.9,
-      experience: 8,
-      education: 'МГУ, механико-математический факультет',
-      completedLessons: 156,
-      subjects: ['Математика', 'Алгебра', 'Геометрия'],
+      createdAt: new Date().toISOString(),
+      lastActivity: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
     message:
       'Здравствуйте! Готова помочь с подготовкой к ЕГЭ по математике. Специализируюсь на параметрах и планиметрии. Занимаюсь подготовкой к ЕГЭ 8 лет, мои ученики набирают 80+ баллов. Провожу бесплатное пробное занятие для знакомства.',
     price: 2200,
-    isRead: false,
-    respondedAt: '2024-01-18T14:30:00',
-    status: 'pending',
-    availability: 'Вторник, четверг 18:00-21:00',
-  },
-  {
-    id: 2,
-    tutor: {
-      name: 'Дмитрий Иванов',
-      avatar: 'ДИ',
-      rating: 4.7,
-      experience: 5,
-      education: 'МФТИ, факультет прикладной математики',
-      completedLessons: 89,
-      subjects: ['Математика', 'Физика'],
-    },
-    message:
-      'Добрый день! Помогу подготовиться к ЕГЭ на высокий балл. Работаю с C1-C6, у меня есть авторские методики решения параметров. Готов предоставить материалы и план подготовки.',
-    price: 2500,
-    isRead: false,
-    respondedAt: '2024-01-18T16:45:00',
-    status: 'pending',
-    availability: 'Понедельник-пятница 19:00-22:00',
-  },
-  {
-    id: 3,
-    tutor: {
-      name: 'Елена Сидорова',
-      avatar: 'ЕС',
-      rating: 5.0,
-      experience: 12,
-      education: 'МГУ, физический факультет',
-      completedLessons: 234,
-      subjects: ['Математика', 'Физика', 'Астрономия'],
-    },
-    message:
-      'Здравствуйте! Работаю с учениками разного уровня подготовки уже 12 лет. Гарантирую индивидуальный подход и качественную подготовку. Мои ученики поступают в ведущие вузы страны.',
-    price: 3000,
-    isRead: true,
-    respondedAt: '2024-01-17T20:15:00',
-    status: 'accepted',
-    availability: 'Гибкий график',
-  },
-  {
-    id: 4,
-    tutor: {
-      name: 'Михаил Козлов',
-      avatar: 'МК',
-      rating: 4.8,
-      experience: 6,
-      education: 'СПбГУ, математико-механический факультет',
-      completedLessons: 112,
-      subjects: ['Математика', 'Информатика'],
-    },
-    message:
-      'Приветствую! Помогу качественно подготовиться к ЕГЭ. Использую современные методики и интерактивные материалы. Занятия проходят интересно и эффективно.',
-    price: 1800,
-    isRead: true,
-    respondedAt: '2024-01-17T12:30:00',
-    status: 'declined',
-    availability: 'Выходные, будни вечером',
+    status: ResponseStatus.EXPIRED,
   },
 ])
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+
+// Загрузка данных заказа
+const loadOrderDetails = async () => {
+  const orderId = route.params.id as string
+  if (!orderId) return
+
+  isLoading.value = true
+  error.value = null
+
+  try {
+    // Загружаем заказ и отклики параллельно
+    const [orderData, responsesData] = await Promise.all([
+      getRequest(orderId),
+      getRequestResponses(orderId),
+    ])
+
+    order.value = orderData
+    // responses.value = responsesData
+  } catch (err: any) {
+    error.value = err.message || 'Ошибка загрузки данных заказа'
+    console.error('Ошибка загрузки заказа:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Вычисляемые свойства
+const subjectName = computed(() => {
+  return order.value?.subject?.name || 'Предмет не указан'
+})
+
+const teacherName = computed(() => {
+  return order.value?.teacher?.fullName || 'Преподаватель не указан'
+})
+
+const formatPrice = (price: number) => {
+  return `${price} ₽`
+}
 
 const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffHours < 1) return 'Только что'
-  if (diffHours < 24) return `${diffHours} ч. назад`
-  if (diffDays === 1) return 'Вчера'
-  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
-}
-
-const goBack = () => {
-  telegramStore.hapticFeedback('light')
-  router.back()
-}
-
-const acceptService = (response: any) => {
-  responses.value = responses.value.map((r) => {
-    if (r.id === response.id) {
-      r.status = 'in_progress'
-    } else {
-      r.status = 'declined'
-    }
-
-    return r
+  return new Date(dateString).toLocaleDateString('ru-RU', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   })
 }
 
-onMounted(() => {
-  // TODO: Загрузить данные заказа и откликов по orderId
+const handleBack = () => {
+  router.back()
+}
+
+const handleEditOrder = () => {
+  if (order.value) {
+    router.push(`/student/orders/${order.value.id}/edit`)
+  }
+}
+
+const handleResponseAction = async (responseId: string, action: 'accept' | 'reject') => {
+  try {
+    if (action === 'accept') {
+      // TODO: Реализовать принятие отклика
+      console.log('Принятие отклика:', responseId)
+    } else {
+      // TODO: Реализовать отклонение отклика
+      console.log('Отклонение отклика:', responseId)
+    }
+
+    // Перезагружаем данные
+    await loadOrderDetails()
+  } catch (error) {
+    console.error('Ошибка обработки отклика:', error)
+  }
+}
+
+// Инициализация
+onMounted(async () => {
+  // Ждем инициализации образовательных данных
+  if (!isInitialized.value) {
+    await initialize()
+  }
+
+  // Загружаем данные заказа
+  await loadOrderDetails()
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 pt-6">
+  <div class="min-h-screen bg-telegram-bg pt-6">
     <!-- Header -->
-    <div class="flex items-center mb-6">
-      <button
-        @click="goBack"
-        class="p-2 -ml-2 rounded-lg hover:bg-telegram-secondary transition-colors mr-3"
-      >
-        <ArrowIcon direction="left" />
-      </button>
-      <div class="flex-1">
-        <h1 class="text-xl font-bold text-telegram-text mb-1">{{ order.subject }}</h1>
-        <p class="text-telegram-textSecondary text-sm">{{ order.budget }}₽</p>
+    <div class="px-4 mb-6">
+      <div class="flex items-center justify-between">
+        <Button variant="ghost" @click="handleBack" class="!p-2">
+          <ArrowIcon class="w-5 h-5 rotate-180" />
+        </Button>
+
+        <h1 class="text-lg font-semibold text-telegram-text">Детали заказа</h1>
+
+        <Button v-if="order" variant="ghost" @click="handleEditOrder" class="!p-2">
+          Редактировать
+        </Button>
       </div>
     </div>
 
-    <!-- Order Info -->
-    <Card class="p-6 mb-6">
-      <h2 class="text-lg font-semibold text-telegram-text mb-3">Описание заказа</h2>
-      <p class="text-telegram-text text-sm mb-4">{{ order.description }}</p>
+    <!-- Loading state -->
+    <div v-if="isLoading" class="flex justify-center py-16">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+    </div>
 
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <span class="text-xs text-telegram-textSecondary">Создана:</span>
-          <div class="text-sm font-medium text-telegram-text">
-            {{ formatDate(order.createdAt) }}
+    <!-- Error state -->
+    <div v-else-if="error" class="px-4">
+      <Card class="p-6 text-center">
+        <div class="text-telegram-destructive mb-4">{{ error }}</div>
+        <Button @click="loadOrderDetails">Попробовать снова</Button>
+      </Card>
+    </div>
+
+    <!-- Order details -->
+    <div v-else-if="order" class="px-4 space-y-6">
+      <!-- Order info -->
+      <Card class="p-6">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-telegram-text">{{ subjectName }}</h2>
+            <div class="text-right">
+              <div class="text-lg font-bold text-telegram-button">
+                {{ order.budget ? formatPrice(order.budget) : 'Бюджет не указан' }}
+              </div>
+              <div class="text-sm text-telegram-textSecondary">бюджет</div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-telegram-textSecondary">Преподаватель:</span>
+              <span class="text-sm font-medium text-telegram-text">{{ teacherName }}</span>
+            </div>
+
+            <div v-if="order.deadline" class="flex items-center space-x-2">
+              <span class="text-sm text-telegram-textSecondary">Срок:</span>
+              <span class="text-sm font-medium text-telegram-text">
+                {{ formatDate(order.deadline) }}
+              </span>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-telegram-textSecondary">Создан:</span>
+              <span class="text-sm font-medium text-telegram-text">
+                {{ formatDate(order.createdAt) }}
+              </span>
+            </div>
+          </div>
+
+          <div v-if="order.description" class="pt-4 border-t border-telegram-border">
+            <h3 class="text-sm font-medium text-telegram-text mb-2">Описание</h3>
+            <p class="text-sm text-telegram-textSecondary">{{ order.description }}</p>
           </div>
         </div>
-      </div>
-    </Card>
+      </Card>
 
-    <!-- Responses -->
-    <div class="mb-4">
-      <h2 class="text-lg font-semibold text-telegram-text mb-4">
-        Отклики ({{ responses.length }})
-      </h2>
-    </div>
+      <!-- Responses -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-telegram-text">Отклики ({{ responses.length }})</h3>
+        </div>
 
-    <div v-if="responses.length > 0" class="space-y-4">
-      <OrderResponseCard
-        v-for="response in responses"
-        :key="response.id"
-        :response="response"
-        @acceptService="acceptService"
-      />
-    </div>
+        <div v-if="responses.length === 0" class="text-center py-8">
+          <div class="text-telegram-textSecondary mb-2">Пока нет откликов</div>
+          <p class="text-sm text-telegram-textSecondary">
+            Репетиторы увидят вашу заявку и смогут откликнуться
+          </p>
+        </div>
 
-    <!-- Empty State -->
-    <div v-else class="text-center py-16">
-      <div
-        class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
-      >
-        <svg
-          class="w-10 h-10 text-telegram-textSecondary"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+        <div v-else class="space-y-4">
+          <OrderResponseCard
+            v-for="response in responses"
+            :key="response.id"
+            :response="response"
+            @accept="handleResponseAction(response.id, 'accept')"
+            @reject="handleResponseAction(response.id, 'reject')"
           />
-        </svg>
+        </div>
       </div>
-
-      <h2 class="text-xl font-semibold text-telegram-text mb-3">Пока нет откликов</h2>
-
-      <p class="text-telegram-textSecondary max-w-sm mx-auto">
-        Когда репетиторы откликнутся на ваш заказ, они появятся здесь
-      </p>
     </div>
   </div>
 </template>

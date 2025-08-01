@@ -1,14 +1,26 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
+import { useEducation } from '@/shared/composables'
+import { useService } from '@/shared/composables'
 import { Card, Button, Input, Select } from '@/shared/components/ui'
 import { ArrowIcon } from '@/shared/components/icons'
 import Modal from '@/shared/components/ui/Modal.vue'
+import type { Service, UpdateServiceDto } from '@/shared/types'
 
 const router = useRouter()
 const route = useRoute()
 const telegramStore = useTelegramStore()
+const { getService, updateService, deleteService } = useService()
+const {
+  activeSubjects,
+  teachers,
+  isLoading: educationLoading,
+  error: educationError,
+  isInitialized,
+  initialize,
+} = useEducation()
 
 const serviceId = route.params.id as string
 
@@ -21,28 +33,20 @@ const form = reactive({
   customDate: '',
 })
 
-const subjects = [
-  { value: 'mathematics', label: 'Математика' },
-  { value: 'physics', label: 'Физика' },
-  { value: 'chemistry', label: 'Химия' },
-  { value: 'biology', label: 'Биология' },
-  { value: 'history', label: 'История' },
-  { value: 'literature', label: 'Литература' },
-  { value: 'russian', label: 'Русский язык' },
-  { value: 'english', label: 'Английский язык' },
-  { value: 'informatics', label: 'Информатика' },
-  { value: 'geography', label: 'География' },
-  { value: 'social', label: 'Обществознание' },
-  { value: 'other', label: 'Другое' },
-]
+// Вычисляемые свойства для опций
+const subjectOptions = computed(() =>
+  activeSubjects.value.map((subject) => ({
+    value: subject.id,
+    label: subject.name,
+  })),
+)
 
-const teachers = [
-  { value: 'teacher1', label: 'Иван Иванович Петров' },
-  { value: 'teacher2', label: 'Мария Александровна Смирнова' },
-  { value: 'teacher3', label: 'Сергей Владимирович Козлов' },
-  { value: 'teacher4', label: 'Елена Михайловна Васильева' },
-  { value: 'teacher5', label: 'Андрей Николаевич Орлов' },
-]
+const teacherOptions = computed(() =>
+  teachers.value.map((teacher) => ({
+    value: teacher.id,
+    label: teacher.fullName,
+  })),
+)
 
 const deadlines = [
   { value: '1', label: '1 день' },
@@ -54,107 +58,128 @@ const deadlines = [
 const isSubmitting = ref(false)
 const isLoading = ref(true)
 const showDeleteModal = ref(false)
-const serviceStatus = ref<'active' | 'frozen' | 'deleted'>('active')
-
-// Mock service data - в реальном приложении загружать из API
-const mockServices = [
-  {
-    id: 1,
-    subject: 'mathematics',
-    teacher: 'teacher1',
-    description:
-      'Комплексная подготовка к ЕГЭ по математике профильного уровня. Разбор всех типов заданий, работа с ошибками, решение вариантов.',
-    price: '2200',
-    deadline: '7',
-    customDate: '',
-    status: 'active',
-  },
-  {
-    id: 2,
-    subject: 'mathematics',
-    teacher: 'teacher2',
-    description:
-      'Помощь с изучением алгебры в 8-9 классах, подготовка к ОГЭ. Работа с уравнениями, неравенствами, функциями.',
-    price: '1800',
-    deadline: '3',
-    customDate: '',
-    status: 'frozen',
-  },
-]
+const service = ref<Service | null>(null)
+const error = ref<string | null>(null)
 
 const loadService = async () => {
+  if (!serviceId) return
+
   isLoading.value = true
+  error.value = null
 
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  try {
+    const serviceData = await getService(serviceId)
+    service.value = serviceData
 
-  const service = mockServices.find((s) => s.id === parseInt(serviceId))
+    // Заполняем форму данными услуги
+    form.subject = serviceData.subjectId || ''
+    form.teacher = serviceData.teacherId || ''
+    form.description = serviceData.description || ''
+    form.price = serviceData.price ? (serviceData.price / 100).toString() : ''
 
-  if (service) {
-    // Copy service data to form, excluding status
-    form.subject = service.subject
-    form.teacher = service.teacher
-    form.description = service.description
-    form.price = service.price
-    form.deadline = service.deadline
-    form.customDate = service.customDate
-    serviceStatus.value = service.status as 'active' | 'frozen' | 'deleted'
+    if (serviceData.deadline) {
+      const deadlineDate = new Date(serviceData.deadline)
+      const now = new Date()
+      const diffDays = Math.ceil((deadlineDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+
+      if (diffDays <= 1) {
+        form.deadline = '1'
+      } else if (diffDays <= 3) {
+        form.deadline = '3'
+      } else if (diffDays <= 7) {
+        form.deadline = '7'
+      } else {
+        form.deadline = 'custom'
+        form.customDate = deadlineDate.toISOString().split('T')[0]
+      }
+    }
+  } catch (err: any) {
+    error.value = err.message || 'Ошибка загрузки услуги'
+    console.error('Ошибка загрузки услуги:', err)
+  } finally {
+    isLoading.value = false
   }
-
-  isLoading.value = false
 }
 
-onMounted(() => {
-  loadService()
-})
-
-const submitService = async () => {
+const updateServiceData = async () => {
   if (!validateForm()) return
 
   isSubmitting.value = true
   telegramStore.hapticFeedback('medium')
 
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 1500))
+  try {
+    const updateData: UpdateServiceDto = {
+      price: parseInt(form.price) * 100, // Конвертируем в копейки
+      description: form.description,
+      deadline: getDeadlineDate(),
+    }
 
-  telegramStore.hapticFeedback('heavy')
-  router.push('/tutor/services')
-  isSubmitting.value = false
+    await updateService(serviceId, updateData)
+
+    telegramStore.hapticFeedback('heavy')
+    router.push('/tutor/services')
+  } catch (error: any) {
+    console.error('Ошибка обновления услуги:', error)
+    telegramStore.showAlert('Ошибка при обновлении услуги. Попробуйте снова.')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
-const toggleStatus = async () => {
-  const newStatus = serviceStatus.value === 'active' ? 'frozen' : 'active'
-  serviceStatus.value = newStatus
-
-  telegramStore.hapticFeedback('medium')
-
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 500))
-
-  telegramStore.hapticFeedback('light')
-}
-
-const deleteService = async () => {
-  showDeleteModal.value = false
+const deleteServiceData = async () => {
   isSubmitting.value = true
 
-  telegramStore.hapticFeedback('heavy')
+  try {
+    await deleteService(serviceId)
+    showDeleteModal.value = false
+    router.push('/tutor/services')
+  } catch (error: any) {
+    console.error('Ошибка удаления услуги:', error)
+    telegramStore.showAlert('Ошибка при удалении услуги. Попробуйте снова.')
+  } finally {
+    isSubmitting.value = false
+  }
+}
 
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+const getDeadlineDate = (): string | undefined => {
+  if (!form.deadline) return undefined
 
-  router.push('/tutor/services')
-  isSubmitting.value = false
+  const now = new Date()
+
+  switch (form.deadline) {
+    case '1':
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString()
+    case '3':
+      return new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString()
+    case '7':
+      return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
+    case 'custom':
+      return form.customDate ? new Date(form.customDate).toISOString() : undefined
+    default:
+      return undefined
+  }
 }
 
 const validateForm = () => {
-  return form.subject && form.teacher && form.description && form.price
+  const hasDescription = form.description.trim()
+  const hasPrice = form.price && parseInt(form.price) > 0
+  const hasDeadline = form.deadline && (form.deadline !== 'custom' || form.customDate)
+
+  return hasDescription && hasPrice && hasDeadline
 }
 
 const goBack = () => {
   telegramStore.hapticFeedback('light')
   router.back()
 }
+
+// Инициализация
+onMounted(async () => {
+  if (!isInitialized.value) {
+    await initialize()
+  }
+  await loadService()
+})
 </script>
 
 <template>
@@ -174,12 +199,12 @@ const goBack = () => {
           <span
             :class="[
               'px-2 py-1 text-xs font-medium rounded-full',
-              serviceStatus === 'active'
+              service?.status === 'ACTIVE'
                 ? 'bg-green-100 text-green-700'
                 : 'bg-gray-100 text-gray-700',
             ]"
           >
-            {{ serviceStatus === 'active' ? 'Активна' : 'Заморожена' }}
+            {{ service?.status === 'ACTIVE' ? 'Активна' : 'Заморожена' }}
           </span>
         </div>
       </div>
@@ -192,6 +217,27 @@ const goBack = () => {
       ></div>
     </div>
 
+    <!-- Загрузка образовательных данных -->
+    <div v-else-if="educationLoading" class="flex justify-center items-center py-12">
+      <div class="text-center">
+        <div
+          class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"
+        ></div>
+        <p class="text-gray-600">Загрузка данных...</p>
+      </div>
+    </div>
+
+    <!-- Ошибка образовательных данных -->
+    <div v-else-if="educationError" class="text-center py-12">
+      <div class="text-red-600 mb-4">{{ educationError }}</div>
+      <button
+        @click="initialize"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Попробовать снова
+      </button>
+    </div>
+
     <div v-else>
       <!-- Service Management -->
       <Card class="mx-4 mt-4 p-4">
@@ -202,17 +248,8 @@ const goBack = () => {
               Измените статус или настройки услуги
             </p>
           </div>
-          <Button
-            variant="ghost"
-            @click="toggleStatus"
-            class="text-sm px-3 py-2"
-            :class="
-              serviceStatus === 'active'
-                ? 'text-orange-600 hover:bg-orange-50'
-                : 'text-green-600 hover:bg-green-50'
-            "
-          >
-            {{ serviceStatus === 'active' ? 'Заморозить' : 'Активировать' }}
+          <Button variant="ghost" class="text-sm px-3 py-2 text-blue-600 hover:bg-blue-50">
+            {{ service?.status === 'ACTIVE' ? 'Заморозить' : 'Активировать' }}
           </Button>
         </div>
       </Card>
@@ -225,7 +262,7 @@ const goBack = () => {
 
           <Select
             v-model="form.subject"
-            :options="subjects"
+            :options="subjectOptions"
             placeholder="Выберите предмет"
             required
           />
@@ -240,7 +277,7 @@ const goBack = () => {
 
           <Select
             v-model="form.teacher"
-            :options="teachers"
+            :options="teacherOptions"
             placeholder="Выберите преподавателя"
             required
           />
@@ -291,7 +328,7 @@ const goBack = () => {
 
         <!-- Submit -->
         <Button
-          @click="submitService"
+          @click="updateServiceData"
           :disabled="!validateForm()"
           :loading="isSubmitting"
           size="lg"
@@ -335,7 +372,7 @@ const goBack = () => {
 
         <div class="flex space-x-3">
           <Button variant="ghost" @click="showDeleteModal = false" class="flex-1"> Отмена </Button>
-          <Button @click="deleteService" class="flex-1 bg-red-600 hover:bg-red-700 text-white">
+          <Button @click="deleteServiceData" class="flex-1 bg-red-600 hover:bg-red-700 text-white">
             Удалить
           </Button>
         </div>

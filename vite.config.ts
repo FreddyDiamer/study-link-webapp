@@ -18,7 +18,7 @@ export default defineConfig({
     // TODO: remove this
     allowedHosts: true,
     host: true,
-    port: 3000,
+    port: 3050,
   },
   build: {
     outDir: 'dist',

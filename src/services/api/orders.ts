@@ -1,85 +1,112 @@
 import { apiClient } from './client'
-
-export interface Order {
-  id: string
-  studentId: string
-  tutorId?: string
-  subject: string
-  description: string
-  budget: number
-  format: string
-  urgency: 'normal' | 'urgent'
-  schedule: string
-  status: 'active' | 'paused' | 'completed' | 'cancelled'
-  createdAt: string
-  updatedAt: string
-  responsesCount?: number
-  newResponsesCount?: number
-}
-
-export interface OrderResponse {
-  id: string
-  orderId: string
-  tutorId: string
-  tutor: {
-    name: string
-    avatar: string
-    rating: number
-    experience: number
-    education: string
-  }
-  message: string
-  price: number
-  isRead: boolean
-  respondedAt: string
-  status: 'pending' | 'accepted' | 'declined'
-}
-
-export interface CreateOrderData {
-  subject: string
-  description: string
-  budget: number
-  format: string
-  urgency: 'normal' | 'urgent'
-  schedule: string
-  tutorId?: string
-}
+import type {
+  Request,
+  Deal,
+  ServiceResponse,
+  RequestResponse,
+  CreateRequestDto,
+  UpdateRequestDto,
+  CreateServiceResponseDto,
+  CreateRequestResponseDto,
+  PaginatedResponse,
+} from '@/shared/types'
 
 export const ordersApi = {
-  // Получение заказов студента
-  getStudentOrders: (studentId: string) => apiClient.get<Order[]>(`/students/${studentId}/orders`),
+  // =============================================================================
+  // REQUESTS (Заявки студентов)
+  // =============================================================================
 
-  // Получение заказов репетитора
-  getTutorOrders: (tutorId: string) => apiClient.get<Order[]>(`/tutors/${tutorId}/orders`),
+  // Получить все заявки
+  getRequests: (params?: any) =>
+    apiClient.get<PaginatedResponse<Request>>('/marketplace/requests', params),
 
-  // Создание заказа
-  create: (data: CreateOrderData) => apiClient.post<Order>('/orders', data),
+  // Получить мои заявки
+  getMyRequests: () => apiClient.get<PaginatedResponse<Request>>('/marketplace/requests/my'),
 
-  // Получение заказа по ID
-  getById: (id: string) => apiClient.get<Order>(`/orders/${id}`),
+  // Получить заявку по ID
+  getRequest: (id: string) => apiClient.get<Request>(`/marketplace/requests/${id}`),
 
-  // Обновление заказа
-  update: (id: string, data: Partial<Order>) => apiClient.patch<Order>(`/orders/${id}`, data),
+  // Создать заявку
+  createRequest: (data: CreateRequestDto) => apiClient.post<Request>('/marketplace/requests', data),
 
-  // Отмена заказа
-  cancel: (id: string) => apiClient.patch<Order>(`/orders/${id}/cancel`),
+  // Обновить заявку
+  updateRequest: (id: string, data: UpdateRequestDto) =>
+    apiClient.patch<Request>(`/marketplace/requests/${id}`, data),
 
-  // Получение откликов на заказ
-  getResponses: (orderId: string) => apiClient.get<OrderResponse[]>(`/orders/${orderId}/responses`),
+  // Удалить заявку
+  deleteRequest: (id: string) => apiClient.delete(`/marketplace/requests/${id}`),
 
-  // Отклик на заказ (репетитор)
-  respond: (orderId: string, data: { message: string; price: number }) =>
-    apiClient.post<OrderResponse>(`/orders/${orderId}/responses`, data),
+  // =============================================================================
+  // DEALS (Сделки)
+  // =============================================================================
 
-  // Принятие отклика (студент)
-  acceptResponse: (orderId: string, responseId: string) =>
-    apiClient.patch(`/orders/${orderId}/responses/${responseId}/accept`),
+  // Получить все сделки
+  getDeals: (params?: any) => apiClient.get<PaginatedResponse<Deal>>('/marketplace/deals', params),
 
-  // Отклонение отклика (студент)
-  declineResponse: (orderId: string, responseId: string) =>
-    apiClient.patch(`/orders/${orderId}/responses/${responseId}/decline`),
+  // Получить мои сделки как студент
+  getMyStudentDeals: () => apiClient.get<PaginatedResponse<Deal>>('/marketplace/deals/my-student'),
 
-  // Пометить отклик как прочитанный
-  markResponseAsRead: (orderId: string, responseId: string) =>
-    apiClient.patch(`/orders/${orderId}/responses/${responseId}/read`),
+  // Получить мои сделки как репетитор
+  getMyTutorDeals: () => apiClient.get<PaginatedResponse<Deal>>('/marketplace/deals/my-tutor'),
+
+  // Получить сделку по ID
+  getDeal: (id: string) => apiClient.get<Deal>(`/marketplace/deals/${id}`),
+
+  // Принять сделку
+  acceptDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/accept`),
+
+  // Отклонить сделку
+  rejectDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/reject`),
+
+  // Завершить сделку
+  completeDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/complete`),
+
+  // Отменить сделку
+  cancelDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/cancel`),
+
+  // =============================================================================
+  // SERVICE RESPONSES (Отклики студентов на услуги)
+  // =============================================================================
+
+  // Получить отклики на услугу
+  getServiceResponses: (serviceId: string) =>
+    apiClient.get<ServiceResponse[]>(`/marketplace/service-responses/by-service/${serviceId}`),
+
+  // Получить мои отклики на услуги
+  getMyServiceResponses: () =>
+    apiClient.get<PaginatedResponse<ServiceResponse>>('/marketplace/service-responses/my'),
+
+  // Создать отклик на услугу
+  createServiceResponse: (data: CreateServiceResponseDto) =>
+    apiClient.post<ServiceResponse>('/marketplace/service-responses', data),
+
+  // Обновить отклик на услугу
+  updateServiceResponse: (id: string, data: Partial<CreateServiceResponseDto>) =>
+    apiClient.patch<ServiceResponse>(`/marketplace/service-responses/${id}`, data),
+
+  // Удалить отклик на услугу
+  deleteServiceResponse: (id: string) => apiClient.delete(`/marketplace/service-responses/${id}`),
+
+  // =============================================================================
+  // REQUEST RESPONSES (Отклики репетиторов на заявки)
+  // =============================================================================
+
+  // Получить отклики на заявку
+  getRequestResponses: (requestId: string) =>
+    apiClient.get<RequestResponse[]>(`/marketplace/request-responses`, { requestId }),
+
+  // Получить мои отклики на заявки
+  getMyRequestResponses: () =>
+    apiClient.get<PaginatedResponse<RequestResponse>>('/marketplace/request-responses/my'),
+
+  // Создать отклик на заявку
+  createRequestResponse: (data: CreateRequestResponseDto) =>
+    apiClient.post<RequestResponse>('/marketplace/request-responses', data),
+
+  // Обновить отклик на заявку
+  updateRequestResponse: (id: string, data: Partial<CreateRequestResponseDto>) =>
+    apiClient.patch<RequestResponse>(`/marketplace/request-responses/${id}`, data),
+
+  // Удалить отклик на заявку
+  deleteRequestResponse: (id: string) => apiClient.delete(`/marketplace/request-responses/${id}`),
 }

@@ -1,12 +1,34 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+// Vue
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+
+// Stores
 import { useTelegramStore } from '@/stores/telegram'
+import { useAuthStore } from '@/stores'
+
+// Composables
+import { useEducation } from '@/shared/composables'
+
+// Services
+import { orderService } from '@/services/business'
+
+// Components
 import { Card, Button, Input, Select } from '@/shared/components/ui'
 import { ArrowIcon } from '@/shared/components/icons'
 
+// Composables
 const router = useRouter()
 const telegramStore = useTelegramStore()
+const authStore = useAuthStore()
+const {
+  activeSubjects,
+  teachers,
+  isLoading: educationLoading,
+  error: educationError,
+  isInitialized,
+  initialize,
+} = useEducation()
 
 const form = reactive({
   subject: '',
@@ -20,26 +42,22 @@ const form = reactive({
   schedule: '',
 })
 
-const subjects = [
-  { value: 'mathematics', label: 'Математика' },
-  { value: 'physics', label: 'Физика' },
-  { value: 'chemistry', label: 'Химия' },
-  { value: 'biology', label: 'Биология' },
-  { value: 'history', label: 'История' },
-  { value: 'literature', label: 'Литература' },
-  { value: 'russian', label: 'Русский язык' },
-  { value: 'english', label: 'Английский язык' },
-  { value: 'informatics', label: 'Информатика' },
-  { value: 'geography', label: 'География' },
-  { value: 'social', label: 'Обществознание' },
+// Вычисляемые свойства для опций
+const subjectOptions = computed(() => [
+  ...activeSubjects.value.map((subject) => ({
+    value: subject.id,
+    label: subject.name,
+  })),
   { value: 'other', label: 'Другое' },
-]
+])
 
-const teachers = [
-  { value: 'teacher1', label: 'Преподаватель 1' },
-  { value: 'teacher2', label: 'Преподаватель 2' },
-  { value: 'teacher3', label: 'Преподаватель 3' },
-]
+const teacherOptions = computed(() => [
+  { value: 'any', label: 'Любой преподаватель' },
+  ...teachers.value.map((teacher) => ({
+    value: teacher.id,
+    label: teacher.fullName,
+  })),
+])
 
 const deadlines = [
   { value: 'day', label: 'День', description: 'Исполнение в течение дня' },
@@ -60,17 +78,60 @@ const submitOrder = async () => {
   isSubmitting.value = true
   telegramStore.hapticFeedback('medium')
 
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 1500))
+  try {
+    // Подготавливаем данные для API
+    const requestData = {
+      studentId: authStore.user?.id || '',
+      subjectId: form.subject === 'other' ? '' : form.subject,
+      teacherId: form.teacher || '',
+      description: form.description,
+      budget: form.budget ? parseInt(form.budget) : undefined,
+      deadline: getDeadlineDate(),
+    }
 
-  telegramStore.hapticFeedback('heavy')
-  router.push('/student/orders')
-  isSubmitting.value = false
+    // Создаем заявку через API
+    await orderService.createRequest(requestData)
+
+    telegramStore.hapticFeedback('heavy')
+    router.push('/student/orders')
+  } catch (error: any) {
+    console.error('Ошибка создания заявки:', error)
+    telegramStore.showAlert('Ошибка при создании заявки. Попробуйте снова.')
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+const getDeadlineDate = (): string | undefined => {
+  if (!form.deadline) return undefined
+
+  const now = new Date()
+
+  switch (form.deadline) {
+    case 'day':
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString()
+    case 'week':
+      return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
+    case 'endOfSemester':
+      // Примерно до конца семестра (через 3 месяца)
+      return new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString()
+    case 'custom':
+      return form.customDate ? new Date(form.customDate).toISOString() : undefined
+    default:
+      return undefined
+  }
 }
 
 const validateForm = () => {
   const hasSubject = form.subject && (form.subject !== 'other' || form.customSubject)
   const hasDeadline = form.deadline && (form.deadline !== 'custom' || form.customDate)
+  const hasUser = !!authStore.user?.id
+
+  if (!hasUser) {
+    telegramStore.showAlert('Ошибка авторизации. Войдите в систему.')
+    return false
+  }
+
   return hasSubject && form.description && form.budget && hasDeadline
 }
 
@@ -78,6 +139,13 @@ const goBack = () => {
   telegramStore.hapticFeedback('light')
   router.back()
 }
+
+// Инициализация образовательных данных
+onMounted(async () => {
+  if (!isInitialized.value) {
+    await initialize()
+  }
+})
 </script>
 
 <template>
@@ -92,17 +160,46 @@ const goBack = () => {
       </div>
     </div>
 
-    <div class="p-4 flex flex-col gap-6">
+    <!-- Загрузка образовательных данных -->
+    <div v-if="educationLoading" class="flex justify-center items-center py-12">
+      <div class="text-center">
+        <div
+          class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"
+        ></div>
+        <p class="text-gray-600">Загрузка данных...</p>
+      </div>
+    </div>
+
+    <!-- Ошибка образовательных данных -->
+    <div v-else-if="educationError" class="text-center py-12">
+      <div class="text-red-600 mb-4">{{ educationError }}</div>
+      <button
+        @click="initialize"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Попробовать снова
+      </button>
+    </div>
+
+    <!-- Основной контент -->
+    <div v-else class="p-4 flex flex-col gap-6">
       <!-- Subject Selection -->
       <Card class="p-6">
         <h2 class="text-lg font-semibold text-telegram-text mb-4">Предмет</h2>
 
         <Select
           v-model="form.subject"
-          :options="subjects"
+          :options="subjectOptions"
           placeholder="Выберите предмет"
           required
           class="mb-4"
+        />
+
+        <Input
+          v-if="form.subject === 'other'"
+          v-model="form.customSubject"
+          placeholder="Укажите предмет"
+          class="mt-2"
         />
       </Card>
 
@@ -115,9 +212,8 @@ const goBack = () => {
 
         <Select
           v-model="form.teacher"
-          :options="teachers"
+          :options="teacherOptions"
           placeholder="Выберите преподавателя"
-          required
           class="mb-4"
         />
       </Card>

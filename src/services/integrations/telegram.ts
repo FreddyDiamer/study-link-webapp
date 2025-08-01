@@ -1,4 +1,3 @@
-import type { TelegramUser } from '@/shared/types'
 /// <reference types="@types/telegram-web-app" />
 
 class TelegramService {
@@ -6,6 +5,17 @@ class TelegramService {
 
   async init(): Promise<boolean> {
     if (typeof window === 'undefined') return false
+
+    // Проверяем, запущено ли приложение в Telegram
+    const isTelegramWebApp =
+      window.Telegram?.WebApp &&
+      window.Telegram.WebApp.initData &&
+      window.Telegram.WebApp.initDataUnsafe?.user
+
+    if (!isTelegramWebApp) {
+      console.warn('Telegram WebApp not available - running in browser mode')
+      return false
+    }
 
     // Wait for Telegram WebApp to load
     for (let i = 0; i < 100; i++) {
@@ -46,7 +56,7 @@ class TelegramService {
     return this.webapp
   }
 
-  getUser(): TelegramUser | null {
+  getUser(): WebAppUser | null {
     return this.webapp?.initDataUnsafe?.user || null
   }
 

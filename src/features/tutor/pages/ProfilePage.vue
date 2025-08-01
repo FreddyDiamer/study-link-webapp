@@ -1,24 +1,48 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
+import { userService } from '@/services/business'
+import { useTutor } from '@/shared/composables'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import { PATHS } from '@/router/paths'
+import type { User } from '@/shared/types'
 
 const router = useRouter()
 const telegramStore = useTelegramStore()
+const { getTutorStats } = useTutor()
 
-const stats = [
+const user = ref<User | null>(null)
+const isLoading = ref(false)
+
+// Статистика репетитора
+const stats = ref([
   { label: 'Активных услуг', value: '0', icon: '📚' },
   { label: 'Заявок за месяц', value: '0', icon: '📋' },
   { label: 'Студентов', value: '0', icon: '👥' },
   { label: 'Рейтинг', value: '5.0', icon: '⭐' },
-]
+])
 
-const notifications = [
-  { id: 1, text: 'У вас новая заявка от студента', isRead: false },
-  { id: 2, text: 'Обновление расписания занятий', isRead: true },
-]
+const loadProfile = async () => {
+  isLoading.value = true
+  try {
+    user.value = await userService.getProfile()
+
+    // Загружаем статистику репетитора
+    const tutorStats = await getTutorStats()
+    stats.value = [
+      { label: 'Активных услуг', value: tutorStats.activeServices.toString(), icon: '📚' },
+      { label: 'Заявок за месяц', value: tutorStats.monthlyRequests.toString(), icon: '📋' },
+      { label: 'Студентов', value: tutorStats.totalStudents.toString(), icon: '👥' },
+      { label: 'Рейтинг', value: tutorStats.averageRating.toFixed(1), icon: '⭐' },
+    ]
+  } catch (error) {
+    console.error('Ошибка загрузки профиля:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const openFeedback = () => {
   // Здесь будет логика открытия формы обратной связи
@@ -33,24 +57,34 @@ const openSupport = () => {
 const editProfile = () => {
   router.push(PATHS.TUTOR_EDIT_PROFILE)
 }
+
+onMounted(() => {
+  loadProfile()
+})
 </script>
 
 <template>
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
     <!-- Profile info -->
     <Card class="p-6 mb-6">
-      <div class="flex items-center space-x-4 mb-6">
+      <div v-if="isLoading" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+      </div>
+
+      <div v-else-if="user" class="flex items-center space-x-4 mb-6">
         <div
           class="w-16 h-16 bg-telegram-success rounded-full flex items-center justify-center text-white text-xl font-bold"
         >
-          {{ telegramStore.firstName?.charAt(0) || 'Р' }}
+          {{ user.name?.charAt(0) || telegramStore.firstName?.charAt(0) || 'Р' }}
         </div>
 
         <div class="flex-1">
           <h2 class="text-xl font-semibold text-telegram-text">
-            {{ telegramStore.firstName || 'Репетитор' }} {{ telegramStore.lastName || '' }}
+            {{ user.name || telegramStore.firstName || 'Репетитор' }}
           </h2>
-          <p class="text-telegram-textSecondary">@{{ telegramStore.username || 'username' }}</p>
+          <p class="text-telegram-textSecondary">
+            @{{ user.telegramUsername || telegramStore.username || 'username' }}
+          </p>
           <div class="inline-flex items-center mt-2 px-2 py-1 bg-telegram-success/10 rounded-lg">
             <svg
               class="w-4 h-4 text-telegram-success mr-1"

@@ -1,69 +1,103 @@
 import { apiClient } from './client'
-
-export interface Tutor {
-  id: string
-  name: string
-  avatar?: string
-  rating: number
-  reviewsCount: number
-  experience: number
-  education: string
-  subjects: string[]
-  specializations: string[]
-  price: number
-  isOnline: boolean
-  responseTime: string
-  description: string
-  format: string[]
-  availability: string
-  isVerified: boolean
-  isTopRated: boolean
-}
-
-export interface TutorSearchParams {
-  subject?: string
-  search?: string
-  minPrice?: number
-  maxPrice?: number
-  minRating?: number
-  format?: 'online' | 'offline' | 'both'
-  availability?: string
-  sortBy?: 'rating' | 'price' | 'experience' | 'reviews'
-  sortOrder?: 'asc' | 'desc'
-  page?: number
-  limit?: number
-}
-
-export interface TutorSearchResponse {
-  tutors: Tutor[]
-  total: number
-  page: number
-  totalPages: number
-}
+import type {
+  Service,
+  ServiceFilterDto,
+  CreateServiceDto,
+  UpdateServiceDto,
+  PaginatedResponse,
+  Tutor,
+  TutorSearchParams,
+} from '@/shared/types'
 
 export const tutorsApi = {
   // Поиск репетиторов
-  search: (params: TutorSearchParams) => apiClient.get<TutorSearchResponse>('/tutors', params),
+  search: (params: TutorSearchParams) =>
+    apiClient.get<PaginatedResponse<Tutor>>('/tutors/search', params),
 
-  // Получение репетитора по ID
+  // Получить репетитора по ID
   getById: (id: string) => apiClient.get<Tutor>(`/tutors/${id}`),
 
-  // Получение избранных репетиторов
-  getFavorites: () => apiClient.get<Tutor[]>('/tutors/favorites'),
+  // Добавить в избранное
+  addToFavorites: (tutorId: string) => apiClient.post(`/tutors/${tutorId}/favorites`),
 
-  // Добавление в избранное
-  addToFavorites: (tutorId: string) => apiClient.post(`/tutors/${tutorId}/favorite`),
+  // Удалить из избранного
+  removeFromFavorites: (tutorId: string) => apiClient.delete(`/tutors/${tutorId}/favorites`),
 
-  // Удаление из избранного
-  removeFromFavorites: (tutorId: string) => apiClient.delete(`/tutors/${tutorId}/favorite`),
+  // Получить избранных репетиторов
+  getFavorites: () => apiClient.get<PaginatedResponse<Tutor>>('/tutors/favorites'),
 
-  // Получение отзывов о репетиторе
-  getReviews: (tutorId: string, page = 1, limit = 10) =>
-    apiClient.get(`/tutors/${tutorId}/reviews`, { page, limit }),
+  // Получить популярных репетиторов
+  getPopular: (limit?: number) =>
+    apiClient.get<PaginatedResponse<Tutor>>('/tutors/popular', { limit }),
 
-  // Получение доступных предметов
-  getSubjects: () => apiClient.get<string[]>('/tutors/subjects'),
+  // Получить предметы
+  getSubjects: () => apiClient.get('/education/subjects'),
 
-  // Получение популярных репетиторов
-  getPopular: (limit = 6) => apiClient.get<Tutor[]>('/tutors/popular', { limit }),
+  // Получить статистику репетитора
+  getTutorStats: () =>
+    apiClient.get<{
+      totalStudents: number
+      totalReviews: number
+      averageRating: number
+      activeServices: number
+      monthlyRequests: number
+    }>('/tutors/stats'),
+
+  // Получить все услуги с фильтрацией
+  getServices: (params?: ServiceFilterDto) =>
+    apiClient.get<PaginatedResponse<Service>>('/marketplace/services', params),
+
+  // Получить активные услуги
+  getActiveServices: () =>
+    apiClient.get<PaginatedResponse<Service>>('/marketplace/services/active'),
+
+  // Получить популярные услуги
+  getPopularServices: (limit?: number) =>
+    apiClient.get<PaginatedResponse<Service>>('/marketplace/services/popular', { limit }),
+
+  // Получить мои услуги
+  getMyServices: () => apiClient.get<PaginatedResponse<Service>>('/marketplace/services/my'),
+
+  // Получить услуги конкретного репетитора
+  getServicesByTutor: (tutorId: string) =>
+    apiClient.get<PaginatedResponse<Service>>(`/marketplace/services/by-tutor/${tutorId}`),
+
+  // Получить услуги по предмету и преподавателю
+  getServicesBySubjectAndTeacher: (subjectId: string, teacherId: string) =>
+    apiClient.get<PaginatedResponse<Service>>(
+      `/marketplace/services/by-subject-teacher/${subjectId}/${teacherId}`,
+    ),
+
+  // Получить услугу по ID
+  getService: (id: string) => apiClient.get<Service>(`/marketplace/services/${id}`),
+
+  // Получить статистику услуги
+  getServiceStats: (id: string) => apiClient.get(`/marketplace/services/${id}/stats`),
+
+  // Создать услугу
+  createService: (data: CreateServiceDto) => apiClient.post<Service>('/marketplace/services', data),
+
+  // Обновить услугу
+  updateService: (id: string, data: UpdateServiceDto) =>
+    apiClient.patch<Service>(`/marketplace/services/${id}`, data),
+
+  // Активировать услугу
+  activateService: (id: string) => apiClient.patch<Service>(`/marketplace/services/${id}/activate`),
+
+  // Деактивировать услугу
+  deactivateService: (id: string) =>
+    apiClient.patch<Service>(`/marketplace/services/${id}/deactivate`),
+
+  // Удалить услугу
+  deleteService: (id: string) => apiClient.delete(`/marketplace/services/${id}`),
+}
+
+export const getTutorStats = async () => {
+  return await apiClient.get<{
+    totalStudents: number
+    totalReviews: number
+    averageRating: number
+    activeServices: number
+    monthlyRequests: number
+  }>('/tutors/stats')
 }

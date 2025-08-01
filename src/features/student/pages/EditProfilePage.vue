@@ -2,10 +2,12 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
+import { userService } from '@/services/business'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
 import { ArrowIcon } from '@/shared/components/icons'
+import type { User } from '@/shared/types'
 
 const router = useRouter()
 const telegramStore = useTelegramStore()
@@ -21,8 +23,11 @@ const handleSave = async () => {
   isLoading.value = true
 
   try {
-    // TODO: API call для сохранения данных профиля
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    const updateData: Partial<User> = {
+      name: `${form.firstName} ${form.lastName}`.trim(),
+    }
+
+    await userService.updateProfile(updateData)
 
     console.log('Профиль сохранен:', form)
 

@@ -1,10 +1,12 @@
 // API клиент
-export { apiClient } from './client'
+export { authApi } from './auth'
+export { tutorsApi } from './tutors'
+export { ordersApi } from './orders'
 
-// API модули
-export * from './auth'
-export * from './tutors'
-export * from './orders'
+// Новые API клиенты
+export { usersApi } from './users'
+export { educationApi } from './education'
+export { reviewsApi } from './reviews'
 
 // Типы
 export type { ApiResponse } from '@/shared/types'

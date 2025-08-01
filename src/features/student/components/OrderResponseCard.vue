@@ -3,6 +3,7 @@ import { Card, Button } from '@/shared/components/ui'
 import { ContactIcon } from '@/shared/components/icons'
 import { formatDate } from '@/shared/utils'
 import { useTelegramStore } from '@/stores/telegram'
+import { ResponseStatus, type RequestResponse } from '@/shared/types'
 
 const telegramStore = useTelegramStore()
 
@@ -11,7 +12,7 @@ const emit = defineEmits<{
 }>()
 
 defineProps<{
-  response: any
+  response: RequestResponse
 }>()
 
 const getStatusInfo = (status: string) => {
@@ -86,9 +87,9 @@ const declineService = (response: any) => {
     :key="response.id"
     class="p-6"
     :class="{
-      'border-telegram-accent bg-telegram-accent/5': !response.isRead,
-      'border-orange-500 bg-orange-500/10': response.status === 'accepted',
-      'border-telegram-success bg-telegram-success/10': response.status === 'in_progress',
+      'border-telegram-accent bg-telegram-accent/5': true,
+      'border-orange-500 bg-orange-500/10': response.status === ResponseStatus.ACCEPTED,
+      'border-telegram-success bg-telegram-success/10': response.status === ResponseStatus.ACCEPTED,
     }"
   >
     <!-- Tutor Header -->
@@ -97,7 +98,7 @@ const declineService = (response: any) => {
         <div
           class="w-12 h-12 shrink-0 bg-telegram-accent/20 rounded-full flex items-center justify-center"
         >
-          <span class="text-telegram-accent font-semibold">{{ response.tutor.avatar }}</span>
+          <span class="text-telegram-accent font-semibold">{{ response.tutor.name[0] }}</span>
         </div>
         <div>
           <h3 class="font-semibold text-telegram-text">{{ response.tutor.name }}</h3>
@@ -108,9 +109,9 @@ const declineService = (response: any) => {
                   d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                 />
               </svg>
-              <span>{{ response.tutor.rating }}</span>
+              <span>{{ 0 }}</span>
             </div>
-            <span class="whitespace-nowrap">{{ response.tutor.completedLessons }} услуг</span>
+            <span class="whitespace-nowrap">{{ 0 }} отзывов</span>
           </div>
         </div>
       </div>
@@ -137,15 +138,15 @@ const declineService = (response: any) => {
     <!-- Response Time -->
     <div class="flex items-center justify-between mb-4">
       <span class="text-telegram-textSecondary text-xs">
-        Отклик отправлен {{ formatDate(response.respondedAt) }}
+        Отклик отправлен {{ formatDate(response.createdAt) }}
       </span>
-      <div v-if="!response.isRead" class="w-2 h-2 bg-telegram-accent rounded-full"></div>
+      <div class="w-2 h-2 bg-telegram-accent rounded-full"></div>
     </div>
 
     <!-- Actions -->
     <div class="flex space-x-3">
       <!-- Pending Response Actions -->
-      <template v-if="response.status === 'pending'">
+      <template v-if="response.status === ResponseStatus.PENDING">
         <Button @click="acceptResponse(response)" class="flex-1">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -171,7 +172,7 @@ const declineService = (response: any) => {
       </template>
 
       <!-- Accepted Response Actions -->
-      <template v-else-if="response.status === 'accepted'">
+      <template v-else-if="response.status === ResponseStatus.ACCEPTED">
         <div class="space-y-3 w-full">
           <Button @click="contactTutor(response)" variant="secondary" class="w-full">
             <ContactIcon class="w-4 h-4 mr-2" />
@@ -199,7 +200,7 @@ const declineService = (response: any) => {
       </template>
 
       <!-- In Progress Response Actions -->
-      <template v-else-if="response.status === 'in_progress'">
+      <template v-else-if="response.status === ResponseStatus.EXPIRED">
         <Button @click="contactTutor(response)" variant="secondary" class="flex-1">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -217,7 +218,7 @@ const declineService = (response: any) => {
       </template>
 
       <!-- Declined Response -->
-      <template v-else-if="response.status === 'declined'">
+      <template v-else-if="response.status === ResponseStatus.REJECTED">
         <div class="flex-1 text-center py-2 text-telegram-textSecondary text-sm">
           Отклик отклонен
         </div>

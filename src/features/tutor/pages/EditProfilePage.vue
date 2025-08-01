@@ -1,44 +1,72 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
+import { userService } from '@/services/business'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
 import { ArrowIcon } from '@/shared/components/icons'
+import type { User } from '@/shared/types'
 
 const router = useRouter()
 const telegramStore = useTelegramStore()
 
+const user = ref<User | null>(null)
+const isLoading = ref(false)
+const isSaving = ref(false)
+
 const form = reactive({
-  firstName: telegramStore.firstName || '',
-  lastName: telegramStore.lastName || '',
+  name: '',
   description: '',
 })
 
-const isLoading = ref(false)
+const loadProfile = async () => {
+  isLoading.value = true
+  try {
+    user.value = await userService.getProfile()
+    // Заполняем форму данными пользователя
+    form.name = user.value.name || ''
+    form.description = user.value.description || ''
+  } catch (error) {
+    console.error('Ошибка загрузки профиля:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const handleSave = async () => {
-  isLoading.value = true
+  isSaving.value = true
 
   try {
-    // TODO: API call для сохранения данных профиля
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    const updateData: Partial<User> = {}
 
-    console.log('Профиль сохранен:', form)
+    if (form.name.trim()) {
+      updateData.name = form.name.trim()
+    }
+
+    if (form.description.trim()) {
+      updateData.description = form.description.trim()
+    }
+
+    await userService.updateProfile(updateData)
 
     // Возвращаемся на предыдущую страницу
     router.back()
   } catch (error) {
     console.error('Ошибка сохранения профиля:', error)
   } finally {
-    isLoading.value = false
+    isSaving.value = false
   }
 }
 
 const handleBack = () => {
   router.back()
 }
+
+onMounted(() => {
+  loadProfile()
+})
 </script>
 
 <template>
@@ -56,13 +84,17 @@ const handleBack = () => {
 
     <!-- Profile Form -->
     <Card class="p-6 mb-6">
-      <form @submit.prevent="handleSave" class="space-y-6">
+      <div v-if="isLoading" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+      </div>
+
+      <form v-else @submit.prevent="handleSave" class="space-y-6">
         <!-- Avatar Section -->
         <div class="flex items-center space-x-4 mb-6">
           <div
             class="w-16 h-16 bg-telegram-success rounded-full flex items-center justify-center text-white text-xl font-bold"
           >
-            {{ form.firstName?.charAt(0) || 'Р' }}
+            {{ form.name?.charAt(0) || user?.name?.charAt(0) || 'Р' }}
           </div>
           <div>
             <h3 class="text-lg font-medium text-telegram-text">Фото профиля</h3>
@@ -74,13 +106,7 @@ const handleBack = () => {
 
         <!-- Form Fields -->
         <div class="space-y-4">
-          <Input v-model="form.firstName" label="Имя" placeholder="Введите ваше имя" required />
-
-          <Input
-            v-model="form.lastName"
-            label="Фамилия"
-            placeholder="Введите вашу фамилию (необязательно)"
-          />
+          <Input v-model="form.name" label="Имя" placeholder="Введите ваше имя" required />
 
           <div class="space-y-2">
             <label class="block text-sm font-medium text-telegram-text"> Описание </label>
@@ -100,9 +126,11 @@ const handleBack = () => {
 
     <!-- Action Buttons -->
     <div class="space-y-3">
-      <Button @click="handleSave" :loading="isLoading" class="w-full"> Сохранить изменения </Button>
+      <Button @click="handleSave" :loading="isSaving" class="w-full" :disabled="isLoading">
+        Сохранить изменения
+      </Button>
 
-      <Button variant="ghost" @click="handleBack" class="w-full" :disabled="isLoading">
+      <Button variant="ghost" @click="handleBack" class="w-full" :disabled="isLoading || isSaving">
         Отменить
       </Button>
     </div>
