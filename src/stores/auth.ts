@@ -12,9 +12,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Getters
   const isAuthenticated = computed(() => !!user.value && !!token.value)
-  const userRole = computed(() => user.value?.role)
-  const isStudent = computed(() => userRole.value === 'student' || userRole.value === 'both')
-  const isTutor = computed(() => userRole.value === 'tutor' || userRole.value === 'both')
 
   // Mutations (только изменение состояния)
   const setUser = (newUser: User) => {
@@ -73,9 +70,6 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Getters
     isAuthenticated,
-    userRole,
-    isStudent,
-    isTutor,
 
     // Mutations
     setUser,

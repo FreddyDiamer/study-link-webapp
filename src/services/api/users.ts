@@ -2,15 +2,28 @@ import { apiClient } from './client'
 import type { User } from '@/shared/types'
 
 export const usersApi = {
-  // Получить профиль пользователя
-  getProfile: () => apiClient.get<User>('/users/profile'),
+  // Получить профиль текущего пользователя
+  getProfile(): Promise<User> {
+    return apiClient.get('/users/me')
+  },
 
-  // Обновить профиль пользователя
-  updateProfile: (data: Partial<User>) => apiClient.patch<User>('/users/profile', data),
+  // Обновить профиль текущего пользователя
+  updateProfile(data: Partial<User>): Promise<User> {
+    return apiClient.patch('/users/me', data)
+  },
+
+  // Обновить группу пользователя
+  updateGroup(userId: string, groupId?: string): Promise<User> {
+    return apiClient.patch(`/users/${userId}/group`, { groupId })
+  },
 
   // Получить пользователя по ID
-  getUser: (id: string) => apiClient.get<User>(`/users/${id}`),
+  getUser(id: string): Promise<User> {
+    return apiClient.get(`/users/${id}`)
+  },
 
-  // Получить баланс пользователя
-  getBalance: () => apiClient.get<{ balance: number }>('/users/balance'),
+  // Получить статистику пользователя
+  getUserStats(id: string): Promise<any> {
+    return apiClient.get(`/users/${id}/stats`)
+  },
 }

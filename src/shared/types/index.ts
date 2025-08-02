@@ -10,6 +10,8 @@ export interface User {
   firstName?: string
   description?: string
   avatarUrl?: string
+  groupId?: string
+  group?: Group
   balance: number // в копейках
   lastActivity: string
   createdAt: string
@@ -58,6 +60,13 @@ export interface Teacher {
   id: string
   fullName: string
   foreignId: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Group {
+  id: string
+  number: string
   createdAt: string
   updatedAt: string
 }

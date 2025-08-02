@@ -1,42 +1,64 @@
 import { apiClient } from './client'
-import type { Subject, Teacher, TeacherSubject } from '@/shared/types'
+import type { Subject, Teacher, TeacherSubject, Group } from '@/shared/types'
 
 export const educationApi = {
   // =============================================================================
   // SUBJECTS
   // =============================================================================
 
-  // Получить все предметы
-  getSubjects: () => apiClient.get<Subject[]>('/education/subjects'),
+  getSubjects(): Promise<Subject[]> {
+    return apiClient.get('/education/subjects')
+  },
 
-  // Получить активные предметы
-  getActiveSubjects: () => apiClient.get<Subject[]>('/education/subjects/active'),
-
-  // Получить предмет по ID
-  getSubject: (id: string) => apiClient.get<Subject>(`/education/subjects/${id}`),
+  getSubject(id: string): Promise<Subject> {
+    return apiClient.get(`/education/subjects/${id}`)
+  },
 
   // =============================================================================
   // TEACHERS
   // =============================================================================
 
-  // Получить всех преподавателей
-  getTeachers: () => apiClient.get<Teacher[]>('/education/teachers'),
+  getTeachers(): Promise<Teacher[]> {
+    return apiClient.get('/education/teachers')
+  },
 
-  // Получить преподавателя по ID
-  getTeacher: (id: string) => apiClient.get<Teacher>(`/education/teachers/${id}`),
+  getTeacher(id: string): Promise<Teacher> {
+    return apiClient.get(`/education/teachers/${id}`)
+  },
 
   // =============================================================================
   // TEACHER SUBJECTS
   // =============================================================================
 
-  // Получить связи преподаватель-предмет
-  getTeacherSubjects: () => apiClient.get<TeacherSubject[]>('/education/teacher-subjects'),
+  getTeacherSubjects(): Promise<TeacherSubject[]> {
+    return apiClient.get('/education/teacher-subjects')
+  },
 
-  // Получить предметы преподавателя
-  getTeacherSubjectsByTeacher: (teacherId: string) =>
-    apiClient.get<TeacherSubject[]>(`/education/teacher-subjects/by-teacher/${teacherId}`),
+  getTeacherSubjectsByTeacher(teacherId: string): Promise<TeacherSubject[]> {
+    return apiClient.get(`/education/teacher-subjects/teacher/${teacherId}`)
+  },
 
-  // Получить преподавателей предмета
-  getTeacherSubjectsBySubject: (subjectId: string) =>
-    apiClient.get<TeacherSubject[]>(`/education/teacher-subjects/by-subject/${subjectId}`),
+  getTeacherSubjectsBySubject(subjectId: string): Promise<TeacherSubject[]> {
+    return apiClient.get(`/education/teacher-subjects/subject/${subjectId}`)
+  },
+
+  // =============================================================================
+  // GROUPS
+  // =============================================================================
+
+  getGroups(): Promise<Group[]> {
+    return apiClient.get('/education/groups')
+  },
+
+  getGroup(id: string): Promise<Group> {
+    return apiClient.get(`/education/groups/${id}`)
+  },
+
+  createGroup(data: { number: string }): Promise<Group> {
+    return apiClient.post('/education/groups', data)
+  },
+
+  deleteGroup(id: string): Promise<void> {
+    return apiClient.delete(`/education/groups/${id}`)
+  },
 }

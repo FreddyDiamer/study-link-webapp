@@ -10,7 +10,7 @@ export interface SelectOption {
 }
 
 interface Props {
-  modelValue: string | null
+  modelValue: SelectOption | null
   options: SelectOption[]
   label?: string
   placeholder?: string
@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string | null]
+  'update:modelValue': [value: SelectOption | null]
 }>()
 
 const isOpen = ref(false)
@@ -35,7 +35,7 @@ const highlightedIndex = ref(-1)
 const selectId = computed(() => `select-${Math.random().toString(36).substr(2, 9)}`)
 
 const selectedOption = computed(() => {
-  return props.options.find((option) => option.value === props.modelValue)
+  return props.options.find((option) => option.value === props.modelValue?.value)
 })
 
 const filteredOptions = computed(() => {
@@ -58,7 +58,7 @@ const filteredOptions = computed(() => {
 watch(
   () => props.modelValue,
   (newValue) => {
-    const option = props.options.find((opt) => opt.value === newValue)
+    const option = props.options.find((opt) => opt.value === newValue?.value)
     inputValue.value = option ? option.label : ''
   },
   { immediate: true },
@@ -95,7 +95,7 @@ const closeDropdown = () => {
   highlightedIndex.value = -1
 
   // Восстанавливаем значение, если ничего не выбрано
-  const option = props.options.find((opt) => opt.value === props.modelValue)
+  const option = props.options.find((opt) => opt.value === props.modelValue?.value)
   inputValue.value = option ? option.label : ''
 }
 
@@ -105,7 +105,7 @@ const selectOption = (option: SelectOption) => {
     emit('update:modelValue', null)
     inputValue.value = ''
   } else {
-    emit('update:modelValue', option.value)
+    emit('update:modelValue', option)
     inputValue.value = option.label
   }
   closeDropdown()
@@ -208,9 +208,9 @@ onUnmounted(() => {
           class="w-full px-4 py-3 text-left hover:bg-telegram-secondary transition-colors border-b border-telegram-border last:border-b-0"
           :class="{
             'bg-telegram-accent/10 text-telegram-accent':
-              modelValue === option.value && option.value !== '',
+              modelValue?.value === option.value && option.value !== '',
             'text-telegram-textSecondary italic': option.value === '',
-            'text-telegram-text': modelValue !== option.value && option.value !== '',
+            'text-telegram-text': modelValue?.value !== option.value && option.value !== '',
             'bg-telegram-secondary': highlightedIndex === index,
           }"
           @mouseenter="highlightedIndex = index"
@@ -218,7 +218,7 @@ onUnmounted(() => {
           <div class="flex items-center justify-between">
             <span class="font-medium" v-html="highlightSearchText(option.label)"></span>
             <svg
-              v-if="modelValue === option.value && option.value !== ''"
+              v-if="modelValue?.value === option.value && option.value !== ''"
               class="w-4 h-4 text-telegram-accent"
               fill="currentColor"
               viewBox="0 0 20 20"

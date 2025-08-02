@@ -6,7 +6,10 @@ export type UserFlow = 'student' | 'tutor'
 
 export const useAppStore = defineStore('app', () => {
   const currentFlow = useLocalStorage<UserFlow | null>('currentFlow', null)
+
   const isAuthenticated = ref(false)
+
+  const showGroupCard = useLocalStorage<boolean>('showGroupCard', true)
 
   const setFlow = (flow: UserFlow) => {
     currentFlow.value = flow
@@ -22,6 +25,7 @@ export const useAppStore = defineStore('app', () => {
   return {
     currentFlow,
     isAuthenticated,
+    showGroupCard,
     setFlow,
     clearFlow,
     isStudentFlow,

@@ -7,8 +7,6 @@ const isLoading = ref(false)
 
 export const useAuth = () => {
   const isAuthenticated = computed(() => !!user.value)
-  const isStudent = computed(() => user.value?.role === 'student' || user.value?.role === 'both')
-  const isTutor = computed(() => user.value?.role === 'tutor' || user.value?.role === 'both')
 
   const login = async (telegramUser: any) => {
     isLoading.value = true
@@ -21,12 +19,11 @@ export const useAuth = () => {
       user.value = {
         id: '1',
         telegramId: telegramUser.id,
-        username: telegramUser.username,
+        telegramUsername: telegramUser.username,
         firstName: telegramUser.first_name,
-        lastName: telegramUser.last_name,
-        role: 'student',
-        rating: 0,
-        reviewsCount: 0,
+        name: telegramUser.first_name,
+        lastActivity: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         balance: 0,
         createdAt: new Date().toISOString(),
       }
@@ -56,8 +53,6 @@ export const useAuth = () => {
   return {
     user: computed(() => user.value),
     isAuthenticated,
-    isStudent,
-    isTutor,
     isLoading: computed(() => isLoading.value),
     login,
     logout,
