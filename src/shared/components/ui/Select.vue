@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { ArrowIcon, LoupeIcon } from '../icons'
 import { Input } from '.'
-import { delay } from '@/shared/utils'
 
 export interface SelectOption {
   value: string
@@ -10,7 +9,7 @@ export interface SelectOption {
 }
 
 interface Props {
-  modelValue: SelectOption | null
+  modelValue?: SelectOption | null
   options: SelectOption[]
   label?: string
   placeholder?: string
@@ -27,16 +26,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: SelectOption | null]
+  'update:value': [value: string | null]
 }>()
 
 const isOpen = ref(false)
 const inputValue = ref('')
 const highlightedIndex = ref(-1)
 const selectId = computed(() => `select-${Math.random().toString(36).substr(2, 9)}`)
-
-const selectedOption = computed(() => {
-  return props.options.find((option) => option.value === props.modelValue?.value)
-})
+const selectedOption = ref<SelectOption | null>(null)
 
 const filteredOptions = computed(() => {
   let options = props.options
@@ -47,7 +44,7 @@ const filteredOptions = computed(() => {
   }
 
   // Добавляем опцию сброса если что-то выбрано
-  if (props.modelValue && !inputValue.value) {
+  if (selectedOption.value && !inputValue.value) {
     return [{ value: '', label: 'Отменить выбор' }, ...options]
   }
 
@@ -57,6 +54,13 @@ const filteredOptions = computed(() => {
 // Синхронизация inputValue с выбранным значением
 watch(
   () => props.modelValue,
+  (newValue) => {
+    if (newValue !== undefined) selectedOption.value = newValue
+  },
+)
+
+watch(
+  () => selectedOption.value,
   (newValue) => {
     const option = props.options.find((opt) => opt.value === newValue?.value)
     inputValue.value = option ? option.label : ''
@@ -95,17 +99,21 @@ const closeDropdown = () => {
   highlightedIndex.value = -1
 
   // Восстанавливаем значение, если ничего не выбрано
-  const option = props.options.find((opt) => opt.value === props.modelValue?.value)
+  const option = props.options.find((opt) => opt.value === selectedOption?.value?.value)
   inputValue.value = option ? option.label : ''
 }
 
 const selectOption = (option: SelectOption) => {
   if (option.value === '') {
     // Отмена выбора
+    selectedOption.value = null
     emit('update:modelValue', null)
+    emit('update:value', null)
     inputValue.value = ''
   } else {
+    selectedOption.value = option
     emit('update:modelValue', option)
+    emit('update:value', option.value)
     inputValue.value = option.label
   }
   closeDropdown()
@@ -208,9 +216,9 @@ onUnmounted(() => {
           class="w-full px-4 py-3 text-left hover:bg-telegram-secondary transition-colors border-b border-telegram-border last:border-b-0"
           :class="{
             'bg-telegram-accent/10 text-telegram-accent':
-              modelValue?.value === option.value && option.value !== '',
+              selectedOption?.value === option.value && option.value !== '',
             'text-telegram-textSecondary italic': option.value === '',
-            'text-telegram-text': modelValue?.value !== option.value && option.value !== '',
+            'text-telegram-text': selectedOption?.value !== option.value && option.value !== '',
             'bg-telegram-secondary': highlightedIndex === index,
           }"
           @mouseenter="highlightedIndex = index"
@@ -218,7 +226,7 @@ onUnmounted(() => {
           <div class="flex items-center justify-between">
             <span class="font-medium" v-html="highlightSearchText(option.label)"></span>
             <svg
-              v-if="modelValue?.value === option.value && option.value !== ''"
+              v-if="selectedOption?.value === option.value && option.value !== ''"
               class="w-4 h-4 text-telegram-accent"
               fill="currentColor"
               viewBox="0 0 20 20"

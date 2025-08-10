@@ -105,16 +105,17 @@ const submitOrder = async () => {
 const getDeadlineDate = (): string | undefined => {
   if (!form.deadline) return undefined
 
-  const now = new Date()
+  const now = Date.now()
+  const dayMs = 24 * 60 * 60 * 1000
 
   switch (form.deadline) {
     case 'day':
-      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString()
+      return new Date(now + dayMs).toISOString()
     case 'week':
-      return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      return new Date(now + 7 * dayMs).toISOString()
     case 'endOfSemester':
       // Примерно до конца семестра (через 3 месяца)
-      return new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString()
+      return new Date(now + 90 * dayMs).toISOString()
     case 'custom':
       return form.customDate ? new Date(form.customDate).toISOString() : undefined
     default:
@@ -132,12 +133,12 @@ const validateForm = () => {
     return false
   }
 
-  return hasSubject && form.description && form.budget && hasDeadline
+  return hasSubject && form.budget && hasDeadline
 }
 
 const goBack = () => {
   telegramStore.hapticFeedback('light')
-  router.back()
+  // router.back()
 }
 
 // Инициализация образовательных данных
@@ -188,7 +189,7 @@ onMounted(async () => {
         <h2 class="text-lg font-semibold text-telegram-text mb-4">Предмет</h2>
 
         <Select
-          v-model="form.subject"
+          v-model:value="form.subject"
           :options="subjectOptions"
           placeholder="Выберите предмет"
           required
@@ -211,7 +212,7 @@ onMounted(async () => {
         </p>
 
         <Select
-          v-model="form.teacher"
+          v-model:value="form.teacher"
           :options="teacherOptions"
           placeholder="Выберите преподавателя"
           class="mb-4"
@@ -240,7 +241,7 @@ onMounted(async () => {
         </p>
 
         <Select
-          v-model="form.deadline"
+          v-model:value="form.deadline"
           :options="deadlines"
           placeholder="Выберите срок"
           required

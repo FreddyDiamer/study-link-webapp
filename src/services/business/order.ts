@@ -397,24 +397,18 @@ export class OrderService {
     if (!data.teacherId) {
       throw new Error('Выберите преподавателя')
     }
-    if (!data.description || data.description.trim().length < 10) {
-      throw new Error('Описание должно содержать минимум 10 символов')
-    }
     if (data.description && data.description.length > 500) {
       throw new Error('Описание не должно превышать 500 символов')
     }
     if (data.budget && data.budget < 100) {
       throw new Error('Бюджет должен быть не менее 100 рублей')
     }
-    if (data.budget && data.budget > 10000) {
-      throw new Error('Бюджет не должен превышать 10000 рублей')
+    if (data.budget && data.budget > 50000) {
+      throw new Error('Бюджет не должен превышать 50000 рублей')
     }
   }
 
   private validateUpdateRequestData(data: any): void {
-    if (data.description && data.description.trim().length < 10) {
-      throw new Error('Описание должно содержать минимум 10 символов')
-    }
     if (data.description && data.description.length > 500) {
       throw new Error('Описание не должно превышать 500 символов')
     }

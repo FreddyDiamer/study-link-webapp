@@ -14,6 +14,7 @@ import { PlusIcon } from '@components/icons'
 import { Button, Card, Input } from '@components/ui'
 import QuickActions from '../components/QuickActions.vue'
 import SelectGroupCard from '../components/SelectGroupCard.vue'
+import { PATHS } from '@/router/paths'
 
 // Composables
 const router = useRouter()
@@ -72,9 +73,10 @@ const formatDate = (dateString: string | null) => {
 
 const search = () => {
   telegramStore.hapticFeedback('light')
+  const searchValue = searchQuery.value.trim()
   router.push({
-    path: '/student/tutors',
-    query: searchQuery.value.trim() ? { search: searchQuery.value.trim() } : {},
+    path: PATHS.STUDENT_SERVICES,
+    query: searchValue ? { search: searchValue } : {},
   })
 }
 
@@ -140,7 +142,7 @@ onMounted(async () => {
             placeholder="Поиск репетиторов, предметов..."
             class="w-full"
           />
-          <Button @click="search" class="w-full" size="sm"> Найти репетиторов </Button>
+          <Button @click="search" class="w-full" size="sm">Найти услугу</Button>
         </div>
       </Card>
 
