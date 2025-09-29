@@ -109,7 +109,7 @@ onMounted(async () => {
 <template>
   <div class="min-h-screen bg-telegram-bg p-4 flex flex-col gap-6">
     <!-- Group Number Input -->
-    <SelectGroupCard v-if="appStore.showGroupCard && !authStore.user?.group" />
+    <SelectGroupCard v-if="appStore.showGroupCard || !authStore.user?.group" />
 
     <!-- Загрузка образовательных данных -->
     <div v-if="educationLoading" class="flex justify-center items-center py-12">

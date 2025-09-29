@@ -49,10 +49,15 @@ const saveGroupNumber = async () => {
     telegramStore.hapticFeedback('medium')
 
     // Если группа не выбрана, передаем undefined для удаления группы
-    const groupId = group.value?.value || undefined
+    const groupId = group.value?.value
+
+    if (!groupId) {
+      console.error('Группа не выбрана')
+      return
+    }
 
     // Обновляем группу пользователя через API
-    const updatedUser = await usersApi.updateGroup(authStore.user!.id, groupId)
+    const updatedUser = await usersApi.updateGroup(groupId)
 
     // Обновляем данные в store
     authStore.setUser(updatedUser)

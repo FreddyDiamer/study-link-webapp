@@ -13,8 +13,8 @@ export const usersApi = {
   },
 
   // Обновить группу пользователя
-  updateGroup(userId: string, groupId?: string): Promise<User> {
-    return apiClient.patch(`/users/${userId}/group`, { groupId })
+  updateGroup(groupId: string): Promise<User> {
+    return apiClient.patch(`/users/group`, { groupId })
   },
 
   // Получить пользователя по ID
