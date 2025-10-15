@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { useEducation } from '@/shared/composables'
 import { useService } from '@/shared/composables'
-import { Card, Button, Input, Select } from '@/shared/components/ui'
+import { Card, Button, Input, Select, type SelectOption } from '@/shared/components/ui'
 import { ArrowIcon } from '@/shared/components/icons'
 import type { CreateServiceDto } from '@/shared/types'
 
@@ -21,11 +21,11 @@ const {
 } = useEducation()
 
 const form = reactive({
-  subject: '',
-  teacher: '',
+  subject: null as SelectOption | null,
+  teacher: null as SelectOption | null,
   description: '',
   price: '',
-  deadline: '',
+  deadline: null as SelectOption | null,
   customDate: '',
 })
 
@@ -59,10 +59,22 @@ const submitService = async () => {
   isSubmitting.value = true
   telegramStore.hapticFeedback('medium')
 
+  if (!form.subject) {
+    telegramStore.showAlert('Укажите предмет')
+
+    return
+  }
+
+  if (!form.teacher) {
+    telegramStore.showAlert('Укажите преподавателя')
+
+    return
+  }
+
   try {
     const serviceData: CreateServiceDto = {
-      subjectId: form.subject,
-      teacherId: form.teacher,
+      subjectId: form.subject.value,
+      teacherId: form.teacher.value,
       description: form.description,
       price: parseInt(form.price) * 100, // Конвертируем в копейки
       deadline: getDeadlineDate(),
@@ -85,7 +97,7 @@ const getDeadlineDate = (): string | undefined => {
 
   const now = new Date()
 
-  switch (form.deadline) {
+  switch (form.deadline.value) {
     case '1':
       return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString()
     case '3':
@@ -104,7 +116,7 @@ const validateForm = () => {
   const hasTeacher = form.teacher
   const hasDescription = form.description.trim()
   const hasPrice = form.price && parseInt(form.price) > 0
-  const hasDeadline = form.deadline && (form.deadline !== 'custom' || form.customDate)
+  const hasDeadline = form.deadline && (form.deadline.value !== 'custom' || form.customDate)
 
   return hasSubject && hasTeacher && hasDescription && hasPrice && hasDeadline
 }
@@ -212,7 +224,7 @@ onMounted(async () => {
           class="mb-4"
         />
 
-        <Input v-if="form.deadline === 'custom'" v-model="form.customDate" type="date" />
+        <Input v-if="form.deadline?.value === 'custom'" v-model="form.customDate" type="date" />
       </Card>
 
       <!-- Price -->
