@@ -23,64 +23,7 @@ const {
 
 // Данные заказа
 const order = ref<Request | null>(null)
-const responses = ref<RequestResponse[]>([
-  {
-    id: '1',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    tutorId: '1',
-    requestId: '1',
-    request: {
-      id: '1',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      studentId: '1',
-      subjectId: '1',
-      teacherId: '1',
-      description: 'Описание заказа',
-      budget: 1000,
-      deadline: new Date().toISOString(),
-      student: {
-        id: '1',
-        telegramUsername: 'annapetrova',
-        telegramId: '1234567890',
-        balance: 1000,
-        name: 'Анна Петрова',
-        createdAt: new Date().toISOString(),
-        lastActivity: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      subject: {
-        id: '1',
-        name: 'Математика',
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      teacher: {
-        id: '1',
-        fullName: 'Анна Петрова',
-        foreignId: '1234567890',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    },
-    tutor: {
-      id: '1',
-      telegramUsername: 'annapetrova',
-      telegramId: '1234567890',
-      balance: 1000,
-      name: 'Анна Петрова',
-      createdAt: new Date().toISOString(),
-      lastActivity: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    message:
-      'Здравствуйте! Готова помочь с подготовкой к ЕГЭ по математике. Специализируюсь на параметрах и планиметрии. Занимаюсь подготовкой к ЕГЭ 8 лет, мои ученики набирают 80+ баллов. Провожу бесплатное пробное занятие для знакомства.',
-    price: 2200,
-    status: ResponseStatus.EXPIRED,
-  },
-])
+const responses = ref<RequestResponse[]>([])
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 
@@ -100,7 +43,7 @@ const loadOrderDetails = async () => {
     ])
 
     order.value = orderData
-    // responses.value = responsesData
+    responses.value = responsesData
   } catch (err: any) {
     error.value = err.message || 'Ошибка загрузки данных заказа'
     console.error('Ошибка загрузки заказа:', err)
@@ -175,16 +118,17 @@ onMounted(async () => {
   <div class="min-h-screen bg-telegram-bg pt-6">
     <!-- Header -->
     <div class="px-4 mb-6">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center">
         <Button variant="ghost" @click="handleBack" class="!p-2">
-          <ArrowIcon class="w-5 h-5 rotate-180" />
+          <ArrowIcon class="w-5 h-5 rotate-90" />
         </Button>
 
         <h1 class="text-lg font-semibold text-telegram-text">Детали заказа</h1>
 
-        <Button v-if="order" variant="ghost" @click="handleEditOrder" class="!p-2">
+        <!-- TODO: Добавить редактирование заявки -->
+        <!-- <Button v-if="order" variant="ghost" @click="handleEditOrder" class="!p-2">
           Редактировать
-        </Button>
+        </Button> -->
       </div>
     </div>
 

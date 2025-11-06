@@ -48,11 +48,13 @@ const subjectOptions = computed(() => [
     value: subject.id,
     label: subject.name,
   })),
-  { value: 'other', label: 'Другое' },
+  // TODO: Добавить опцию "Другое"
+  // { value: 'other', label: 'Другое' },
 ])
 
 const teacherOptions = computed(() => [
-  { value: 'any', label: 'Любой преподаватель' },
+  // TODO: Добавить опцию "Любой преподаватель"
+  // { value: 'any', label: 'Любой преподаватель' },
   ...teachers.value.map((teacher) => ({
     value: teacher.id,
     label: teacher.fullName,

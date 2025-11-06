@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { Modal, Button, Input, Select } from '@/shared/components/ui'
-import { useTelegramStore } from '@/stores/telegram'
+import { useTelegramStore, useAuthStore } from '@/stores'
+import { useOrder } from '@/shared/composables'
 
 interface Service {
   id: string
@@ -34,19 +35,21 @@ interface RequestData {
 }
 
 const telegramStore = useTelegramStore()
+const authStore = useAuthStore()
+const { createServiceResponse } = useOrder()
 
 const form = reactive({
   message: '',
-  budget: '',
+  budget: 'service-price',
   urgency: 'week',
 })
 
 const isLoading = ref(false)
 
 const budgetOptions = computed(() => [
-  { value: 'service-price', label: `${props.service?.price || 1000}₽/час (как указано)` },
+  { value: 'service-price', label: `${props.service?.price || 1000}₽` },
   { value: 'flexible', label: 'Готов обсудить цену' },
-  { value: 'lower', label: 'Ищу более низкую цену' },
+  { value: 'lower', label: 'Ищу более низкую' },
   { value: 'higher', label: 'Готов доплатить за качество' },
 ])
 
@@ -56,11 +59,6 @@ const urgencyOptions = [
   { value: 'week', label: 'На этой неделе' },
   { value: 'month', label: 'В течение месяца' },
 ]
-
-const defaultMessage = computed(() => {
-  if (!props.service) return ''
-  return `Здравствуйте! Интересует ${props.service.subject.toLowerCase()} от ${props.service.teacher.name}. `
-})
 
 const handleClose = () => {
   emit('update:modelValue', false)
@@ -73,24 +71,66 @@ const resetForm = () => {
   form.urgency = 'week'
 }
 
+const getProposedDeadline = (urgency: string): string | undefined => {
+  const now = Date.now()
+  const dayMs = 24 * 60 * 60 * 1000
+
+  switch (urgency) {
+    case 'today':
+      return new Date(now + dayMs).toISOString()
+    case 'tomorrow':
+      return new Date(now + 2 * dayMs).toISOString()
+    case 'week':
+      return new Date(now + 7 * dayMs).toISOString()
+    case 'month':
+      return new Date(now + 30 * dayMs).toISOString()
+    default:
+      return undefined
+  }
+}
+
+const getPriceFromBudget = (budget: string): number | undefined => {
+  if (budget === 'service-price' && props.service) {
+    return props.service.price
+  }
+  if (budget === 'flexible' || budget === 'lower' || budget === 'higher') {
+    return undefined
+  }
+  return undefined
+}
+
 const handleSubmit = async () => {
-  if (!props.service) return
+  if (!props.service || !authStore.user?.id) {
+    telegramStore.showAlert('Ошибка: не удалось определить пользователя')
+    return
+  }
 
   isLoading.value = true
   telegramStore.hapticFeedback('medium')
 
   try {
-    const requestData: RequestData = {
-      serviceId: props.service.id,
-      message: form.message || defaultMessage.value,
-      budget: form.budget || 'service-price',
-      urgency: form.urgency,
-    }
+    const price = getPriceFromBudget(form.budget)
+    const proposedDeadline = getProposedDeadline(form.urgency)
 
-    emit('submit', requestData)
+    await createServiceResponse({
+      studentId: authStore.user.id,
+      serviceId: props.service.id,
+      message: form.message || undefined,
+      price: price,
+      proposedDeadline: proposedDeadline,
+    })
+
+    telegramStore.showAlert('Отклик отправлен! Репетитор ответит в ближайшее время.')
+    emit('submit', {
+      serviceId: props.service.id,
+      message: form.message,
+      budget: form.budget,
+      urgency: form.urgency,
+    })
     handleClose()
-  } catch (error) {
-    console.error('Ошибка отправки заявки:', error)
+  } catch (error: any) {
+    console.error('Ошибка отправки отклика:', error)
+    telegramStore.showAlert(error.message || 'Ошибка отправки отклика. Попробуйте еще раз.')
   } finally {
     isLoading.value = false
   }
@@ -99,11 +139,19 @@ const handleSubmit = async () => {
 // Инициализация формы при открытии
 const initializeForm = () => {
   if (props.service && props.modelValue) {
-    form.message = defaultMessage.value
     form.budget = 'service-price'
     form.urgency = 'week'
   }
 }
+
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal) {
+      initializeForm()
+    }
+  },
+)
 </script>
 
 <template>
@@ -132,7 +180,7 @@ const initializeForm = () => {
           <textarea
             v-model="form.message"
             rows="3"
-            :placeholder="defaultMessage"
+            placeholder="Здравствуйте! Интересует помощь с ..."
             class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
           />
           <p class="text-xs text-telegram-textSecondary mt-1">
@@ -143,7 +191,7 @@ const initializeForm = () => {
         <!-- Budget -->
         <div>
           <Select
-            v-model="form.budget"
+            v-model:value="form.budget"
             :options="budgetOptions"
             label="Бюджет"
             placeholder="Выберите бюджет"
@@ -153,7 +201,7 @@ const initializeForm = () => {
         <!-- Urgency -->
         <div>
           <Select
-            v-model="form.urgency"
+            v-model:value="form.urgency"
             :options="urgencyOptions"
             label="Когда нужно?"
             placeholder="Выберите срочность"

@@ -1,115 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { Card, Button } from '@/shared/components/ui'
+import type { Deal } from '@/shared/types'
 
 const router = useRouter()
 const telegramStore = useTelegramStore()
 
-// Моковые данные активных сделок (Deal)
-const myDeals = ref([
-  {
-    id: '1',
-    studentId: 'student-1',
-    tutorId: 'tutor-1',
-    subjectId: 'math-1',
-    teacherId: 'teacher-1',
-    price: 120000, // в копейках (1200 рублей)
-    deadline: '2024-01-25T18:00:00',
-    status: 'IN_PROGRESS',
-    serviceResponseId: null,
-    requestResponseId: 'req-resp-1',
-    createdAt: '2024-01-15T10:30:00',
-    updatedAt: '2024-01-18T10:30:00',
-    // Связанные данные
-    tutor: {
-      name: 'Иван Петров',
-      rating: 4.8,
-    },
-    subject: {
-      name: 'Математика',
-    },
-    teacher: {
-      fullName: 'Подготовка к ЕГЭ',
-    },
-  },
-  {
-    id: '2',
-    studentId: 'student-1',
-    tutorId: 'tutor-2',
-    subjectId: 'physics-1',
-    teacherId: 'teacher-2',
-    price: 150000, // в копейках (1500 рублей)
-    deadline: '2024-01-22T16:00:00',
-    status: 'ACCEPTED',
-    serviceResponseId: 'srv-resp-1',
-    requestResponseId: null,
-    createdAt: '2024-01-17T09:15:00',
-    updatedAt: '2024-01-17T14:20:00',
-    // Связанные данные
-    tutor: {
-      name: 'Анна Сидорова',
-      rating: 4.9,
-    },
-    subject: {
-      name: 'Физика',
-    },
-    teacher: {
-      fullName: 'Олимпиадная физика',
-    },
-  },
-  {
-    id: '3',
-    studentId: 'student-1',
-    tutorId: 'tutor-3',
-    subjectId: 'chemistry-1',
-    teacherId: 'teacher-3',
-    price: 100000, // в копейках (1000 рублей)
-    deadline: '2024-01-20T14:00:00',
-    status: 'COMPLETED',
-    serviceResponseId: null,
-    requestResponseId: 'req-resp-2',
-    createdAt: '2024-01-10T14:20:00',
-    updatedAt: '2024-01-18T18:30:00',
-    // Связанные данные
-    tutor: {
-      name: 'Мария Козлова',
-      rating: 4.7,
-    },
-    subject: {
-      name: 'Химия',
-    },
-    teacher: {
-      fullName: 'Органическая химия',
-    },
-  },
-  {
-    id: '4',
-    studentId: 'student-1',
-    tutorId: 'tutor-4',
-    subjectId: 'history-1',
-    teacherId: 'teacher-4',
-    price: 80000, // в копейках (800 рублей)
-    deadline: null,
-    status: 'PENDING',
-    serviceResponseId: 'srv-resp-2',
-    requestResponseId: null,
-    createdAt: '2024-01-12T11:45:00',
-    updatedAt: '2024-01-15T09:20:00',
-    // Связанные данные
-    tutor: {
-      name: 'Сергей Волков',
-      rating: 4.6,
-    },
-    subject: {
-      name: 'История',
-    },
-    teacher: {
-      fullName: 'ЕГЭ История России',
-    },
-  },
-])
+const props = defineProps<{
+  items?: Deal[]
+}>()
+
+// Данные сделок, приходящие сверху
+const myDeals = computed(() => props.items ?? [])
 
 const getDealStatusInfo = (status: string) => {
   switch (status) {
@@ -166,8 +70,8 @@ const formatDate = (dateString: string) => {
   return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
 }
 
-const formatPrice = (priceInKopecks: number) => {
-  return Math.round(priceInKopecks / 100)
+const formatPrice = (priceInRubles: number) => {
+  return Math.round(priceInRubles)
 }
 
 const findTutors = () => {
@@ -228,17 +132,22 @@ const startLesson = (deal: any) => {
         <div class="flex items-start justify-between mb-4">
           <div class="flex-1">
             <h3 class="text-telegram-text font-semibold text-lg mb-1">
-              {{ deal.subject.name }} • {{ deal.teacher.fullName }}
+              {{ deal.subject?.name || 'Предмет' }} •
+              {{ deal.teacher?.fullName || 'Преподаватель' }}
             </h3>
             <div class="flex items-center space-x-2 mb-2">
-              <span class="text-telegram-textSecondary text-sm">{{ deal.tutor.name }}</span>
+              <span class="text-telegram-textSecondary text-sm">{{
+                deal.tutor?.name || 'Репетитор'
+              }}</span>
               <div class="flex items-center space-x-1">
                 <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                   />
                 </svg>
-                <span class="text-telegram-textSecondary text-sm">{{ deal.tutor.rating }}</span>
+                <span class="text-telegram-textSecondary text-sm">{{
+                  deal.tutor?.rating ?? '—'
+                }}</span>
               </div>
             </div>
           </div>

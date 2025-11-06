@@ -153,7 +153,8 @@ onMounted(async () => {
       </div>
 
       <!-- My subjects -->
-      <div>
+      <!-- TODO: Добавить мои предметы -->
+      <!-- <div></div>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-semibold text-telegram-text">Мои предметы</h2>
           <Button variant="secondary" size="sm" @click="createOrder">
@@ -226,7 +227,7 @@ onMounted(async () => {
             </div>
           </Card>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

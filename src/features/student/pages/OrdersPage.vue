@@ -7,7 +7,14 @@ import ResponsesList from '../components/ResponsesList.vue'
 import DealsList from '../components/DealsList.vue'
 
 const telegramStore = useTelegramStore()
-const { getMyRequests, getMyServiceResponses, getMyStudentDeals } = useOrder()
+const {
+  requests,
+  serviceResponses,
+  deals,
+  getMyRequests,
+  getMyServiceResponses,
+  getMyStudentDeals,
+} = useOrder()
 
 type TabType = 'requests' | 'responses' | 'deals'
 
@@ -89,9 +96,12 @@ onMounted(async () => {
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
       </div>
 
-      <RequestsList v-else-if="currentTab === 'requests'" />
-      <ResponsesList v-else-if="currentTab === 'responses'" />
-      <DealsList v-else-if="currentTab === 'deals'" />
+      <RequestsList v-else-if="currentTab === 'requests'" :items="requests?.items || []" />
+      <ResponsesList
+        v-else-if="currentTab === 'responses'"
+        :items="serviceResponses?.items || []"
+      />
+      <DealsList v-else-if="currentTab === 'deals'" :items="deals?.items || []" />
     </div>
   </div>
 </template>

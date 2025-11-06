@@ -1,84 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { Card, Button } from '@/shared/components/ui'
+import type { Request } from '@/shared/types'
 
 const router = useRouter()
 const telegramStore = useTelegramStore()
 
-// Моковые данные заявок студента (Request)
-const myRequests = ref([
-  {
-    id: '1',
-    studentId: 'student-1',
-    subjectId: 'math-1',
-    teacherId: 'teacher-1',
-    description: 'Подготовка к ЕГЭ по математике, особенно задачи с параметрами',
-    urgency: 'HIGH',
-    budget: 200000, // в копейках (2000 рублей)
-    status: 'OPEN',
-    deadline: '2024-01-25T18:00:00',
-    createdAt: '2024-01-18T10:30:00',
-    updatedAt: '2024-01-18T10:30:00',
-    // Связанные данные
-    subject: {
-      name: 'Математика',
-    },
-    teacher: {
-      fullName: 'Подготовка к ЕГЭ',
-    },
-    // Подсчет откликов
-    responsesCount: 5,
-    newResponsesCount: 2,
-  },
-  {
-    id: '2',
-    studentId: 'student-1',
-    subjectId: 'physics-1',
-    teacherId: 'teacher-2',
-    description: 'Подготовка к олимпиаде, нужна помощь с механикой и термодинамикой',
-    urgency: 'HIGH',
-    budget: 250000, // в копейках (2500 рублей)
-    status: 'OPEN',
-    deadline: '2024-01-22T16:00:00',
-    createdAt: '2024-01-17T16:15:00',
-    updatedAt: '2024-01-17T16:15:00',
-    // Связанные данные
-    subject: {
-      name: 'Физика',
-    },
-    teacher: {
-      fullName: 'Олимпиадная физика',
-    },
-    // Подсчет откликов
-    responsesCount: 3,
-    newResponsesCount: 1,
-  },
-  {
-    id: '3',
-    studentId: 'student-1',
-    subjectId: 'chemistry-1',
-    teacherId: 'teacher-3',
-    description: 'Школьная программа 10 класс, органическая химия',
-    urgency: 'MEDIUM',
-    budget: 180000, // в копейках (1800 рублей)
-    status: 'CLOSED',
-    deadline: '2024-01-30T14:00:00',
-    createdAt: '2024-01-15T14:20:00',
-    updatedAt: '2024-01-18T18:00:00',
-    // Связанные данные
-    subject: {
-      name: 'Химия',
-    },
-    teacher: {
-      fullName: 'Органическая химия',
-    },
-    // Подсчет откликов
-    responsesCount: 8,
-    newResponsesCount: 0,
-  },
-])
+const props = defineProps<{
+  items?: Request[]
+}>()
+
+// Данные заявок, приходящие сверху
+const myRequests = computed(() => props.items ?? [])
 
 const getRequestStatusInfo = (status: string) => {
   switch (status) {
@@ -108,8 +43,8 @@ const getUrgencyText = (urgency: string) => {
   }
 }
 
-const formatPrice = (priceInKopecks: number) => {
-  return Math.round(priceInKopecks / 100)
+const formatPrice = (priceInRubles: number) => {
+  return Math.round(priceInRubles)
 }
 
 const formatDate = (dateString: string) => {
@@ -213,15 +148,17 @@ const editRequest = (request: any, event: Event) => {
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1 pr-3">
             <h3 class="text-lg font-semibold text-telegram-text mb-1">
-              {{ request.subject.name }} • {{ request.teacher.fullName }}
+              {{ request.subject?.name || 'Предмет' }} •
+              {{ request.teacher?.fullName || 'Преподаватель' }}
             </h3>
             <div class="flex items-center space-x-3">
               <span class="text-telegram-success font-semibold"
-                >до {{ formatPrice(request.budget) }}₽</span
+                >до {{ formatPrice(request.budget || 0) }}₽</span
               >
             </div>
           </div>
-          <button
+          <!-- TODO: Добавить редактирование заявки -->
+          <!-- <button
             @click="editRequest(request, $event)"
             class="p-2 text-telegram-textSecondary hover:text-telegram-text hover:bg-telegram-secondary/50 rounded-lg transition-colors flex-shrink-0"
             title="Редактировать заявку"
@@ -234,7 +171,7 @@ const editRequest = (request: any, event: Event) => {
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
               />
             </svg>
-          </button>
+          </button> -->
         </div>
 
         <!-- Description -->
@@ -249,12 +186,14 @@ const editRequest = (request: any, event: Event) => {
           <div class="text-right">
             <p class="text-telegram-textSecondary text-xs mb-1">Откликов</p>
             <div class="flex items-center justify-end space-x-2">
-              <span class="text-telegram-text text-lg font-bold">{{ request.responsesCount }}</span>
+              <span class="text-telegram-text text-lg font-bold">{{
+                (request as any)?._count?.responses ?? 0
+              }}</span>
               <div
-                v-if="request.newResponsesCount > 0"
+                v-if="(request as any)?.newResponsesCount > 0"
                 class="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
               >
-                {{ request.newResponsesCount }}
+                {{ (request as any)?.newResponsesCount }}
               </div>
             </div>
           </div>

@@ -52,7 +52,7 @@ onMounted(() => {
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
       </div>
 
-      <div v-else-if="user" class="flex items-center space-x-4 mb-6">
+      <div v-else-if="user" class="flex items-center space-x-4">
         <div
           class="w-16 h-16 bg-telegram-accent rounded-full flex items-center justify-center text-white text-xl font-bold"
         >
@@ -85,7 +85,8 @@ onMounted(() => {
         </div>
       </div>
 
-      <Button variant="ghost" class="w-full" @click="editProfile"> Редактировать профиль </Button>
+      <!-- TODO: Добавить редактирование профиля -->
+      <!-- <Button variant="ghost" class="w-full" @click="editProfile"> Редактировать профиль </Button> -->
     </Card>
 
     <!-- Блок обратной связи -->

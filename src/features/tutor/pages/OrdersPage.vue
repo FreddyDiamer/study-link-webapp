@@ -587,7 +587,7 @@ onMounted(() => {
           <div>
             <Select
               label="Предмет"
-              v-model="filters.subject"
+              v-model:value="filters.subject"
               :options="availableSubjects"
               placeholder="Выберите предмет"
             />
@@ -597,7 +597,7 @@ onMounted(() => {
           <div>
             <Select
               label="Преподаватель"
-              v-model="filters.teacher"
+              v-model:value="filters.teacher"
               :options="availableTeachers"
               placeholder="Выберите преподавателя"
             />
@@ -608,7 +608,7 @@ onMounted(() => {
             <div>
               <Select
                 label="Сортировать"
-                v-model="filters.sortBy"
+                v-model:value="filters.sortBy"
                 :options="sortOptions"
                 placeholder="Выберите сортировку"
               />
@@ -616,7 +616,7 @@ onMounted(() => {
             <div>
               <Select
                 label="Порядок"
-                v-model="filters.sortOrder"
+                v-model:value="filters.sortOrder"
                 :options="sortOrderOptions"
                 placeholder="Выберите порядок"
               />

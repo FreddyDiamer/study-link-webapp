@@ -4,6 +4,9 @@ import { useRoute, useRouter } from 'vue-router'
 
 // Stores
 import { useTelegramStore } from '@/stores/telegram'
+import { serviceService } from '@/services/business'
+import { useEducation } from '@/shared/composables'
+import type { Service as ApiService, ServiceFilterDto } from '@/shared/types'
 
 // Components
 import Card from '@/shared/components/ui/Card.vue'
@@ -47,6 +50,7 @@ interface ServiceFilters {
 const route = useRoute()
 const router = useRouter()
 const telegramStore = useTelegramStore()
+const { activeSubjects, teachers, isInitialized, initialize } = useEducation()
 
 // State
 const isLoading = ref(false)
@@ -81,7 +85,7 @@ const pageTitle = computed(() => {
 const filteredServices = computed(() => {
   let result = [...services.value]
 
-  // Search filter
+  // Search filter (клиентская фильтрация, т.к. API может не поддерживать поиск по тексту)
   if (filters.value.search.trim()) {
     const searchTerm = filters.value.search.trim().toLowerCase()
     result = result.filter(
@@ -93,22 +97,12 @@ const filteredServices = computed(() => {
     )
   }
 
-  // Subject filter
-  if (filters.value.subject) {
-    result = result.filter((service) => service.subject === filters.value.subject)
-  }
-
-  // Teacher filter
-  if (filters.value.teacher) {
-    result = result.filter((service) => service.teacher.id === filters.value.teacher)
-  }
-
-  // Availability filter
+  // Availability filter (клиентская фильтрация, т.к. API использует status)
   if (filters.value.availability !== 'all') {
     result = result.filter((service) => service.availability === filters.value.availability)
   }
 
-  // Sorting
+  // Sorting (клиентская сортировка, т.к. API может не поддерживать все типы сортировки)
   result.sort((a, b) => {
     let comparison = 0
 
@@ -147,15 +141,43 @@ const resultStats = computed(() => ({
 }))
 
 // Methods
+const buildApiFilters = (): ServiceFilterDto => {
+  const apiFilters: ServiceFilterDto = {}
+
+  // Преобразуем subject (название) в subjectId
+  if (filters.value.subject && activeSubjects.value.length > 0) {
+    const subject = activeSubjects.value.find((s) => s.name === filters.value.subject)
+    if (subject) {
+      apiFilters.subjectId = subject.id
+    }
+  }
+
+  // Преобразуем teacher (ID) в teacherId
+  if (filters.value.teacher) {
+    apiFilters.teacherId = filters.value.teacher
+  }
+
+  return apiFilters
+}
+
 const loadServices = async () => {
   isLoading.value = true
   error.value = null
 
   try {
-    // Mock data - в реальном проекте здесь будет API call
-    await new Promise((resolve) => setTimeout(resolve, 800))
+    // Инициализируем образовательные данные если нужно
+    if (!isInitialized.value) {
+      await initialize()
+    }
 
-    services.value = generateMockServices()
+    // Строим фильтры для API
+    const apiFilters = buildApiFilters()
+
+    // Загружаем услуги с фильтрами с бэкенда
+    const response = await serviceService.getServices(apiFilters)
+    services.value = response.items.map(mapApiToViewModel)
+
+    // Обновляем опции фильтров из education store
     extractFiltersData()
   } catch (err: any) {
     error.value = err.message || 'Ошибка загрузки услуг'
@@ -164,14 +186,41 @@ const loadServices = async () => {
   }
 }
 
+const mapApiToViewModel = (api: ApiService): Service => {
+  return {
+    id: api.id,
+    title: api.subject?.name || 'Услуга',
+    description: api.description || '',
+    price: api.price, // уже в рублях благодаря serviceService
+    priceType: 'hour',
+    subject: api.subject?.name || 'Предмет',
+    teacher: {
+      id: api.teacher?.id || '',
+      name: api.teacher?.fullName || 'Преподаватель',
+      experience: 0,
+      rating: 0,
+      reviewsCount: 0,
+    },
+    format: 'online',
+    workingHours: '',
+    availability: 'available',
+    tags: [],
+  }
+}
+
 const extractFiltersData = () => {
-  availableSubjects.value = [...services.value.map((s) => ({ value: s.id, label: s.subject }))]
-  availableTeachers.value = [
-    ...services.value.map((s) => ({
-      value: s.teacher.id,
-      label: s.teacher.name,
-    })),
-  ]
+  // Используем предметы из education store
+  availableSubjects.value = activeSubjects.value.map((subject) => ({
+    value: subject.name,
+    label: subject.name,
+  }))
+
+  // Используем преподавателей из education store
+  availableTeachers.value = teachers.value.map((teacher) => ({
+    value: teacher.id,
+    label: teacher.fullName,
+  }))
+
   sortOptions.value = [
     { value: 'rating', label: 'По рейтингу' },
     { value: 'price', label: 'По цене' },
@@ -184,32 +233,6 @@ const extractFiltersData = () => {
   ]
 }
 
-const generateMockServices = (): Service[] => {
-  const subjects = ['Математика', 'Физика', 'Химия', 'Английский язык', 'История', 'Биология']
-  const formats = ['online', 'offline', 'both'] as const
-  const availabilities = ['available', 'busy', 'limited'] as const
-
-  return Array.from({ length: 24 }, (_, i) => ({
-    id: `service-${i + 1}`,
-    title: `Подготовка к ЕГЭ по ${subjects[i % subjects.length]}`,
-    description: `Качественная подготовка к экзаменам с опытным преподавателем. Индивидуальный подход к каждому ученику.`,
-    price: Math.floor(Math.random() * 2000) + 1000,
-    priceType: 'hour' as const,
-    subject: subjects[i % subjects.length],
-    teacher: {
-      id: `teacher-${i + 1}`,
-      name: `${['Анна', 'Елена', 'Мария', 'Сергей', 'Дмитрий', 'Алексей'][i % 6]} ${['Иванова', 'Петрова', 'Сидорова', 'Иванов', 'Петров', 'Сидоров'][i % 6]}`,
-      experience: Math.floor(Math.random() * 15) + 2,
-      rating: Math.round((Math.random() * 2 + 3) * 10) / 10,
-      reviewsCount: Math.floor(Math.random() * 50) + 5,
-    },
-    format: formats[i % formats.length],
-    workingHours: 'Пн-Пт 16:00-20:00',
-    availability: availabilities[i % availabilities.length],
-    tags: ['ЕГЭ', 'ОГЭ', 'Школьная программа'].slice(0, Math.floor(Math.random() * 3) + 1),
-  }))
-}
-
 const resetFilters = () => {
   filters.value = {
     search: '',
@@ -220,6 +243,7 @@ const resetFilters = () => {
     sortOrder: 'desc',
   }
   telegramStore.hapticFeedback('light')
+  loadServices()
 }
 
 const toggleFilters = () => {
@@ -289,15 +313,28 @@ let searchTimeout: number | null = null
 watch(
   () => filters.value.search,
   () => {
-    if (searchTimeout) clearTimeout(searchTimeout)
-    searchTimeout = setTimeout(() => {
-      // В реальном проекте здесь может быть API call для дебаунса
-    }, 300)
+    // Поиск остается клиентской фильтрацией, не перезагружаем данные
   },
 )
 
+// Автоматическая перезагрузка при изменении фильтров предмета и преподавателя
+watch(
+  () => [filters.value.subject, filters.value.teacher],
+  () => {
+    if (isInitialized.value) {
+      loadServices()
+    }
+  },
+  { deep: true },
+)
+
 // Lifecycle
-onMounted(() => {
+onMounted(async () => {
+  // Инициализируем образовательные данные
+  if (!isInitialized.value) {
+    await initialize()
+  }
+
   // Получаем параметры из URL
   const subject = route.query.subject as string
   if (subject) {
@@ -309,7 +346,8 @@ onMounted(() => {
     filters.value.search = search
   }
 
-  loadServices()
+  // Загружаем услуги после установки фильтров из URL
+  await loadServices()
 })
 </script>
 
@@ -358,7 +396,7 @@ onMounted(() => {
           <div>
             <Select
               label="Предмет"
-              v-model="filters.subject"
+              v-model:value="filters.subject"
               :options="availableSubjects"
               placeholder="Выберите предмет"
             />
@@ -368,7 +406,7 @@ onMounted(() => {
           <div>
             <Select
               label="Преподаватель"
-              v-model="filters.teacher"
+              v-model:value="filters.teacher"
               :options="availableTeachers"
               placeholder="Выберите преподавателя"
             />
@@ -379,7 +417,7 @@ onMounted(() => {
             <div>
               <Select
                 label="Сортировать"
-                v-model="filters.sortBy"
+                v-model:value="filters.sortBy"
                 :options="sortOptions"
                 placeholder="Выберите сортировку"
               />
@@ -387,7 +425,7 @@ onMounted(() => {
             <div>
               <Select
                 label="Порядок"
-                v-model="filters.sortOrder"
+                v-model:value="filters.sortOrder"
                 :options="sortOrderOptions"
                 placeholder="Выберите порядок"
               />

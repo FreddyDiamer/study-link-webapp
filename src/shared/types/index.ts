@@ -16,6 +16,7 @@ export interface User {
   lastActivity: string
   createdAt: string
   updatedAt: string
+  rating: number
 }
 
 export interface Tutor extends User {

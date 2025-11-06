@@ -1,93 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { Card, Button } from '@/shared/components/ui'
+import type { ServiceResponse } from '@/shared/types'
 
 const router = useRouter()
 const telegramStore = useTelegramStore()
 
-// Моковые данные откликов студента на услуги (ServiceResponse)
-const myResponses = ref([
-  {
-    id: '1',
-    studentId: 'student-1',
-    serviceId: 'service-1',
-    message: 'Здравствуйте! Нужна подготовка к ЕГЭ по математике. Особенно профильная часть.',
-    price: 120000, // в копейках (1200 рублей) - предложенная цена студента
-    proposedDeadline: '2024-01-25T18:00:00',
-    status: 'PENDING',
-    createdAt: '2024-01-18T14:30:00',
-    updatedAt: '2024-01-18T14:30:00',
-    // Связанные данные
-    service: {
-      price: 120000, // цена услуги репетитора в копейках
-      description: 'Подготовка к ЕГЭ по математике',
-      tutor: {
-        name: 'Иван Петров',
-        rating: 4.8,
-      },
-      subject: {
-        name: 'Математика',
-      },
-      teacher: {
-        fullName: 'ЕГЭ математика',
-      },
-    },
-  },
-  {
-    id: '2',
-    studentId: 'student-1',
-    serviceId: 'service-2',
-    message: 'Нужна помощь с механикой и электричеством для олимпиады.',
-    price: 110000, // в копейках (1100 рублей) - студент предложил дороже
-    proposedDeadline: '2024-01-20T16:00:00',
-    status: 'ACCEPTED',
-    createdAt: '2024-01-17T11:20:00',
-    updatedAt: '2024-01-17T18:30:00',
-    // Связанные данные
-    service: {
-      price: 100000, // цена услуги репетитора в копейках
-      description: 'Физика 10-11 класс',
-      tutor: {
-        name: 'Анна Сидорова',
-        rating: 4.9,
-      },
-      subject: {
-        name: 'Физика',
-      },
-      teacher: {
-        fullName: 'Олимпиадная физика',
-      },
-    },
-  },
-  {
-    id: '3',
-    studentId: 'student-1',
-    serviceId: 'service-3',
-    message: 'Сложности с органической химией, нужна помощь с решением задач.',
-    price: 90000, // в копейках (900 рублей) - цена услуги
-    proposedDeadline: '2024-01-22T14:00:00',
-    status: 'REJECTED',
-    createdAt: '2024-01-16T09:45:00',
-    updatedAt: '2024-01-16T20:15:00',
-    // Связанные данные
-    service: {
-      price: 90000, // цена услуги репетитора в копейках
-      description: 'Химия органическая',
-      tutor: {
-        name: 'Мария Козлова',
-        rating: 4.7,
-      },
-      subject: {
-        name: 'Химия',
-      },
-      teacher: {
-        fullName: 'Органическая химия',
-      },
-    },
-  },
-])
+const props = defineProps<{
+  items?: ServiceResponse[]
+}>()
+
+// Данные откликов, приходящие сверху
+const myResponses = computed(() => props.items ?? [])
 
 const getResponseStatusInfo = (status: string) => {
   switch (status) {
@@ -112,9 +38,8 @@ const getResponseStatusInfo = (status: string) => {
   }
 }
 
-const formatPrice = (priceInKopecks: number) => {
-  return Math.round(priceInKopecks / 100)
-}
+const formatRub = (priceInRubles: number) => Math.round(priceInRubles)
+const formatKopToRub = (priceInKopecks: number) => Math.round(priceInKopecks / 100)
 
 const formatDeadline = (dateString: string | null) => {
   if (!dateString) return null
@@ -202,11 +127,12 @@ const viewResponseDetails = (response: any) => {
         <div class="flex items-start justify-between mb-4">
           <div class="flex-1">
             <h3 class="text-telegram-text font-semibold text-lg mb-1">
-              {{ response.service.subject.name }} • {{ response.service.teacher.fullName }}
+              {{ response.service?.subject?.name || 'Предмет' }} •
+              {{ response.service?.teacher?.fullName || 'Преподаватель' }}
             </h3>
             <div class="flex items-center space-x-2 mb-2">
               <span class="text-telegram-textSecondary text-sm">{{
-                response.service.tutor.name
+                response.service?.tutor?.name || 'Репетитор'
               }}</span>
               <div class="flex items-center space-x-1">
                 <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -215,7 +141,7 @@ const viewResponseDetails = (response: any) => {
                   />
                 </svg>
                 <span class="text-telegram-textSecondary text-sm">{{
-                  response.service.tutor.rating
+                  response.service?.tutor?.rating ?? '—'
                 }}</span>
               </div>
             </div>
@@ -246,11 +172,13 @@ const viewResponseDetails = (response: any) => {
           <div class="flex items-center space-x-4">
             <div>
               <span class="text-telegram-textSecondary">Моя цена: </span>
-              <span class="text-telegram-text">{{ formatPrice(response.price) }}₽</span>
+              <span class="text-telegram-text">{{ formatRub(response.price || 0) }}₽</span>
             </div>
             <div>
               <span class="text-telegram-textSecondary">Цена услуги: </span>
-              <span class="text-telegram-text">{{ formatPrice(response.service.price) }}₽</span>
+              <span class="text-telegram-text"
+                >{{ formatKopToRub(response.service?.price || 0) }}₽</span
+              >
             </div>
             <div v-if="response.proposedDeadline">
               <span class="text-telegram-textSecondary">Дедлайн: </span>

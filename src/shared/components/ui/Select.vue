@@ -10,6 +10,7 @@ export interface SelectOption {
 
 interface Props {
   modelValue?: SelectOption | null
+  value?: string | null
   options: SelectOption[]
   label?: string
   placeholder?: string
@@ -51,22 +52,11 @@ const filteredOptions = computed(() => {
   return options
 })
 
-// Синхронизация inputValue с выбранным значением
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) selectedOption.value = newValue
-  },
-)
-
-watch(
-  () => selectedOption.value,
-  (newValue) => {
-    const option = props.options.find((opt) => opt.value === newValue?.value)
-    inputValue.value = option ? option.label : ''
-  },
-  { immediate: true },
-)
+const handleValueChange = (value: string | null | undefined) => {
+  if (props.value !== undefined) {
+    selectedOption.value = props.options.find((opt) => opt.value === props.value) ?? null
+  }
+}
 
 const handleInput = () => {
   if (!isOpen.value) {
@@ -156,8 +146,29 @@ const handleClickOutside = (event: Event) => {
   }
 }
 
+// Синхронизация inputValue с выбранным значением
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue !== undefined) selectedOption.value = newValue
+  },
+)
+
+watch(() => props.value, handleValueChange)
+
+watch(
+  () => selectedOption.value,
+  (newValue) => {
+    const option = props.options.find((opt) => opt.value === newValue?.value)
+    inputValue.value = option ? option.label : ''
+  },
+  { immediate: true },
+)
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+
+  handleValueChange(props.value)
 })
 
 onUnmounted(() => {
