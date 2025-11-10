@@ -140,7 +140,7 @@ const validateForm = () => {
 
 const goBack = () => {
   telegramStore.hapticFeedback('light')
-  // router.back()
+  router.back()
 }
 
 // Инициализация образовательных данных

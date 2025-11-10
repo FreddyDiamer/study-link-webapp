@@ -125,8 +125,6 @@ const handleViewResponses = (serviceId: string) => {
       <p class="text-telegram-textSecondary mb-4">
         Создайте свою первую услугу, чтобы начать получать заявки
       </p>
-
-      <Button @click="router.push(PATHS.TUTOR_CREATE_SERVICE)"> Создать услугу </Button>
     </div>
   </div>
 </template>
