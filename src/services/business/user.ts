@@ -44,16 +44,6 @@ export class UserService {
     }
   }
 
-  async getBalance(): Promise<number> {
-    try {
-      const response = await usersApi.getBalance()
-      return response.balance / 100 // конвертируем из копеек в рубли
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении баланса')
-      throw error
-    }
-  }
-
   private validateProfileData(data: Partial<User>): void {
     if (data.name && data.name.trim().length < 2) {
       throw new Error('Имя должно содержать минимум 2 символа')
@@ -69,7 +59,7 @@ export class UserService {
   private convertUserToRubles(user: User): User {
     return {
       ...user,
-      balance: user.balance / 100, // конвертируем из копеек в рубли
+      balance: user.balance, // конвертируем из копеек в рубли
     }
   }
 

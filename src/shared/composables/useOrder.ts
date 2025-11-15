@@ -104,16 +104,6 @@ export const useOrder = () => {
     }
   }
 
-  const getMyStudentDeals = async () => {
-    isLoading.value = true
-    try {
-      deals.value = await orderService.getMyStudentDeals()
-      return deals.value
-    } finally {
-      isLoading.value = false
-    }
-  }
-
   const getMyTutorDeals = async () => {
     try {
       const response = await orderService.getMyTutorDeals()
@@ -130,6 +120,19 @@ export const useOrder = () => {
       return await orderService.getDeal(id)
     } finally {
       isLoading.value = false
+    }
+  }
+
+  const updateDeal = async (
+    id: string,
+    data: Partial<Pick<Deal, 'status' | 'price' | 'deadline'>>,
+  ) => {
+    try {
+      const response = await orderService.updateDeal(id, data)
+      return response
+    } catch (error) {
+      console.error('Ошибка обновления сделки:', error)
+      throw error
     }
   }
 
@@ -160,18 +163,6 @@ export const useOrder = () => {
     } catch (error) {
       console.error('Ошибка завершения сделки:', error)
       throw error
-    }
-  }
-
-  const cancelDeal = async (id: string) => {
-    isLoading.value = true
-    try {
-      const deal = await orderService.cancelDeal(id)
-      // Обновляем список сделок
-      await getMyStudentDeals()
-      return deal
-    } finally {
-      isLoading.value = false
     }
   }
 
@@ -319,13 +310,11 @@ export const useOrder = () => {
 
     // Deals
     getDeals,
-    getMyStudentDeals,
     getMyTutorDeals,
     getDeal,
     acceptDeal,
     rejectDeal,
     completeDeal,
-    cancelDeal,
 
     // Service Responses
     getServiceResponses,

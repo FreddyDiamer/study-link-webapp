@@ -11,7 +11,7 @@ interface Props {
   isLoading?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   isLoading: false,
 })
 
@@ -20,18 +20,6 @@ const telegramStore = useTelegramStore()
 
 const formatPrice = (price: number) => {
   return `${price} ₽`
-}
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('ru-RU', {
-    day: '2-digit',
-    month: '2-digit',
-  })
-}
-
-const handleViewService = (serviceId: string) => {
-  telegramStore.hapticFeedback('light')
-  router.push(`${PATHS.TUTOR_EDIT_SERVICE.replace(':id', serviceId)}`)
 }
 
 const handleViewResponses = (serviceId: string) => {
@@ -61,7 +49,12 @@ const handleViewResponses = (serviceId: string) => {
 
     <!-- Services list -->
     <div v-else-if="services.length > 0" class="space-y-3">
-      <Card v-for="service in services" :key="service.id" class="p-4">
+      <Card
+        v-for="service in services"
+        :key="service.id"
+        class="p-4"
+        @click="handleViewResponses(service.id)"
+      >
         <div class="flex items-center justify-between">
           <div class="flex-1">
             <div class="flex items-center space-x-2">

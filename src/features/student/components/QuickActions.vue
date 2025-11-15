@@ -16,13 +16,14 @@ const actions = [
     color: 'bg-telegram-button',
     path: PATHS.STUDENT_CREATE_ORDER,
   },
-  {
-    title: 'Найти репетиторов',
-    description: 'Просмотреть доступных преподавателей',
-    icon: LoupeIcon,
-    color: 'bg-telegram-success',
-    path: PATHS.STUDENT_TUTORS,
-  },
+  // TODO вернуть
+  // {
+  //   title: 'Найти репетиторов',
+  //   description: 'Просмотреть доступных преподавателей',
+  //   icon: LoupeIcon,
+  //   color: 'bg-telegram-success',
+  //   path: PATHS.STUDENT_TUTORS,
+  // },
   {
     title: 'Мои заявки',
     description: 'Управление заявками и откликами',

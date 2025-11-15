@@ -44,7 +44,9 @@ const buttonClasses = computed(() => {
 
 <template>
   <button :class="buttonClasses" :disabled="disabled || loading" @click="$emit('click', $event)">
-    <Loader class="size-5 opacity-0 mr-2 -ml-7" :class="{ 'opacity-100': loading }" />
+    <div class="w-0">
+      <Loader class="size-5 opacity-0" :class="{ 'opacity-100': loading }" />
+    </div>
 
     <slot />
   </button>

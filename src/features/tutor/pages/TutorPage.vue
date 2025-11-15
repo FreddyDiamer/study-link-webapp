@@ -3,27 +3,19 @@ import { ref, onMounted } from 'vue'
 import { useTelegramStore } from '@/stores/telegram'
 import { useRouter } from 'vue-router'
 import { useService } from '@/shared/composables'
-import { useTutor } from '@/shared/composables'
 import { Card, Input, Button } from '@components/ui'
 import { LoupeIcon } from '@/shared/components/icons'
-import StatsCard from '../components/StatsCard.vue'
 import ActiveServicesList from '../components/ActiveServicesList.vue'
 import type { Service } from '@/shared/types'
+import { PATHS } from '@/router/paths'
 
 const telegramStore = useTelegramStore()
 const router = useRouter()
 const { getMyServices } = useService()
-const { getTutorStats } = useTutor()
 
 const searchQuery = ref('')
 const isLoading = ref(false)
 const activeServices = ref<Service[]>([])
-const stats = ref({
-  activeServices: 0,
-  monthlyRequests: 0,
-  totalStudents: 0,
-  averageRating: 0,
-})
 
 const quickActions = [
   {
@@ -36,16 +28,17 @@ const quickActions = [
       router.push('/tutor/services/create')
     },
   },
-  {
-    title: 'Просмотреть заявки',
-    description: 'Новые запросы студентов',
-    icon: 'M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4',
-    color: 'bg-telegram-success',
-    action: () => {
-      telegramStore.hapticFeedback('light')
-      router.push('/tutor/requests')
-    },
-  },
+  // TODO вернуть
+  // {
+  //   title: 'Просмотреть заявки по моим предметам',
+  //   description: 'Новые запросы студентов',
+  //   icon: 'M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4',
+  //   color: 'bg-telegram-success',
+  //   action: () => {
+  //     telegramStore.hapticFeedback('light')
+  //     router.push('/tutor/requests')
+  //   },
+  // },
   {
     title: 'Мои услуги',
     description: 'Управление предложениями',
@@ -66,10 +59,6 @@ const loadData = async () => {
     activeServices.value = servicesResponse.items
       .filter((service) => service.status === 'ACTIVE')
       .slice(0, 3)
-
-    // Загружаем статистику
-    const statsResponse = await getTutorStats()
-    stats.value = statsResponse
   } catch (error) {
     console.error('Ошибка загрузки данных:', error)
   } finally {
@@ -93,15 +82,15 @@ onMounted(() => {
       <div class="space-y-3">
         <Input
           v-model="searchQuery"
-          placeholder="Поиск заявок по предметам, преподователям..."
+          placeholder="Поиск заказов по предметам, преподователям..."
           class="w-full"
         >
           <template #prepend>
             <LoupeIcon />
           </template>
         </Input>
-        <Button class="w-full" size="sm" @click="router.push('/tutor/requests')">
-          Найти заявки
+        <Button class="w-full" size="sm" @click="router.push(PATHS.TUTOR_ORDERS)">
+          Найти заказ
         </Button>
       </div>
     </Card>

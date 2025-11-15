@@ -91,13 +91,3 @@ export const tutorsApi = {
   // Удалить услугу
   deleteService: (id: string) => apiClient.delete(`/marketplace/services/${id}`),
 }
-
-export const getTutorStats = async () => {
-  return await apiClient.get<{
-    totalStudents: number
-    totalReviews: number
-    averageRating: number
-    activeServices: number
-    monthlyRequests: number
-  }>('/tutors/stats')
-}

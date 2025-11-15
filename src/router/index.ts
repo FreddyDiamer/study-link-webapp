@@ -117,11 +117,6 @@ const router = createRouter({
       component: () => import('../features/tutor/pages/OrdersPage.vue'),
     },
     {
-      path: PATHS.TUTOR_REQUESTS,
-      name: 'tutor-requests',
-      component: () => import('../features/tutor/pages/RequestsPage.vue'),
-    },
-    {
       path: PATHS.TUTOR_PROFILE,
       name: 'tutor-profile',
       component: () => import('../features/tutor/pages/ProfilePage.vue'),

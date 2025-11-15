@@ -49,6 +49,10 @@ export const ordersApi = {
   // Получить сделку по ID
   getDeal: (id: string) => apiClient.get<Deal>(`/marketplace/deals/${id}`),
 
+  // Обновить сделку (статус, цена, дедлайн)
+  updateDeal: (id: string, data: Partial<Deal>) =>
+    apiClient.patch<Deal>(`/marketplace/deals/${id}`, data),
+
   // Принять сделку
   acceptDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/accept`),
 

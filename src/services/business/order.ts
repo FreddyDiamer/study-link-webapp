@@ -11,7 +11,6 @@ import type {
   CreateRequestResponseDto,
   PaginatedResponse,
 } from '@/shared/types'
-import { convertRublesToKopeks, convertKopeksToRubles } from '@/shared/types'
 
 export class OrderService {
   private get telegramStore() {
@@ -25,7 +24,8 @@ export class OrderService {
   async getRequests(params?: any): Promise<PaginatedResponse<Request>> {
     try {
       const response = await ordersApi.getRequests(params)
-      return this.convertRequestsToRubles(response)
+      const normalized = this.normalizeRequestsResponse(response)
+      return this.convertRequestsToRubles(normalized)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении заявок')
       throw error
@@ -60,7 +60,7 @@ export class OrderService {
 
       const requestData: CreateRequestDto = {
         ...data,
-        budget: data.budget ? convertRublesToKopeks(data.budget) : undefined,
+        budget: data.budget,
       }
 
       this.telegramStore.hapticFeedback('light')
@@ -85,7 +85,7 @@ export class OrderService {
 
       const updateData: UpdateRequestDto = {
         ...data,
-        budget: data.budget ? convertRublesToKopeks(data.budget) : undefined,
+        budget: data.budget,
       }
 
       this.telegramStore.hapticFeedback('light')
@@ -128,16 +128,6 @@ export class OrderService {
     }
   }
 
-  async getMyStudentDeals(): Promise<PaginatedResponse<Deal>> {
-    try {
-      const response = await ordersApi.getMyStudentDeals()
-      return this.convertDealsToRubles(response)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении ваших сделок как студента')
-      throw error
-    }
-  }
-
   async getMyTutorDeals(): Promise<PaginatedResponse<Deal>> {
     try {
       const response = await ordersApi.getMyTutorDeals()
@@ -154,6 +144,21 @@ export class OrderService {
       return this.convertDealToRubles(deal)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении сделки')
+      throw error
+    }
+  }
+
+  async updateDeal(
+    id: string,
+    data: Partial<Pick<Deal, 'status' | 'price' | 'deadline'>>,
+  ): Promise<Deal> {
+    try {
+      this.telegramStore.hapticFeedback('light')
+      const deal = await ordersApi.updateDeal(id, data)
+      this.telegramStore.showAlert('Сделка обновлена!')
+      return this.convertDealToRubles(deal)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при обновлении сделки')
       throw error
     }
   }
@@ -250,7 +255,7 @@ export class OrderService {
 
       const responseData: CreateServiceResponseDto = {
         ...data,
-        price: data.price ? convertRublesToKopeks(data.price) : undefined,
+        price: data.price,
       }
 
       this.telegramStore.hapticFeedback('light')
@@ -273,7 +278,7 @@ export class OrderService {
     try {
       const updateData: Partial<CreateServiceResponseDto> = {
         ...data,
-        price: data.price ? convertRublesToKopeks(data.price) : undefined,
+        price: data.price,
       }
 
       this.telegramStore.hapticFeedback('light')
@@ -334,7 +339,7 @@ export class OrderService {
 
       const responseData: CreateRequestResponseDto = {
         ...data,
-        price: data.price ? convertRublesToKopeks(data.price) : undefined,
+        price: data.price,
       }
 
       this.telegramStore.hapticFeedback('light')
@@ -357,7 +362,7 @@ export class OrderService {
     try {
       const updateData: Partial<CreateRequestResponseDto> = {
         ...data,
-        price: data.price ? convertRublesToKopeks(data.price) : undefined,
+        price: data.price,
       }
 
       this.telegramStore.hapticFeedback('light')
@@ -427,9 +432,6 @@ export class OrderService {
     if (data.price && data.price < 100) {
       throw new Error('Цена должна быть не менее 100 рублей')
     }
-    if (data.price && data.price > 10000) {
-      throw new Error('Цена не должна превышать 10000 рублей')
-    }
     if (data.message && data.message.length > 500) {
       throw new Error('Сообщение не должно превышать 500 символов')
     }
@@ -441,9 +443,6 @@ export class OrderService {
     }
     if (data.price && data.price < 100) {
       throw new Error('Цена должна быть не менее 100 рублей')
-    }
-    if (data.price && data.price > 10000) {
-      throw new Error('Цена не должна превышать 10000 рублей')
     }
     if (data.message && data.message.length > 500) {
       throw new Error('Сообщение не должно превышать 500 символов')
@@ -457,7 +456,7 @@ export class OrderService {
   private convertRequestToRubles(request: Request): Request {
     return {
       ...request,
-      budget: request.budget ? convertKopeksToRubles(request.budget) : undefined,
+      budget: request.budget,
     }
   }
 
@@ -470,10 +469,35 @@ export class OrderService {
     }
   }
 
+  private normalizeRequestsResponse(data: any): PaginatedResponse<Request> {
+    // Backend may return an array or an object with { items, total }
+    if (Array.isArray(data)) {
+      return {
+        items: data,
+        total: data.length,
+        page: 1,
+        limit: data.length,
+        totalPages: 1,
+      }
+    }
+    if (data && Array.isArray(data.items)) {
+      const total = typeof data.total === 'number' ? data.total : data.items.length
+      return {
+        items: data.items,
+        total,
+        page: data.page ?? 1,
+        limit: data.limit ?? data.items.length,
+        totalPages: data.totalPages ?? 1,
+      }
+    }
+    // Fallback to empty
+    return { items: [], total: 0, page: 1, limit: 0, totalPages: 1 }
+  }
+
   private convertDealToRubles(deal: Deal): Deal {
     return {
       ...deal,
-      price: convertKopeksToRubles(deal.price),
+      price: deal.price,
     }
   }
 
@@ -487,7 +511,7 @@ export class OrderService {
   private convertServiceResponseToRubles(response: ServiceResponse): ServiceResponse {
     return {
       ...response,
-      price: response.price ? convertKopeksToRubles(response.price) : undefined,
+      price: response.price,
     }
   }
 
@@ -503,7 +527,7 @@ export class OrderService {
   private convertRequestResponseToRubles(response: RequestResponse): RequestResponse {
     return {
       ...response,
-      price: response.price ? convertKopeksToRubles(response.price) : undefined,
+      price: response.price,
     }
   }
 

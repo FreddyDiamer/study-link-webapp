@@ -2,39 +2,18 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
+import { useAuthStore } from '@/stores/auth'
+import { useOrder } from '@/shared/composables/useOrder'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
-import { Select, type SelectOption, Modal } from '@/shared/components/ui'
+import { Select, type SelectOption, Modal, Loader } from '@/shared/components/ui'
+import type { Request } from '@/shared/types'
+import { delay } from '@/shared/utils'
 
-// Types based on Prisma Deal model
-interface TutorDeal {
-  id: string
-  studentId: string
-  tutorId: string
-  subjectId: string
-  teacherId: string
-  price: number // в копейках
-  deadline: string | null
-  status: 'PENDING' | 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
-  serviceResponseId: string | null
-  requestResponseId: string | null
-  description: string
-  createdAt: string
-  updatedAt: string
-  // Связанные данные
-  student: {
-    name: string
-    rating: number
-    ordersCount: number
-  }
-  subject: {
-    name: string
-  }
-  teacher: {
-    fullName: string
-  }
-}
+// Backend integration
+const { getRequests, createRequestResponse } = useOrder()
+const authStore = useAuthStore()
 
 interface DealFilters {
   search: string
@@ -56,99 +35,14 @@ const isLoading = ref(false)
 const error = ref<string | null>(null)
 const showFilters = ref(false)
 const showAcceptModal = ref(false)
-const selectedDeal = ref<TutorDeal | null>(null)
+const selectedRequest = ref<Request | null>(null)
 const isAccepting = ref(false)
 const tutorComment = ref('')
 const proposedDate = ref('')
 const proposedPrice = ref<number | null>(null)
 
-// Mock data - активные сделки репетитора (Deal)
-const deals = ref<TutorDeal[]>([
-  {
-    id: '1',
-    studentId: 'student-1',
-    tutorId: 'tutor-1',
-    subjectId: 'math-1',
-    teacherId: 'teacher-1',
-    price: 120000, // в копейках (1200 рублей)
-    deadline: '2024-01-25T18:00:00',
-    status: 'IN_PROGRESS',
-    serviceResponseId: null,
-    requestResponseId: 'req-resp-1',
-    description:
-      'Нужна помощь в подготовке к ЕГЭ по математике. Особенно сложно даются задачи с параметрами и стереометрия. Хотелось бы разобрать типовые задания и научиться решать их самостоятельно.',
-    createdAt: '2024-01-15T10:30:00',
-    updatedAt: '2024-01-18T14:30:00',
-    // Связанные данные
-    student: {
-      name: 'Мария Васильева',
-      rating: 4.8,
-      ordersCount: 10,
-    },
-    subject: {
-      name: 'Математика',
-    },
-    teacher: {
-      fullName: 'Анна Петрова',
-    },
-  },
-  {
-    id: '2',
-    studentId: 'student-2',
-    tutorId: 'tutor-1',
-    subjectId: 'physics-1',
-    teacherId: 'teacher-2',
-    price: 150000, // в копейках (1500 рублей)
-    deadline: '2024-01-22T16:00:00',
-    status: 'ACCEPTED',
-    serviceResponseId: 'srv-resp-1',
-    requestResponseId: null,
-    description:
-      'Готовлюсь к поступлению в технический университет. Нужно подтянуть механику и термодинамику, а также разобрать задачи из сборника Чертова.',
-    createdAt: '2024-01-17T09:15:00',
-    updatedAt: '2024-01-17T14:20:00',
-    // Связанные данные
-    student: {
-      name: 'Алексей Козлов',
-      rating: 4.5,
-      ordersCount: 10,
-    },
-    subject: {
-      name: 'Физика',
-    },
-    teacher: {
-      fullName: 'Университетская физика',
-    },
-  },
-  {
-    id: '3',
-    studentId: 'student-3',
-    tutorId: 'tutor-1',
-    subjectId: 'chemistry-1',
-    teacherId: 'teacher-3',
-    price: 100000, // в копейках (1000 рублей)
-    deadline: null,
-    status: 'COMPLETED',
-    serviceResponseId: null,
-    requestResponseId: 'req-resp-2',
-    description:
-      'Изучаю органическую химию в 10 классе. Нужна помощь с механизмами реакций и номенклатурой органических соединений.',
-    createdAt: '2024-01-10T14:20:00',
-    updatedAt: '2024-01-18T18:30:00',
-    // Связанные данные
-    student: {
-      name: 'София Петрова',
-      rating: 5.0,
-      ordersCount: 10,
-    },
-    subject: {
-      name: 'Химия',
-    },
-    teacher: {
-      fullName: 'Органическая химия',
-    },
-  },
-])
+// Requests from backend
+const requests = ref<Request[]>([])
 
 // Filters
 const filters = ref<DealFilters>({
@@ -179,18 +73,15 @@ const sortOrderOptions = ref<SelectOption[]>([
 const activeTab = ref<'all' | 'active' | 'completed'>('all')
 
 const filteredDeals = computed(() => {
-  let result = [...deals.value]
+  let result = [...requests.value]
 
   // Tab filter
   switch (activeTab.value) {
     case 'active':
-      result = result.filter(
-        (deal) =>
-          deal.status === 'PENDING' || deal.status === 'ACCEPTED' || deal.status === 'IN_PROGRESS',
-      )
+      result = result.filter((r) => !r.deadline || new Date(r.deadline).getTime() >= Date.now())
       break
     case 'completed':
-      result = result.filter((deal) => deal.status === 'COMPLETED' || deal.status === 'CANCELLED')
+      result = result.filter((r) => r.deadline && new Date(r.deadline).getTime() < Date.now())
       break
   }
 
@@ -198,37 +89,29 @@ const filteredDeals = computed(() => {
   if (filters.value.search.trim()) {
     const searchTerm = filters.value.search.trim().toLowerCase()
     result = result.filter(
-      (deal) =>
-        deal.subject.name.toLowerCase().includes(searchTerm) ||
-        deal.teacher.fullName.toLowerCase().includes(searchTerm) ||
-        deal.student.name.toLowerCase().includes(searchTerm) ||
-        deal.description.toLowerCase().includes(searchTerm),
+      (req) =>
+        req.subject.name.toLowerCase().includes(searchTerm) ||
+        req.teacher.fullName.toLowerCase().includes(searchTerm) ||
+        req.student.name.toLowerCase().includes(searchTerm) ||
+        (req.description || '').toLowerCase().includes(searchTerm),
     )
   }
 
   // Subject filter
   if (filters.value.subject) {
-    result = result.filter((deal) => deal.subject.name === filters.value.subject)
+    result = result.filter((req) => req.subject.id === filters.value.subject)
   }
 
   // Teacher filter
   if (filters.value.teacher) {
-    result = result.filter((deal) => deal.teacher.fullName === filters.value.teacher)
+    result = result.filter((req) => req.teacher.id === filters.value.teacher)
   }
 
   // Status filter
-  if (filters.value.status !== 'all') {
-    result = result.filter((deal) => deal.status === filters.value.status)
-  }
+  // not applicable to requests
 
   // Source filter
-  if (filters.value.source !== 'all') {
-    if (filters.value.source === 'request') {
-      result = result.filter((deal) => deal.requestResponseId !== null)
-    } else if (filters.value.source === 'service') {
-      result = result.filter((deal) => deal.serviceResponseId !== null)
-    }
-  }
+  // not applicable to requests
 
   // Sorting
   result.sort((a, b) => {
@@ -236,7 +119,7 @@ const filteredDeals = computed(() => {
 
     switch (filters.value.sortBy) {
       case 'price':
-        comparison = a.price - b.price
+        comparison = (a.budget ?? 0) - (b.budget ?? 0)
         break
       case 'date':
         comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -258,10 +141,6 @@ const filteredDeals = computed(() => {
 })
 
 // Utility functions
-const formatPrice = (priceInKopecks: number) => {
-  return Math.round(priceInKopecks / 100)
-}
-
 const getDealStatusInfo = (status: string) => {
   switch (status) {
     case 'PENDING':
@@ -304,6 +183,14 @@ const getDealStatusInfo = (status: string) => {
   }
 }
 
+const getDealDescription = (item: any): string => {
+  if (typeof item?.description === 'string' && item.description) return item.description
+  if (item?.requestResponse?.request?.description) return item.requestResponse.request.description
+  if (item?.serviceResponse?.service?.description)
+    return item.serviceResponse.service.description ?? ''
+  return item?.requestResponse?.message || item?.serviceResponse?.message || ''
+}
+
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
   const now = new Date()
@@ -319,23 +206,18 @@ const formatDate = (dateString: string) => {
 
 // Computed
 const pageTitle = computed(() => {
-  if (filters.value.subject) {
-    return `Заказы по ${filters.value.subject.toLowerCase()}`
-  }
-  return 'Все заказы'
+  return 'Все заявки студентов'
 })
 
 const filteredOrders = computed(() => filteredDeals.value)
 
 const resultStats = computed(() => ({
   total: filteredDeals.value.length,
-  pending: filteredDeals.value.filter((d) => d.status === 'PENDING').length,
-  inProgress: filteredDeals.value.filter((d) => d.status === 'IN_PROGRESS').length,
   subjects: [...new Set(filteredDeals.value.map((d) => d.subject.name))].length,
   averagePrice:
     filteredDeals.value.length > 0
       ? Math.round(
-          filteredDeals.value.reduce((sum, d) => sum + formatPrice(d.price), 0) /
+          filteredDeals.value.reduce((sum, d) => sum + (d.budget ?? 0), 0) /
             filteredDeals.value.length,
         )
       : 0,
@@ -347,7 +229,8 @@ const loadOrders = async () => {
   error.value = null
 
   try {
-    await new Promise((resolve) => setTimeout(resolve, 800))
+    const response = await getRequests()
+    requests.value = response?.items ?? []
     extractFiltersData()
   } catch (err: any) {
     error.value = err.message || 'Ошибка загрузки заказов'
@@ -357,16 +240,22 @@ const loadOrders = async () => {
 }
 
 const extractFiltersData = () => {
-  availableSubjects.value = [...new Set(deals.value.map((d) => d.subject.name))].map((subject) => ({
-    value: subject,
-    label: subject,
+  const subjectMap = new Map<string, string>()
+  requests.value.forEach((d) => {
+    if (d.subject?.id && d.subject?.name) subjectMap.set(d.subject.id, d.subject.name)
+  })
+  availableSubjects.value = Array.from(subjectMap.entries()).map(([id, name]) => ({
+    value: id,
+    label: name,
   }))
-  availableTeachers.value = [...new Set(deals.value.map((d) => d.teacher.fullName))].map(
-    (teacher) => ({
-      value: teacher,
-      label: teacher,
-    }),
-  )
+  const teacherMap = new Map<string, string>()
+  requests.value.forEach((d) => {
+    if (d.teacher?.id && d.teacher?.fullName) teacherMap.set(d.teacher.id, d.teacher.fullName)
+  })
+  availableTeachers.value = Array.from(teacherMap.entries()).map(([id, fullName]) => ({
+    value: id,
+    label: fullName,
+  }))
 }
 
 const resetFilters = () => {
@@ -392,13 +281,9 @@ const goBack = () => {
   router.back()
 }
 
-const formatStatus = (status: string) => {
-  return getDealStatusInfo(status)
-}
-
-const respondToOrder = (deal: TutorDeal) => {
+const respondToOrder = (deal: Request) => {
   telegramStore.hapticFeedback('medium')
-  selectedDeal.value = deal
+  selectedRequest.value = deal
 
   // Auto-set proposed date from deal deadline
   if (deal.deadline) {
@@ -413,13 +298,13 @@ const respondToOrder = (deal: TutorDeal) => {
   }
 
   // Auto-set proposed price from deal
-  proposedPrice.value = formatPrice(deal.price)
+  proposedPrice.value = deal.budget ?? null
 
   showAcceptModal.value = true
 }
 
 const handleAcceptDeal = async () => {
-  if (!selectedDeal.value) return
+  if (!selectedRequest.value) return
 
   // Validate required fields
   if (!proposedDate.value.trim()) {
@@ -432,36 +317,30 @@ const handleAcceptDeal = async () => {
   telegramStore.hapticFeedback('medium')
 
   try {
-    // Simulate API call with tutor response
-    const responseData = {
-      dealId: selectedDeal.value.id,
-      tutorComment: tutorComment.value.trim(),
-      proposedDate: proposedDate.value,
-      proposedPrice: proposedPrice.value,
-    }
-
-    console.log('Отклик репетитора:', responseData)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    // Update deal status in mock data
-    const dealIndex = deals.value.findIndex((d) => d.id === selectedDeal.value!.id)
-    if (dealIndex !== -1) {
-      deals.value[dealIndex].status = 'ACCEPTED'
-      deals.value[dealIndex].updatedAt = new Date().toISOString()
-    }
+    await createRequestResponse({
+      tutorId: authStore.user?.id as string,
+      requestId: selectedRequest.value.id,
+      message: tutorComment.value.trim() || undefined,
+      price: proposedPrice.value ?? undefined,
+      proposedDeadline: new Date(proposedDate.value).toISOString(),
+    })
+    await loadOrders()
 
     telegramStore.hapticFeedback('success')
     showAcceptModal.value = false
-    selectedDeal.value = null
+    selectedRequest.value = null
     tutorComment.value = ''
     proposedDate.value = ''
     proposedPrice.value = null
 
     // Show success message
     telegramStore.showAlert('Отклик отправлен! Студент получит уведомление.')
+
+    showAcceptModal.value = false
   } catch (error) {
     console.error('Ошибка отправки отклика:', error)
     telegramStore.hapticFeedback('error')
+    telegramStore.showAlert('Не удалось отправить отклик. Попробуйте ещё раз.')
   } finally {
     isAccepting.value = false
   }
@@ -470,7 +349,7 @@ const handleAcceptDeal = async () => {
 const handleCloseAcceptModal = () => {
   if (!isAccepting.value) {
     showAcceptModal.value = false
-    selectedDeal.value = null
+    selectedRequest.value = null
     tutorComment.value = ''
     proposedDate.value = ''
     proposedPrice.value = null
@@ -493,7 +372,7 @@ watch(
 // Reset selected deal when modal closes
 watch(showAcceptModal, (isOpen) => {
   if (!isOpen) {
-    selectedDeal.value = null
+    selectedRequest.value = null
     tutorComment.value = ''
     proposedDate.value = ''
     proposedPrice.value = null
@@ -652,7 +531,7 @@ onMounted(() => {
             </div>
           </div>
           <div class="text-right">
-            <div class="font-bold text-telegram-accent">{{ formatPrice(order.price) }} ₽</div>
+            <div class="font-bold text-telegram-accent">{{ order.budget ?? '—' }} ₽</div>
           </div>
         </div>
 
@@ -671,7 +550,8 @@ onMounted(() => {
           <div class="flex-1">
             <div class="font-medium text-telegram-text">{{ order.student.name }}</div>
             <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
-              <span>{{ order.student.ordersCount }} заказов</span>
+              <!-- TODO вернуть -->
+              <!-- <span>{{ 5 }} заказов</span>
               <span>•</span>
               <div class="flex items-center space-x-1">
                 <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -679,14 +559,14 @@ onMounted(() => {
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                   />
                 </svg>
-                <span>{{ order.student.rating }}</span>
-              </div>
+                <span>{{ 5 }}</span>
+              </div> -->
             </div>
           </div>
         </div>
 
         <p class="text-sm line-clamp-5 leading-relaxed mb-3">
-          {{ order.description }}
+          {{ getDealDescription(order) }}
         </p>
 
         <!-- Meta Info -->
@@ -730,7 +610,7 @@ onMounted(() => {
 
     <!-- Accept Modal -->
     <Modal v-model="showAcceptModal" title="Откликнуться на заказ" max-width="lg">
-      <div v-if="selectedDeal" class="space-y-5 max-h-[60vh] overflow-y-auto pr-2">
+      <div v-if="selectedRequest" class="space-y-5 max-h-[60vh] overflow-y-auto pr-2">
         <div class="space-y-3 mb-7 mt-2">
           <!-- Student Info -->
           <div class="flex items-center space-x-3 bg-telegram-secondary/20 rounded-xl">
@@ -738,25 +618,25 @@ onMounted(() => {
               class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-semibold"
             >
               {{
-                selectedDeal.student.name
+                selectedRequest.student.name
                   .split(' ')
                   .map((n) => n[0])
                   .join('')
               }}
             </div>
             <div class="flex-1">
-              <h3 class="font-semibold text-telegram-text">{{ selectedDeal.student.name }}</h3>
+              <h3 class="font-semibold text-telegram-text">{{ selectedRequest.student.name }}</h3>
             </div>
             <div class="text-right">
               <div class="font-bold text-telegram-accent text-lg">
-                {{ formatPrice(selectedDeal.price) }} ₽
+                {{ selectedRequest.budget ?? '—' }} ₽
               </div>
             </div>
           </div>
           <!-- Order Description -->
           <div class="bg-telegram-bg/50 border-l-4 border-telegram-accent p-4 rounded-r-lg">
             <p class="text-telegram-text leading-relaxed italic">
-              {{ selectedDeal.description }}
+              {{ getDealDescription(selectedRequest) }}
             </p>
           </div>
           <!-- Meta Info -->
@@ -766,7 +646,7 @@ onMounted(() => {
               <span class="text-telegram-textSecondary">
                 Дедлайн:
                 <span class="text-telegram-text">{{
-                  selectedDeal.deadline ? formatDate(selectedDeal.deadline) : 'Не установлен'
+                  selectedRequest.deadline ? formatDate(selectedRequest.deadline) : 'Не установлен'
                 }}</span>
               </span>
             </div>
@@ -774,7 +654,7 @@ onMounted(() => {
               <div class="w-2 h-2 bg-telegram-textSecondary rounded-full"></div>
               <span class="text-telegram-textSecondary">
                 Создан:
-                <span class="text-telegram-text">{{ formatDate(selectedDeal.createdAt) }}</span>
+                <span class="text-telegram-text">{{ formatDate(selectedRequest.createdAt) }}</span>
               </span>
             </div>
           </div>

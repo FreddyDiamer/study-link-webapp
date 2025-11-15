@@ -75,7 +75,7 @@ const loadService = async () => {
     form.subject = serviceData.subjectId || ''
     form.teacher = serviceData.teacherId || ''
     form.description = serviceData.description || ''
-    form.price = serviceData.price ? (serviceData.price / 100).toString() : ''
+    form.price = serviceData.price ? serviceData.price.toString() : ''
 
     if (serviceData.deadline) {
       const deadlineDate = new Date(serviceData.deadline)
@@ -109,7 +109,7 @@ const updateServiceData = async () => {
 
   try {
     const updateData: UpdateServiceDto = {
-      price: parseInt(form.price) * 100, // Конвертируем в копейки
+      price: parseInt(form.price), // Конвертируем в копейки
       description: form.description,
       deadline: getDeadlineDate(),
     }
@@ -261,7 +261,7 @@ onMounted(async () => {
           <h2 class="text-lg font-semibold text-telegram-text mb-4">Предмет преподавания</h2>
 
           <Select
-            v-model="form.subject"
+            v-model:value="form.subject"
             :options="subjectOptions"
             placeholder="Выберите предмет"
             required
@@ -276,7 +276,7 @@ onMounted(async () => {
           </p>
 
           <Select
-            v-model="form.teacher"
+            v-model:value="form.teacher"
             :options="teacherOptions"
             placeholder="Выберите преподавателя"
             required
@@ -305,7 +305,7 @@ onMounted(async () => {
           </p>
 
           <Select
-            v-model="form.deadline"
+            v-model:value="form.deadline"
             :options="deadlines"
             placeholder="Выберите срок"
             required

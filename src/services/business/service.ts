@@ -7,7 +7,6 @@ import type {
   UpdateServiceDto,
   PaginatedResponse,
 } from '@/shared/types'
-import { convertRublesToKopeks, convertKopeksToRubles } from '@/shared/types'
 
 export class ServiceService {
   private get telegramStore() {
@@ -78,7 +77,7 @@ export class ServiceService {
       // Конвертируем цену в копейки
       const serviceData: CreateServiceDto = {
         ...data,
-        price: convertRublesToKopeks(data.price),
+        price: data.price,
       }
 
       this.telegramStore.hapticFeedback('light')
@@ -104,7 +103,7 @@ export class ServiceService {
       // Конвертируем цену в копейки если она есть
       const updateData: UpdateServiceDto = {
         ...data,
-        price: data.price ? convertRublesToKopeks(data.price) : undefined,
+        price: data.price,
       }
 
       this.telegramStore.hapticFeedback('light')
@@ -173,9 +172,6 @@ export class ServiceService {
     if (!data.price || data.price < 100) {
       throw new Error('Цена должна быть не менее 100 рублей')
     }
-    if (data.price > 10000) {
-      throw new Error('Цена не должна превышать 10000 рублей')
-    }
     if (data.description && data.description.length > 500) {
       throw new Error('Описание не должно превышать 500 символов')
     }
@@ -185,9 +181,6 @@ export class ServiceService {
     if (data.price !== undefined) {
       if (data.price < 100) {
         throw new Error('Цена должна быть не менее 100 рублей')
-      }
-      if (data.price > 10000) {
-        throw new Error('Цена не должна превышать 10000 рублей')
       }
     }
     if (data.description && data.description.length > 500) {
@@ -200,15 +193,15 @@ export class ServiceService {
 
     return {
       ...filters,
-      minPrice: filters.minPrice ? convertRublesToKopeks(filters.minPrice) : undefined,
-      maxPrice: filters.maxPrice ? convertRublesToKopeks(filters.maxPrice) : undefined,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
     }
   }
 
   private convertServiceToRubles(service: Service): Service {
     return {
       ...service,
-      price: convertKopeksToRubles(service.price),
+      price: service.price,
     }
   }
 

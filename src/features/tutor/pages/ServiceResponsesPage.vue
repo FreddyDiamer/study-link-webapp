@@ -166,10 +166,6 @@ const formatDate = (dateString: string): string => {
   })
 }
 
-const formatPrice = (priceInKopecks: number) => {
-  return Math.round(priceInKopecks / 100)
-}
-
 const getResponseStatusInfo = (status: string) => {
   switch (status) {
     case 'PENDING':
@@ -280,7 +276,7 @@ onMounted(() => {
           {{ service.subject.name }} • {{ service.teacher.fullName }}
         </h1>
         <p class="text-telegram-textSecondary text-sm">
-          {{ service.description }} • {{ formatPrice(service.price) }}₽
+          {{ service.description }} • {{ service.price }}₽
         </p>
       </div>
     </div>
@@ -401,15 +397,11 @@ onMounted(() => {
         <div class="grid grid-cols-2 gap-4 mb-4 p-3 bg-telegram-secondary/50 rounded-lg">
           <div>
             <span class="text-xs text-telegram-textSecondary">Предложенная цена:</span>
-            <div class="text-sm font-medium text-telegram-success">
-              {{ formatPrice(response.price) }}₽
-            </div>
+            <div class="text-sm font-medium text-telegram-success">{{ response.price }}₽</div>
           </div>
           <div>
             <span class="text-xs text-telegram-textSecondary">Цена услуги:</span>
-            <div class="text-sm font-medium text-telegram-text">
-              {{ formatPrice(response.service.price) }}₽
-            </div>
+            <div class="text-sm font-medium text-telegram-text">{{ response.service.price }}₽</div>
           </div>
         </div>
 

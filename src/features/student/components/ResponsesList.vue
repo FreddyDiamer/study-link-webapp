@@ -39,7 +39,6 @@ const getResponseStatusInfo = (status: string) => {
 }
 
 const formatRub = (priceInRubles: number) => Math.round(priceInRubles)
-const formatKopToRub = (priceInKopecks: number) => Math.round(priceInKopecks / 100)
 
 const formatDeadline = (dateString: string | null) => {
   if (!dateString) return null
@@ -176,9 +175,7 @@ const viewResponseDetails = (response: any) => {
             </div>
             <div>
               <span class="text-telegram-textSecondary">Цена услуги: </span>
-              <span class="text-telegram-text"
-                >{{ formatKopToRub(response.service?.price || 0) }}₽</span
-              >
+              <span class="text-telegram-text">{{ response.service?.price || 0 }}₽</span>
             </div>
             <div v-if="response.proposedDeadline">
               <span class="text-telegram-textSecondary">Дедлайн: </span>

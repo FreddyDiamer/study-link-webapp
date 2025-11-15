@@ -328,6 +328,3 @@ export interface TelegramAuthDto {
 
 export type PriceInRubles = number
 export type PriceInKopeks = number
-
-export const convertRublesToKopeks = (rubles: PriceInRubles): PriceInKopeks => rubles * 100
-export const convertKopeksToRubles = (kopeks: PriceInKopeks): PriceInRubles => kopeks / 100
