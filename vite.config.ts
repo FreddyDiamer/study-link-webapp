@@ -12,6 +12,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
       '@shared': resolve(__dirname, 'src/shared'),
       '@components': resolve(__dirname, 'src/shared/components'),
+      '@widgets': resolve(__dirname, 'src/widgets'),
     },
   },
   server: {

@@ -218,7 +218,7 @@ onUnmounted(() => {
     >
       <div
         v-if="isOpen && filteredOptions.length > 0"
-        class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg max-h-60 overflow-y-auto"
+        class="absolute z-50 mt-2 w-full bg-telegram-secondary backdrop-blur-sm border border-telegram-border rounded-xl shadow-lg max-h-60 overflow-y-auto"
       >
         <button
           v-for="(option, index) in filteredOptions"
@@ -256,7 +256,7 @@ onUnmounted(() => {
     <!-- No results dropdown -->
     <div
       v-if="isOpen && filteredOptions.length === 0 && inputValue"
-      class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg"
+      class="absolute z-50 mt-2 w-full bg-telegram-secondary backdrop-blur-sm border border-telegram-border rounded-xl shadow-lg"
     >
       <div class="px-4 py-6 text-center text-telegram-textSecondary">
         <LoupeIcon class="w-8 h-8 mx-auto mb-2 opacity-50" />

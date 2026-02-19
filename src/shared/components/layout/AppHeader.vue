@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Vue
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 // Store
 import { useTelegramStore } from '@/stores/telegram'
@@ -15,7 +15,10 @@ import { StudentIcon, TutorIcon, ArrowIcon } from '@components/icons'
 import { PATHS } from '@/router/paths'
 
 // Composables
+const route = useRoute()
 const router = useRouter()
+
+const isWelcomePage = computed(() => route.name === 'welcome')
 
 // Stores
 const telegramStore = useTelegramStore()
@@ -107,8 +110,8 @@ const handleLogoClick = () => {
         <h1 class="text-lg font-semibold text-telegram-text">KAI</h1>
       </div>
 
-      <!-- Flow Selector & Profile -->
-      <div class="flex items-center space-x-2">
+      <!-- Flow Selector & Profile (скрыты на странице welcome) -->
+      <div v-if="!isWelcomePage" class="flex items-center space-x-2">
         <!-- Flow Selector -->
         <div class="relative">
           <Button
@@ -139,7 +142,7 @@ const handleLogoClick = () => {
           <!-- Flow Dropdown -->
           <div
             v-if="showFlowSelector"
-            class="absolute right-0 top-full mt-2 w-48 bg-telegram-card border border-telegram-border rounded-xl shadow-lg py-2 z-10"
+            class="absolute right-0 top-full mt-2 w-48 bg-telegram-secondary backdrop-blur-sm border border-telegram-border rounded-xl shadow-lg py-2 z-10"
           >
             <button
               @click="selectFlow('student')"
