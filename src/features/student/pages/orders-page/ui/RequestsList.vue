@@ -96,7 +96,7 @@ const viewRequestDetails = (request: Request) => {
           </div>
           <div class="text-right">
             <p class="text-telegram-textSecondary text-xs mb-1">Откликов</p>
-            <span class="text-telegram-text text-lg font-bold">{{ (request as any)?._count?.responses ?? 0 }}</span>
+            <span class="text-telegram-text text-lg font-bold">{{ request.responses?.length ?? 0 }}</span>
           </div>
         </div>
       </Card>

@@ -72,11 +72,43 @@ export class ReviewService {
     }
   }
 
+  async setReviewReply(id: string, reply: string | null): Promise<Review> {
+    try {
+      this.telegramStore.hapticFeedback('light')
+      const review = await reviewsApi.setReviewReply(id, reply)
+      this.telegramStore.showAlert(reply ? 'Ответ сохранён' : 'Ответ удалён')
+      return review
+    } catch (error) {
+      this.handleError(error, 'Ошибка при сохранении ответа на отзыв')
+      throw error
+    }
+  }
+
   async getDealReviews(dealId: string): Promise<Review[]> {
     try {
       return await reviewsApi.getDealReviews(dealId)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении отзывов по сделке')
+      throw error
+    }
+  }
+
+  async getAboutMe(targetRole?: 'TUTOR' | 'STUDENT'): Promise<Review[]> {
+    try {
+      const res = await reviewsApi.getAboutMe(targetRole)
+      return res.items
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении отзывов обо мне')
+      throw error
+    }
+  }
+
+  async getMy(): Promise<Review[]> {
+    try {
+      const res = await reviewsApi.getMy()
+      return res.items
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении моих отзывов')
       throw error
     }
   }

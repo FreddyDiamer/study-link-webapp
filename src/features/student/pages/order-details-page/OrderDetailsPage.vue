@@ -16,6 +16,7 @@ const {
   formatDate,
   handleBack,
   handleResponseAction,
+  handleContactTutor,
 } = useOrderDetails()
 </script>
 
@@ -59,6 +60,8 @@ const {
             :response="response"
             @accept="(id) => handleResponseAction(id, 'accept')"
             @reject="(id) => handleResponseAction(id, 'reject')"
+            @cancel="(id) => handleResponseAction(id, 'cancel')"
+            @contact="handleContactTutor"
           />
         </div>
       </div>

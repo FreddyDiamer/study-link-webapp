@@ -1,4 +1,8 @@
 <script setup lang="ts">
+withDefaults(
+  defineProps<{ variant?: 'active' | 'completed' }>(),
+  { variant: 'active' },
+)
 </script>
 
 <template>
@@ -20,9 +24,15 @@
         />
       </svg>
     </div>
-    <h2 class="text-xl font-semibold text-telegram-text mb-3">Нет активных занятий</h2>
+    <h2 class="text-xl font-semibold text-telegram-text mb-3">
+      {{ variant === 'completed' ? 'Нет завершённых занятий' : 'Нет активных занятий' }}
+    </h2>
     <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
-      У вас пока нет активных занятий. Принимайте отклики студентов, чтобы начать заниматься
+      {{
+        variant === 'completed'
+          ? 'Завершённые занятия появятся здесь после того, как вы завершите сделку'
+          : 'У вас пока нет активных занятий. Принимайте отклики студентов, чтобы начать заниматься'
+      }}
     </p>
   </div>
 </template>

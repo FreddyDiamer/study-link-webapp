@@ -13,7 +13,7 @@ const myDeals = computed(() => props.items ?? [])
 
 const getDealStatusInfo = (status: string) => {
   switch (status) {
-    case 'PENDING': return { color: 'bg-orange-500', text: 'Ожидает подтверждения', textColor: 'text-orange-600' }
+    case 'PENDING': return { color: 'bg-orange-500', text: 'Ожидает начала', textColor: 'text-orange-600' }
     case 'ACCEPTED': return { color: 'bg-blue-500', text: 'Принята', textColor: 'text-blue-600' }
     case 'IN_PROGRESS': return { color: 'bg-telegram-success', text: 'В процессе', textColor: 'text-telegram-success' }
     case 'COMPLETED': return { color: 'bg-telegram-textSecondary', text: 'Завершена', textColor: 'text-telegram-textSecondary' }
@@ -48,12 +48,26 @@ const findTutors = () => {
   router.push('/student/services')
 }
 
-const viewDealDetails = (_deal: Deal) => {
+const viewDealDetails = (deal: Deal) => {
   telegramStore.hapticFeedback('light')
+  router.push(`/student/deals/${deal.id}`)
 }
 
-const startLesson = (_deal: Deal) => {
+const openTutorProfile = (e: Event, tutorId: string) => {
+  e.stopPropagation()
   telegramStore.hapticFeedback('light')
+  router.push(`/user/${tutorId}?view=tutor`)
+}
+
+function openTelegram(deal: Deal) {
+  telegramStore.hapticFeedback('light')
+  const username = (deal as any).tutor?.telegramUsername
+  if (username) {
+    const slug = username.startsWith('@') ? username.slice(1) : username
+    window.open(`https://t.me/${slug}`, '_blank')
+  } else {
+    telegramStore.showAlert('Контакт репетитора недоступен')
+  }
 }
 </script>
 
@@ -82,7 +96,14 @@ const startLesson = (_deal: Deal) => {
               {{ (deal as any).subject?.name || 'Предмет' }} • {{ (deal as any).teacher?.fullName || 'Преподаватель' }}
             </h3>
             <div class="flex items-center space-x-2 mb-2">
-              <span class="text-telegram-textSecondary text-sm">{{ (deal as any).tutor?.name || 'Репетитор' }}</span>
+              <span
+                v-if="deal.tutor?.id"
+                class="text-telegram-accent text-sm cursor-pointer hover:underline"
+                @click="openTutorProfile($event, deal.tutor.id)"
+              >
+                {{ deal.tutor?.name || 'Репетитор' }} →
+              </span>
+              <span v-else class="text-telegram-textSecondary text-sm">{{ (deal as any).tutor?.name || 'Репетитор' }}</span>
             </div>
           </div>
           <div class="text-right">
@@ -103,9 +124,9 @@ const startLesson = (_deal: Deal) => {
             <p class="text-telegram-textSecondary text-xs mb-1">{{ deal.deadline ? 'Дедлайн' : 'Создана' }}</p>
             <p class="text-telegram-text text-sm">{{ deal.deadline ? formatDeadline(deal.deadline) : formatDate(deal.createdAt) }}</p>
           </div>
-          <div v-if="deal.status === 'IN_PROGRESS' || deal.status === 'ACCEPTED'" @click.stop="startLesson(deal)">
-            <Button size="sm" :class="['text-xs px-3 py-1.5', deal.status === 'IN_PROGRESS' ? 'bg-telegram-success hover:bg-telegram-success/90' : 'bg-telegram-accent hover:bg-telegram-accent/90']">
-              {{ deal.status === 'IN_PROGRESS' ? 'Продолжить' : 'Начать' }}
+          <div v-if="deal.status === 'IN_PROGRESS' || deal.status === 'ACCEPTED'" @click.stop="openTelegram(deal)">
+            <Button size="sm" class="text-xs px-3 py-1.5 bg-[#0088cc] hover:bg-[#0077b5] text-white">
+              Телеграм
             </Button>
           </div>
         </div>

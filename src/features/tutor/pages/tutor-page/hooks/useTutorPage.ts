@@ -1,4 +1,4 @@
-import { ref, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { useService } from '@/shared/composables'
@@ -9,10 +9,14 @@ export function useTutorPage() {
   const router = useRouter()
   const telegramStore = useTelegramStore()
   const { getMyServices } = useService()
+  const myServicesQuery = getMyServices()
 
   const searchQuery = ref('')
-  const isLoading = ref(false)
-  const activeServices = ref<Service[]>([])
+  const isLoading = myServicesQuery.isLoading
+  const activeServices = computed(() => {
+    const items = myServicesQuery.data.value?.items ?? []
+    return items.filter((s: Service) => s.status === 'ACTIVE').slice(0, 3)
+  })
 
   const quickActions = [
     {
@@ -37,21 +41,9 @@ export function useTutorPage() {
     },
   ]
 
-  const loadData = async () => {
-    isLoading.value = true
-    try {
-      const servicesResponse = await getMyServices()
-      activeServices.value = servicesResponse.items
-        .filter((s) => s.status === 'ACTIVE')
-        .slice(0, 3)
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error)
-    } finally {
-      isLoading.value = false
-    }
+  const loadData = () => {
+    myServicesQuery.refetch()
   }
-
-  onMounted(() => loadData())
 
   return { searchQuery, isLoading, activeServices, quickActions, loadData }
 }

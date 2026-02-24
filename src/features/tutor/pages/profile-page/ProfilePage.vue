@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import Card from '@/shared/components/ui/Card.vue'
 import { ProfileHeaderCard, StatsGrid, FeedbackCard } from './ui'
 import { useTutorProfile } from './hooks'
+import { PATHS } from '@/router/paths'
 
+const router = useRouter()
 const {
   user,
   isLoading,
@@ -11,6 +14,14 @@ const {
   openFeedback,
   telegramStore,
 } = useTutorProfile()
+
+function openReviews() {
+  router.push(PATHS.TUTOR_REVIEWS)
+}
+
+function openNotifications() {
+  router.push(PATHS.TUTOR_NOTIFICATIONS)
+}
 </script>
 
 <template>
@@ -26,7 +37,10 @@ const {
     <StatsGrid :stats="stats" />
 
     <div class="space-y-3">
-      <Card class="p-4">
+      <Card
+        class="p-4 cursor-pointer hover:border-telegram-accent transition-colors"
+        @click="openReviews"
+      >
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div
@@ -51,7 +65,10 @@ const {
           </svg>
         </div>
       </Card>
-      <Card class="p-4">
+      <Card
+        class="p-4 cursor-pointer hover:border-telegram-accent transition-colors"
+        @click="openNotifications"
+      >
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div
@@ -68,6 +85,7 @@ const {
             </div>
             <div>
               <p class="text-telegram-text font-medium">Уведомления</p>
+              <p class="text-telegram-textSecondary text-sm">Включить или отключить уведомления в Telegram</p>
             </div>
           </div>
           <svg class="w-5 h-5 text-telegram-textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">

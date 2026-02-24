@@ -1,215 +1,184 @@
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS } from '@/router/paths'
+import { useService } from '@/shared/composables'
+import { useOrder } from '@/shared/composables/useOrder'
 import type {
   TutorServicesTab,
   TutorServiceCard,
   TutorActiveDeal,
   TutorRequestResponse,
 } from '../models'
-
-const MOCK_SERVICES: TutorServiceCard[] = [
-  {
-    id: 1,
-    title: 'Подготовка к ЕГЭ по математике',
-    subject: 'Математика',
-    teacher: 'Иван Иванов',
-    level: 'ЕГЭ',
-    description:
-      'Комплексная подготовка к ЕГЭ по математике профильного уровня. Разбор всех типов заданий, работа с ошибками, решение вариантов.',
-    price: 2200,
-    duration: 90,
-    format: ['Онлайн', 'Очно'],
-    status: 'active',
-    studentsCount: 15,
-    rating: 4.9,
-    reviewsCount: 43,
-    responsesCount: 12,
-    newResponsesCount: 3,
-    activeResponsesCount: 8,
-    hasActiveDeals: true,
-    features: [
-      'Индивидуальный план подготовки',
-      'Домашние задания с проверкой',
-      'Пробные тесты ЕГЭ',
-      'Разбор типичных ошибок',
-    ],
-  },
-  {
-    id: 2,
-    title: 'Алгебра для 8-9 классов',
-    subject: 'Математика',
-    teacher: 'Иван Иванов',
-    level: 'ОГЭ',
-    description:
-      'Помощь с изучением алгебры в 8-9 классах, подготовка к ОГЭ. Работа с уравнениями, неравенствами, функциями.',
-    price: 1800,
-    duration: 60,
-    format: ['Онлайн'],
-    status: 'frozen',
-    studentsCount: 8,
-    rating: 4.8,
-    reviewsCount: 21,
-    responsesCount: 5,
-    newResponsesCount: 0,
-    activeResponsesCount: 2,
-    hasActiveDeals: false,
-    features: [
-      'Объяснение сложных тем',
-      'Практические задания',
-      'Подготовка к контрольным',
-      'Регулярная обратная связь',
-    ],
-  },
-  {
-    id: 3,
-    title: 'Геометрия с нуля',
-    subject: 'Математика',
-    teacher: 'Иван Иванов',
-    level: 'Школьная программа',
-    description:
-      'Изучение геометрии с основ. Подходит для учеников 7-11 классов, которые хотят разобраться в предмете.',
-    price: 2000,
-    duration: 75,
-    format: ['Очно'],
-    status: 'active',
-    studentsCount: 3,
-    rating: 4.7,
-    reviewsCount: 12,
-    responsesCount: 8,
-    newResponsesCount: 1,
-    activeResponsesCount: 4,
-    hasActiveDeals: false,
-    features: [
-      'Основы планиметрии',
-      'Стереометрия',
-      'Решение задач разной сложности',
-      'Визуализация теорем',
-    ],
-  },
-  {
-    id: 4,
-    title: 'Олимпиадная математика',
-    subject: 'Математика',
-    teacher: 'Иван Иванов',
-    level: 'Олимпиады',
-    description:
-      'Подготовка к математическим олимпиадам различного уровня. Нестандартные задачи, развитие логического мышления.',
-    price: 3000,
-    duration: 120,
-    format: ['Онлайн', 'Очно'],
-    status: 'deleted',
-    studentsCount: 5,
-    rating: 5.0,
-    reviewsCount: 8,
-    responsesCount: 2,
-    newResponsesCount: 0,
-    activeResponsesCount: 0,
-    hasActiveDeals: false,
-    features: [
-      'Нестандартные задачи',
-      'Развитие логики',
-      'Подготовка к конкурсам',
-      'Индивидуальный подход',
-    ],
-  },
-]
-
-const MOCK_DEALS: TutorActiveDeal[] = [
-  {
-    id: 1,
-    studentId: 'student3',
-    studentName: 'София Иванова',
-    serviceTitle: 'Геометрия с нуля',
-    subject: 'Математика',
-    teacher: 'Иванов Петр Сергеевич',
-    taskDescription:
-      'Совсем не понимаю геометрию, нужна помощь с основами. Особенно сложно с теоремами и доказательствами.',
-    tutorComment:
-      'Готов помочь разобраться с геометрией пошагово. Начнем с основных понятий и постепенно перейдем к более сложным темам.',
-    price: 2000,
-    deadline: new Date('2024-03-15'),
-    status: 'in_progress',
-    createdAt: new Date('2024-01-13T12:00:00'),
-    lastActivity: new Date('2024-01-20T16:30:00'),
-  },
-  {
-    id: 2,
-    studentId: 'student4',
-    studentName: 'Алексей Кузнецов',
-    serviceTitle: 'Алгебра для 8-9 классов',
-    subject: 'Математика',
-    teacher: 'Смирнова Анна Владимировна',
-    taskDescription:
-      'Нужна подготовка к ОГЭ по алгебре. Сложности с решением уравнений и неравенств.',
-    tutorComment: 'Занятия будут включать разбор типовых заданий ОГЭ и практические упражнения.',
-    price: 1800,
-    deadline: new Date('2024-02-28'),
-    status: 'accepted',
-    createdAt: new Date('2024-01-10T14:20:00'),
-    lastActivity: new Date('2024-01-19T10:15:00'),
-  },
-]
-
-const MOCK_RESPONSES: TutorRequestResponse[] = [
-  {
-    id: 1,
-    tutorId: 'current-tutor',
-    requestId: 1,
-    studentName: 'Анна Смирнова',
-    requestTitle: 'Подготовка к ЕГЭ по математике',
-    requestDescription:
-      'Нужна помощь с подготовкой к ЕГЭ по математике, особенно с алгеброй и геометрией.',
-    message:
-      'Здравствуйте! Готов помочь с подготовкой к ЕГЭ. У меня большой опыт подготовки учеников к экзаменам.',
-    price: 2200,
-    proposedDeadline: new Date('2024-05-15'),
-    status: 'pending',
-    createdAt: new Date('2024-01-15T10:30:00'),
-    budget: 2500,
-    urgency: 'high',
-  },
-  {
-    id: 2,
-    tutorId: 'current-tutor',
-    requestId: 2,
-    studentName: 'Михаил Петров',
-    requestTitle: 'Алгебра 9 класс',
-    requestDescription: 'Помощь с алгеброй в 9 классе, подготовка к ОГЭ.',
-    message: 'Могу помочь с алгеброй и подготовкой к ОГЭ. Предлагаю индивидуальный подход.',
-    price: 1800,
-    proposedDeadline: new Date('2024-04-20'),
-    status: 'accepted',
-    createdAt: new Date('2024-01-14T15:20:00'),
-    budget: 2000,
-    urgency: 'medium',
-  },
-  {
-    id: 3,
-    tutorId: 'current-tutor',
-    requestId: 3,
-    studentName: 'София Иванова',
-    requestTitle: 'Геометрия с нуля',
-    requestDescription: 'Совсем не понимаю геометрию, нужна помощь с основами.',
-    message: 'Специализируюсь на объяснении геометрии с нуля. Использую наглядные методы.',
-    price: 2000,
-    proposedDeadline: undefined,
-    status: 'rejected',
-    createdAt: new Date('2024-01-13T09:15:00'),
-    budget: 1800,
-    urgency: 'low',
-  },
-]
+import type { Service, Deal, RequestResponse, ServiceStatus, ResponseStatus } from '@/shared/types'
+import { DealStatus } from '@/shared/types'
 
 export function useTutorServicesPage() {
   const router = useRouter()
   const telegramStore = useTelegramStore()
-
+  const { getMyServices } = useService()
+  const { getMyTutorDeals, getMyRequestResponses, deleteRequestResponse, completeDeal: completeDealMutation, updateDeal: updateDealMutation } = useOrder()
+  const deleteRequestResponseMutation = deleteRequestResponse()
+  const completeDealMutationFn = completeDealMutation()
+  const updateDealMutationFn = updateDealMutation()
   const activeTab = ref<TutorServicesTab>('services')
-  const services = ref<TutorServiceCard[]>([...MOCK_SERVICES])
-  const activeDeals = ref<TutorActiveDeal[]>([...MOCK_DEALS])
-  const requestResponses = ref<TutorRequestResponse[]>([...MOCK_RESPONSES])
+
+  // Запросы создаём на верхнем уровне, чтобы Vue Query их регистрировал и вызывал API
+  const myServicesQuery = getMyServices()
+  const myTutorDealsQuery = getMyTutorDeals()
+  const myRequestResponsesQuery = getMyRequestResponses()
+
+  const error = ref<string | null>(null)
+
+  // Функции маппинга данных с бэка в типы компонента
+  const mapServiceToCard = (service: Service): TutorServiceCard => {
+    const statusMap: Record<ServiceStatus, 'active' | 'frozen' | 'deleted'> = {
+      ACTIVE: 'active',
+      INACTIVE: 'frozen',
+      SUSPENDED: 'frozen',
+    }
+
+    // Используем хеш строки ID как числовой идентификатор для совместимости
+    const numericId = service.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+
+    return {
+      id: numericId,
+      originalId: service.id,
+      title: `${service.subject.name} - ${service.teacher.fullName}`,
+      subject: service.subject.name,
+      teacher: service.teacher.fullName,
+      level: '', // TODO: добавить поле level в Service если нужно
+      description: service.description || '',
+      price: service.price, // уже в рублях благодаря бизнес-сервису
+      duration: 60, // TODO: добавить поле duration в Service если нужно
+      format: ['Онлайн', 'Очно'], // TODO: добавить поле format в Service если нужно
+      status: statusMap[service.status] || 'active',
+      studentsCount: 0, // TODO: добавить подсчет студентов
+      rating: 0, // TODO: добавить рейтинг
+      reviewsCount: 0, // TODO: добавить количество отзывов
+      features: [], // TODO: добавить features если нужно
+      responsesCount: service.responses?.length || 0,
+      newResponsesCount: service.responses?.filter((r) => r.status === 'PENDING').length || 0,
+      activeResponsesCount: service.responses?.filter((r) => r.status === 'ACCEPTED').length || 0,
+      hasActiveDeals: false, // TODO: проверить наличие активных сделок
+    }
+  }
+
+  const mapDealToCard = (deal: Deal): TutorActiveDeal => {
+    const statusMap: Record<DealStatus, 'pending' | 'accepted' | 'in_progress' | 'completed'> = {
+      PENDING: 'pending',
+      ACCEPTED: 'accepted',
+      IN_PROGRESS: 'in_progress',
+      COMPLETED: 'completed',
+      CANCELLED: 'pending',
+    }
+
+    // Используем хеш строки ID как числовой идентификатор для совместимости
+    const numericId = deal.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+
+    return {
+      id: numericId,
+      originalId: deal.id,
+      studentId: deal.studentId,
+      studentName: deal.student.name,
+      studentAvatar: deal.student.avatarUrl,
+      serviceTitle: deal.subject.name,
+      subject: deal.subject.name,
+      teacher: deal.teacher.fullName,
+      taskDescription: deal.requestResponse?.request?.description || '',
+      tutorComment: deal.requestResponse?.message,
+      price: deal.price, // уже в рублях благодаря бизнес-сервису
+      deadline: deal.deadline ? new Date(deal.deadline) : undefined,
+      status: statusMap[deal.status] || 'pending',
+      createdAt: new Date(deal.createdAt),
+      lastActivity: new Date(deal.updatedAt),
+    }
+  }
+
+  const mapRequestResponseToCard = (response: RequestResponse): TutorRequestResponse => {
+    const statusMap: Record<ResponseStatus, 'pending' | 'accepted' | 'rejected' | 'expired'> = {
+      PENDING: 'pending',
+      ACCEPTED: 'accepted',
+      REJECTED: 'rejected',
+      EXPIRED: 'expired',
+    }
+
+    // Используем хеш строки ID как числовой идентификатор для совместимости
+    const numericId = response.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    const numericRequestId = response.requestId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+
+    return {
+      id: numericId,
+      originalId: response.id,
+      tutorId: response.tutorId,
+      requestId: numericRequestId,
+      studentName: response.request.student.name,
+      studentAvatar: response.request.student.avatarUrl,
+      requestTitle: `${response.request.subject.name} - ${response.request.teacher.fullName}`,
+      requestDescription: response.request.description || '',
+      message: response.message,
+      price: response.price, // уже в рублях
+      proposedDeadline: response.proposedDeadline ? new Date(response.proposedDeadline) : undefined,
+      status: statusMap[response.status] || 'pending',
+      createdAt: new Date(response.createdAt),
+      budget: response.request.budget, // уже в рублях
+      urgency: 'medium', // TODO: добавить urgency в Request если нужно
+    }
+  }
+
+  const services = computed(() =>
+    (myServicesQuery.data.value?.items ?? []).map(mapServiceToCard),
+  )
+
+  const allDealsMapped = computed(() =>
+    (myTutorDealsQuery.data.value?.items ?? []).map(mapDealToCard),
+  )
+  const activeDeals = computed(() =>
+    allDealsMapped.value.filter((d) => d.status !== 'completed'),
+  )
+  const completedDeals = computed(() =>
+    allDealsMapped.value.filter((d) => d.status === 'completed'),
+  )
+  const requestResponses = computed(() =>
+    (myRequestResponsesQuery.data.value?.items ?? []).map(mapRequestResponseToCard),
+  )
+
+  const isLoading = computed(
+    () =>
+      myServicesQuery.isLoading.value ||
+      myTutorDealsQuery.isLoading.value ||
+      myRequestResponsesQuery.isLoading.value,
+  )
+
+  const loadServices = () => {
+    error.value = null
+    myServicesQuery.refetch()
+  }
+
+  const loadDeals = () => {
+    error.value = null
+    myTutorDealsQuery.refetch()
+  }
+
+  const loadRequestResponses = () => {
+    error.value = null
+    myRequestResponsesQuery.refetch()
+  }
+
+  const loadTabData = (tab: TutorServicesTab) => {
+    switch (tab) {
+      case 'services':
+        loadServices()
+        break
+      case 'deals':
+      case 'deals-completed':
+        loadDeals()
+        break
+      case 'responses':
+        loadRequestResponses()
+        break
+    }
+  }
 
   const activeServices = computed(() =>
     services.value.filter((s) => s.status !== 'deleted'),
@@ -233,25 +202,65 @@ export function useTutorServicesPage() {
   function viewService(service: TutorServiceCard) {
     if (service.status === 'deleted') return
     telegramStore.hapticFeedback('light')
-    router.push(`/tutor/services/${service.id}/responses`)
+    router.push(`/tutor/services/${service.originalId}/responses`)
   }
 
   function editService(service: TutorServiceCard) {
     telegramStore.hapticFeedback('light')
-    router.push(`/tutor/services/${service.id}/edit`)
+    router.push(`/tutor/services/${service.originalId}/edit`)
   }
 
   function viewDealDetails(deal: TutorActiveDeal) {
     telegramStore.hapticFeedback('light')
+    router.push(`/tutor/deals/${deal.originalId}`)
   }
 
-  function completeDeal(deal: TutorActiveDeal) {
+  async function startDeal(deal: TutorActiveDeal) {
     telegramStore.hapticFeedback('medium')
-    deal.status = 'completed'
+    error.value = null
+    try {
+      await updateDealMutationFn.mutateAsync({
+        id: deal.originalId,
+        data: { status: DealStatus.IN_PROGRESS },
+      })
+      telegramStore.showAlert('Занятие начато')
+      await myTutorDealsQuery.refetch()
+    } catch (err: any) {
+      const message = err?.message || 'Не удалось начать занятие'
+      error.value = message
+      telegramStore.showAlert(message)
+      console.error('Ошибка начала занятия:', err)
+    }
   }
 
-  function withdrawResponse(response: TutorRequestResponse) {
+  async function completeDeal(deal: TutorActiveDeal) {
     telegramStore.hapticFeedback('medium')
+    error.value = null
+    try {
+      await completeDealMutationFn.mutateAsync(deal.originalId)
+      telegramStore.showAlert('Занятие завершено')
+      await myTutorDealsQuery.refetch()
+    } catch (err: any) {
+      const message = err?.message || 'Не удалось завершить сделку'
+      error.value = message
+      telegramStore.showAlert(message)
+      console.error('Ошибка завершения сделки:', err)
+    }
+  }
+
+  async function withdrawResponse(response: TutorRequestResponse) {
+    telegramStore.hapticFeedback('medium')
+    error.value = null
+    try {
+      await deleteRequestResponseMutation.mutateAsync(response.originalId)
+      telegramStore.showAlert('Отклик отозван')
+      await myRequestResponsesQuery.refetch()
+    } catch (err: any) {
+      const message = err.message || 'Не удалось отозвать отклик'
+      error.value = message
+      telegramStore.showAlert(message)
+      console.error('Ошибка отзыва отклика:', err)
+    }
   }
 
   function switchTab(tab: TutorServicesTab) {
@@ -259,20 +268,36 @@ export function useTutorServicesPage() {
     activeTab.value = tab
   }
 
+  // Загружаем данные при монтировании и при изменении таба
+  onMounted(() => {
+    loadTabData(activeTab.value)
+  })
+
+  watch(activeTab, (newTab) => {
+    loadTabData(newTab)
+  })
+
   return {
     activeTab,
     services,
     activeDeals,
+    completedDeals,
     requestResponses,
     activeServices,
     pendingResponsesCount,
     activeDealsCount,
+    isLoading,
+    error,
     createService,
     viewService,
     editService,
     viewDealDetails,
+    startDeal,
     completeDeal,
     withdrawResponse,
     switchTab,
+    loadServices,
+    loadDeals,
+    loadRequestResponses,
   }
 }

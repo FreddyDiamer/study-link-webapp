@@ -1,26 +1,21 @@
-import { ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
-import { userService } from '@/services/business'
+import { useUser } from '@/shared/composables'
 import { PATHS } from '@/router/paths'
 import type { User } from '../models'
 
 export function useProfile() {
   const router = useRouter()
   const telegramStore = useTelegramStore()
+  const { getProfile } = useUser()
+  const profileQuery = getProfile()
 
-  const user = ref<User | null>(null)
-  const isLoading = ref(false)
+  const user = computed(() => (profileQuery.data.value as User | undefined) ?? null)
+  const isLoading = profileQuery.isLoading
 
-  const loadProfile = async () => {
-    isLoading.value = true
-    try {
-      user.value = await userService.getProfile()
-    } catch (error) {
-      console.error('Ошибка загрузки профиля:', error)
-    } finally {
-      isLoading.value = false
-    }
+  const loadProfile = () => {
+    profileQuery.refetch()
   }
 
   const editProfile = () => {
@@ -28,12 +23,10 @@ export function useProfile() {
   }
 
   const openFeedback = () => {
-    console.log('Открытие поддержки')
+    telegramStore.hapticFeedback('light')
+    const supportBot = 'StudyLinkSupport'
+    window.open(`https://t.me/${supportBot}`, '_blank')
   }
-
-  onMounted(() => {
-    loadProfile()
-  })
 
   return {
     user,

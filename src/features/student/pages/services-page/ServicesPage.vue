@@ -97,9 +97,48 @@ const {
       />
     </div>
     <div v-else class="text-center py-12">
+      <div
+        class="w-20 h-20 bg-gradient-to-br from-telegram-accent/20 to-telegram-accent/10 rounded-full mx-auto mb-4 flex items-center justify-center"
+      >
+        <svg
+          class="w-10 h-10 text-telegram-accent"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-4.35-4.35M11 5a6 6 0 100 12 6 6 0 000-12z"
+          />
+        </svg>
+      </div>
+
+      
+
       <h3 class="text-telegram-text font-semibold mb-2">Услуги не найдены</h3>
-      <p class="text-telegram-textSecondary mb-4">Попробуйте изменить параметры поиска</p>
-      <Button @click="resetFilters" variant="secondary">Сбросить фильтры</Button>
+      <p class="text-telegram-textSecondary mb-0">Попробуйте изменить параметры поиска</p>
+      <div
+        class="inline-flex items-center gap-2 px-5 mt-4 py-2.5 rounded-full bg-telegram-accent/10 border border-telegram-accent/40 shadow-sm mx-auto mb-6 cursor-pointer hover:bg-telegram-accent/20 hover:border-telegram-accent/70 transition-all duration-200 backdrop-blur-sm"
+        @click="resetFilters"
+      >
+        <div
+          class="w-7 h-7 rounded-full bg-telegram-accent flex items-center justify-center text-white shadow-md"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m0 0A8.001 8.001 0 0112 4a8 8 0 017.418 5M4.582 9H9m11 11v-5h-.581m0 0A8.003 8.003 0 0112 20a8.003 8.003 0 01-7.418-5M19.418 15H15"
+            />
+          </svg>
+        </div>
+        <div class="text-left">
+          <div class="text-sm font-semibold text-telegram-accent">Сбросить фильтры</div>
+        </div>
+      </div>
     </div>
     <RequestModal
       v-model="showRequestModal"

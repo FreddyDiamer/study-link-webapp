@@ -1,8 +1,7 @@
-import { ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
-import { userService } from '@/services/business/user'
-import { useTutor } from '@/shared/composables'
+import { useUser, useTutor } from '@/shared/composables'
 import { PATHS } from '@/router/paths'
 import type { User } from '@/shared/types'
 import type { StatItem } from '../models'
@@ -17,28 +16,27 @@ const DEFAULT_STATS: StatItem[] = [
 export function useTutorProfile() {
   const router = useRouter()
   const telegramStore = useTelegramStore()
+  const { getProfile } = useUser()
   const { getTutorStats } = useTutor()
+  const profileQuery = getProfile()
+  const statsQuery = getTutorStats()
 
-  const user = ref<User | null>(null)
-  const isLoading = ref(false)
-  const stats = ref<StatItem[]>(DEFAULT_STATS)
+  const user = computed(() => (profileQuery.data.value as User | undefined) ?? null)
+  const isLoading = computed(() => profileQuery.isLoading.value || statsQuery.isLoading.value)
+  const stats = computed<StatItem[]>(() => {
+    const s = statsQuery.data.value
+    if (!s) return DEFAULT_STATS
+    return [
+      { label: 'Активных услуг', value: s.activeServices.toString(), icon: '📚' },
+      { label: 'Заявок за месяц', value: s.monthlyRequests.toString(), icon: '📋' },
+      { label: 'Студентов', value: s.totalStudents.toString(), icon: '👥' },
+      { label: 'Рейтинг', value: s.averageRating.toFixed(1), icon: '⭐' },
+    ]
+  })
 
-  const loadProfile = async () => {
-    isLoading.value = true
-    try {
-      user.value = await userService.getProfile()
-      const tutorStats = await getTutorStats()
-      stats.value = [
-        { label: 'Активных услуг', value: tutorStats.activeServices.toString(), icon: '📚' },
-        { label: 'Заявок за месяц', value: tutorStats.monthlyRequests.toString(), icon: '📋' },
-        { label: 'Студентов', value: tutorStats.totalStudents.toString(), icon: '👥' },
-        { label: 'Рейтинг', value: tutorStats.averageRating.toFixed(1), icon: '⭐' },
-      ]
-    } catch (error) {
-      console.error('Ошибка загрузки профиля:', error)
-    } finally {
-      isLoading.value = false
-    }
+  const loadProfile = () => {
+    profileQuery.refetch()
+    statsQuery.refetch()
   }
 
   const editProfile = () => {
@@ -46,16 +44,16 @@ export function useTutorProfile() {
   }
 
   const openFeedback = () => {
-    console.log('Открыть форму обратной связи')
+    telegramStore.hapticFeedback('light')
+    const supportBot = 'StudyLinkSupport'
+    window.open(`https://t.me/${supportBot}`, '_blank')
   }
 
   const openSupport = () => {
-    console.log('Открытие поддержки')
+    telegramStore.hapticFeedback('light')
+    const supportBot = 'StudyLinkSupport'
+    window.open(`https://t.me/${supportBot}`, '_blank')
   }
-
-  onMounted(() => {
-    loadProfile()
-  })
 
   return {
     user,

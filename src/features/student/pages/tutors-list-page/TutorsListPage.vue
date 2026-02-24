@@ -25,6 +25,10 @@ const {
 } = useTutorsList()
 
 const viewTutor = (tutor: Tutor) => {
+  router.push(`/user/${tutor.id}?view=tutor`)
+}
+
+const viewTutorServices = (tutor: Tutor) => {
   router.push(`/student/services?subject=${encodeURIComponent(tutor.name || '')}`)
 }
 </script>
@@ -57,16 +61,22 @@ const viewTutor = (tutor: Tutor) => {
       <div v-else-if="error" class="text-center py-8 text-red-500">{{ error }}</div>
       <div v-else-if="tutors.length === 0" class="text-center py-12 text-telegram-textSecondary">Репетиторы не найдены</div>
       <div v-else class="space-y-4">
-        <Card v-for="tutor in tutors" :key="tutor.id" class="p-4 cursor-pointer hover:border-telegram-accent" @click="viewTutor(tutor)">
+        <Card v-for="tutor in tutors" :key="tutor.id" class="p-4 hover:border-telegram-accent">
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-bold">{{ tutor.name?.charAt(0) || 'Р' }}</div>
-              <div>
+            <div
+              class="flex items-center space-x-3 flex-1 cursor-pointer min-w-0"
+              @click="viewTutor(tutor)"
+            >
+              <div class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">{{ tutor.name?.charAt(0) || 'Р' }}</div>
+              <div class="min-w-0">
                 <h3 class="font-semibold text-telegram-text">{{ tutor.name }}</h3>
-                <p class="text-sm text-telegram-textSecondary">{{ tutor.description || 'Репетитор' }}</p>
+                <p class="text-sm text-telegram-textSecondary truncate">{{ tutor.description || 'Репетитор' }}</p>
               </div>
             </div>
-            <Button size="sm" @click.stop="viewTutor(tutor)">Выбрать</Button>
+            <div class="flex gap-2 flex-shrink-0">
+              <Button size="sm" variant="ghost" @click.stop="viewTutor(tutor)">Профиль</Button>
+              <Button size="sm" @click.stop="viewTutorServices(tutor)">Услуги</Button>
+            </div>
           </div>
         </Card>
       </div>

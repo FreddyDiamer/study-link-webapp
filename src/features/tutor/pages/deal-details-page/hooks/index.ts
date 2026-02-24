@@ -1,0 +1,1 @@
+export { useDealDetails } from './useDealDetails'

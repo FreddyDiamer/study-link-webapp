@@ -69,9 +69,11 @@ export const ordersApi = {
   // SERVICE RESPONSES (Отклики студентов на услуги)
   // =============================================================================
 
-  // Получить отклики на услугу
+  // Получить отклики на услугу (API возвращает { items, total })
   getServiceResponses: (serviceId: string) =>
-    apiClient.get<ServiceResponse[]>(`/marketplace/service-responses/by-service/${serviceId}`),
+    apiClient.get<PaginatedResponse<ServiceResponse>>(
+      `/marketplace/service-responses/by-service/${serviceId}`,
+    ),
 
   // Получить мои отклики на услуги
   getMyServiceResponses: () =>
@@ -87,6 +89,14 @@ export const ordersApi = {
 
   // Удалить отклик на услугу
   deleteServiceResponse: (id: string) => apiClient.delete(`/marketplace/service-responses/${id}`),
+
+  // Принять отклик на услугу (репетитор)
+  acceptServiceResponse: (id: string) =>
+    apiClient.patch<ServiceResponse>(`/marketplace/service-responses/${id}/accept`),
+
+  // Отклонить отклик на услугу (репетитор)
+  rejectServiceResponse: (id: string) =>
+    apiClient.patch<ServiceResponse>(`/marketplace/service-responses/${id}/reject`),
 
   // =============================================================================
   // REQUEST RESPONSES (Отклики репетиторов на заявки)
@@ -107,6 +117,18 @@ export const ordersApi = {
   // Обновить отклик на заявку
   updateRequestResponse: (id: string, data: Partial<CreateRequestResponseDto>) =>
     apiClient.patch<RequestResponse>(`/marketplace/request-responses/${id}`, data),
+
+  // Принять отклик на заявку (студент)
+  acceptRequestResponse: (id: string) =>
+    apiClient.patch<RequestResponse>(`/marketplace/request-responses/${id}/accept`),
+
+  // Отклонить отклик на заявку (студент)
+  rejectRequestResponse: (id: string) =>
+    apiClient.patch<RequestResponse>(`/marketplace/request-responses/${id}/reject`),
+
+  // Отменить принятый отклик (студент)
+  cancelRequestResponse: (id: string) =>
+    apiClient.patch<RequestResponse>(`/marketplace/request-responses/${id}/cancel`),
 
   // Удалить отклик на заявку
   deleteRequestResponse: (id: string) => apiClient.delete(`/marketplace/request-responses/${id}`),

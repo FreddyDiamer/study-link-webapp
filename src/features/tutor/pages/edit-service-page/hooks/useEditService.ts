@@ -20,7 +20,7 @@ export function useEditService() {
   const router = useRouter()
   const route = useRoute()
   const telegramStore = useTelegramStore()
-  const { getService, updateService, deleteService } = useService()
+  const { getService, updateService, deleteService, activateService, deactivateService } = useService()
   const {
     activeSubjects,
     teachers,
@@ -133,11 +133,35 @@ export function useEditService() {
     }
   }
 
+  const toggleFreeze = async () => {
+    if (!service.value) return
+    isSubmitting.value = true
+    telegramStore.hapticFeedback('medium')
+    try {
+      if (service.value.status === 'ACTIVE') {
+        await deactivateService(serviceId)
+        telegramStore.showAlert('Услуга заморожена')
+      } else {
+        await activateService(serviceId)
+        telegramStore.showAlert('Услуга активирована')
+      }
+      // Перезагружаем данные услуги
+      await loadService()
+    } catch (err: any) {
+      console.error('Ошибка изменения статуса услуги:', err)
+      telegramStore.showAlert('Ошибка при изменении статуса услуги. Попробуйте снова.')
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
   const deleteServiceData = async () => {
     isSubmitting.value = true
+    telegramStore.hapticFeedback('medium')
     try {
       await deleteService(serviceId)
       showDeleteModal.value = false
+      telegramStore.hapticFeedback('heavy')
       router.push(PATHS.TUTOR_SERVICES)
     } catch (err: any) {
       console.error('Ошибка удаления услуги:', err)
@@ -174,6 +198,7 @@ export function useEditService() {
     loadService,
     validateForm,
     updateServiceData,
+    toggleFreeze,
     deleteServiceData,
     goBack,
   }

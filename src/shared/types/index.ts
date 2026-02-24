@@ -17,6 +17,8 @@ export interface User {
   createdAt: string
   updatedAt: string
   rating: number
+  telegramNotificationsEnabled?: boolean
+  notificationPreferences?: Record<string, boolean>
 }
 
 export interface Tutor extends User {
@@ -129,6 +131,10 @@ export interface Service {
   subject: Subject
   teacher: Teacher
   responses?: ServiceResponse[]
+  /** true, если текущий пользователь — владелец услуги (репетитор) */
+  isOwnService?: boolean
+  /** true, если текущий пользователь (студент) уже оставил заявку на эту услугу */
+  currentUserResponded?: boolean
 }
 
 export interface Request {
@@ -145,6 +151,8 @@ export interface Request {
   subject: Subject
   teacher: Teacher
   responses?: RequestResponse[]
+  /** true, если текущий пользователь (репетитор) уже откликнулся на эту заявку */
+  currentUserResponded?: boolean
 }
 
 export interface Deal {
@@ -215,6 +223,7 @@ export interface Review {
   targetId: string
   rating: number // 1-5
   comment?: string
+  reply?: string | null
   targetRole: UserRole
   createdAt: string
   updatedAt: string
@@ -302,6 +311,7 @@ export interface CreateRequestResponseDto {
 
 export interface CreateReviewDto {
   dealId: string
+  authorId: string
   targetId: string
   targetRole: UserRole
   rating: number

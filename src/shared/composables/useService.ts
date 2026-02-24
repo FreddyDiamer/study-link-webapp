@@ -1,114 +1,105 @@
-import { ref } from 'vue'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { tutorsApi } from '@/services/api'
+import { queryKeys } from '@/shared/lib/query-keys'
 import type { Service, PaginatedResponse, CreateServiceDto, UpdateServiceDto } from '@/shared/types'
 
 export const useService = () => {
-  const services = ref<PaginatedResponse<Service> | null>(null)
-  const isLoading = ref(false)
+  const queryClient = useQueryClient()
 
-  const getServices = async (params?: any) => {
-    isLoading.value = true
-    try {
-      services.value = await tutorsApi.getServices(params)
-      return services.value
-    } finally {
-      isLoading.value = false
-    }
+  const getServices = (params?: any) => {
+    return useQuery({
+      queryKey: queryKeys.services(params),
+      queryFn: () => tutorsApi.getServices(params),
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getActiveServices = async () => {
-    isLoading.value = true
-    try {
-      services.value = await tutorsApi.getActiveServices()
-      return services.value
-    } finally {
-      isLoading.value = false
-    }
+  const getActiveServices = () => {
+    return useQuery({
+      queryKey: queryKeys.activeServices(),
+      queryFn: () => tutorsApi.getActiveServices(),
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getMyServices = async () => {
-    isLoading.value = true
-    try {
-      services.value = await tutorsApi.getMyServices()
-      return services.value
-    } finally {
-      isLoading.value = false
-    }
+  const getMyServices = () => {
+    return useQuery({
+      queryKey: queryKeys.myServices(),
+      queryFn: () => tutorsApi.getMyServices(),
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getService = async (id: string) => {
-    isLoading.value = true
-    try {
-      return await tutorsApi.getService(id)
-    } finally {
-      isLoading.value = false
-    }
+  const getService = (id: string) => {
+    return useQuery({
+      queryKey: queryKeys.service(id),
+      queryFn: () => tutorsApi.getService(id),
+      enabled: !!id,
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const createService = async (data: CreateServiceDto) => {
-    isLoading.value = true
-    try {
-      const service = await tutorsApi.createService(data)
-      // Обновляем список услуг
-      await getMyServices()
-      return service
-    } finally {
-      isLoading.value = false
-    }
+  const createService = () => {
+    return useMutation({
+      mutationFn: (data: CreateServiceDto) => tutorsApi.createService(data),
+      onSuccess: () => {
+        // Инвалидируем кэш услуг после создания
+        queryClient.invalidateQueries({ queryKey: queryKeys.myServices() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.services() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.activeServices() })
+      },
+    })
   }
 
-  const updateService = async (id: string, data: UpdateServiceDto) => {
-    isLoading.value = true
-    try {
-      const service = await tutorsApi.updateService(id, data)
-      // Обновляем список услуг
-      await getMyServices()
-      return service
-    } finally {
-      isLoading.value = false
-    }
+  const updateService = () => {
+    return useMutation({
+      mutationFn: ({ id, data }: { id: string; data: UpdateServiceDto }) =>
+        tutorsApi.updateService(id, data),
+      onSuccess: (_, variables) => {
+        // Инвалидируем кэш конкретной услуги и списка
+        queryClient.invalidateQueries({ queryKey: queryKeys.service(variables.id) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myServices() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.services() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.activeServices() })
+      },
+    })
   }
 
-  const deleteService = async (id: string) => {
-    isLoading.value = true
-    try {
-      await tutorsApi.deleteService(id)
-      // Обновляем список услуг
-      await getMyServices()
-    } finally {
-      isLoading.value = false
-    }
+  const deleteService = () => {
+    return useMutation({
+      mutationFn: (id: string) => tutorsApi.deleteService(id),
+      onSuccess: () => {
+        // Инвалидируем кэш услуг после удаления
+        queryClient.invalidateQueries({ queryKey: queryKeys.myServices() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.services() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.activeServices() })
+      },
+    })
   }
 
-  const activateService = async (id: string) => {
-    isLoading.value = true
-    try {
-      const service = await tutorsApi.activateService(id)
-      // Обновляем список услуг
-      await getMyServices()
-      return service
-    } finally {
-      isLoading.value = false
-    }
+  const activateService = () => {
+    return useMutation({
+      mutationFn: (id: string) => tutorsApi.activateService(id),
+      onSuccess: (_, id) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.service(id) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myServices() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.activeServices() })
+      },
+    })
   }
 
-  const deactivateService = async (id: string) => {
-    isLoading.value = true
-    try {
-      const service = await tutorsApi.deactivateService(id)
-      // Обновляем список услуг
-      await getMyServices()
-      return service
-    } finally {
-      isLoading.value = false
-    }
+  const deactivateService = () => {
+    return useMutation({
+      mutationFn: (id: string) => tutorsApi.deactivateService(id),
+      onSuccess: (_, id) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.service(id) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myServices() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.activeServices() })
+      },
+    })
   }
 
   return {
-    // State
-    services,
-    isLoading,
-
     // Methods
     getServices,
     getActiveServices,

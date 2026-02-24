@@ -22,8 +22,14 @@ export function useTutorOrders() {
   const authStore = useAuthStore()
   const { getRequests, createRequestResponse } = useOrder()
 
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  const requestsQuery = getRequests()
+  const createRequestResponseMutation = createRequestResponse()
+
+  const isLoading = computed(() => requestsQuery.isLoading.value)
+  const error = computed(() => {
+    const err = requestsQuery.error.value
+    return err ? (err as Error).message || 'Ошибка загрузки заказов' : null
+  })
   const showFilters = ref(false)
   const showAcceptModal = ref(false)
   const selectedRequest = ref<Request | null>(null)
@@ -32,12 +38,24 @@ export function useTutorOrders() {
   const proposedDate = ref('')
   const proposedPrice = ref<number | null>(null)
 
-  const requests = ref<Request[]>([])
+  const requests = computed(() => requestsQuery.data.value?.items ?? [])
   const filters = ref<DealFilters>({ ...DEFAULT_FILTERS })
   const activeTab = ref<OrdersTab>('all')
 
-  const availableSubjects = ref<SelectOption[]>([])
-  const availableTeachers = ref<SelectOption[]>([])
+  const availableSubjects = computed<SelectOption[]>(() => {
+    const subjectMap = new Map<string, string>()
+    requests.value.forEach((d) => {
+      if (d.subject?.id && d.subject?.name) subjectMap.set(d.subject.id, d.subject.name)
+    })
+    return Array.from(subjectMap.entries()).map(([id, name]) => ({ value: id, label: name }))
+  })
+  const availableTeachers = computed<SelectOption[]>(() => {
+    const teacherMap = new Map<string, string>()
+    requests.value.forEach((d) => {
+      if (d.teacher?.id && d.teacher?.fullName) teacherMap.set(d.teacher.id, d.teacher.fullName)
+    })
+    return Array.from(teacherMap.entries()).map(([id, fullName]) => ({ value: id, label: fullName }))
+  })
   const sortOptions = ref<SelectOption[]>(SORT_OPTIONS)
   const sortOrderOptions = ref<SelectOption[]>(SORT_ORDER_OPTIONS)
 
@@ -109,37 +127,8 @@ export function useTutorOrders() {
         : 0,
   }))
 
-  function extractFiltersData() {
-    const subjectMap = new Map<string, string>()
-    requests.value.forEach((d) => {
-      if (d.subject?.id && d.subject?.name) subjectMap.set(d.subject.id, d.subject.name)
-    })
-    availableSubjects.value = Array.from(subjectMap.entries()).map(([id, name]) => ({
-      value: id,
-      label: name,
-    }))
-    const teacherMap = new Map<string, string>()
-    requests.value.forEach((d) => {
-      if (d.teacher?.id && d.teacher?.fullName) teacherMap.set(d.teacher.id, d.teacher.fullName)
-    })
-    availableTeachers.value = Array.from(teacherMap.entries()).map(([id, fullName]) => ({
-      value: id,
-      label: fullName,
-    }))
-  }
-
   const loadOrders = async () => {
-    isLoading.value = true
-    error.value = null
-    try {
-      const response = await getRequests()
-      requests.value = response?.items ?? []
-      extractFiltersData()
-    } catch (err: any) {
-      error.value = err.message || 'Ошибка загрузки заказов'
-    } finally {
-      isLoading.value = false
-    }
+    await requestsQuery.refetch()
   }
 
   const resetFilters = () => {
@@ -182,7 +171,7 @@ export function useTutorOrders() {
     isAccepting.value = true
     telegramStore.hapticFeedback('medium')
     try {
-      await createRequestResponse({
+      await createRequestResponseMutation.mutateAsync({
         tutorId: authStore.user?.id as string,
         requestId: selectedRequest.value.id,
         message: tutorComment.value.trim() || undefined,

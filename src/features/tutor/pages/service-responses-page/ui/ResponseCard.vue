@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import type { ServiceResponseItem } from '../models'
@@ -7,6 +8,11 @@ import { getResponseStatusInfo, formatResponseDate, formatResponseDeadline } fro
 defineProps<{
   response: ServiceResponseItem
 }>()
+
+const router = useRouter()
+function openProfile(studentId: string) {
+  router.push(`/user/${studentId}?view=student`)
+}
 
 const emit = defineEmits<{
   accept: [response: ServiceResponseItem]
@@ -31,15 +37,18 @@ function formatDeadline(dateString: string | null) {
 <template>
   <Card class="p-6">
     <div class="flex items-start justify-between mb-4">
-      <div class="flex items-center space-x-3">
+      <div
+        class="flex items-center space-x-3 cursor-pointer min-w-0 flex-1"
+        @click="openProfile(response.studentId)"
+      >
         <div
-          class="w-12 h-12 bg-telegram-accent/20 rounded-full flex items-center justify-center"
+          class="w-12 h-12 bg-telegram-accent/20 rounded-full flex items-center justify-center flex-shrink-0"
         >
           <span class="text-telegram-accent font-semibold">
             {{ response.student.name.split(' ').map((n) => n[0]).join('') }}
           </span>
         </div>
-        <div>
+        <div class="min-w-0">
           <h3 class="font-semibold text-telegram-text">{{ response.student.name }}</h3>
           <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
             <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -49,6 +58,7 @@ function formatDeadline(dateString: string | null) {
             </svg>
             <span>{{ response.student.rating }}</span>
           </div>
+          <span class="text-xs text-telegram-accent">Профиль →</span>
         </div>
       </div>
       <div class="flex flex-col items-end space-y-2">

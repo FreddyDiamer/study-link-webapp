@@ -17,6 +17,7 @@ const defaultFilters: ServiceFilters = {
 }
 
 function mapApiToViewModel(api: ApiService): Service {
+  const apiWithTutor = api as ApiService & { tutorId?: string; tutor?: { id: string } }
   return {
     id: api.id,
     title: api.subject?.name || 'Услуга',
@@ -31,10 +32,13 @@ function mapApiToViewModel(api: ApiService): Service {
       rating: 0,
       reviewsCount: 0,
     },
+    tutorId: apiWithTutor.tutorId ?? apiWithTutor.tutor?.id,
     format: 'online',
     workingHours: '',
     availability: 'available',
     tags: [],
+    isOwnService: api.isOwnService,
+    currentUserResponded: api.currentUserResponded,
   }
 }
 

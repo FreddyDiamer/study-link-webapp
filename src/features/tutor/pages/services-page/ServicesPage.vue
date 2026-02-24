@@ -16,10 +16,12 @@ const {
   activeServices,
   requestResponses,
   activeDeals,
+  completedDeals,
   createService,
   viewService,
   editService,
   viewDealDetails,
+  startDeal,
   completeDeal,
   withdrawResponse,
   switchTab,
@@ -65,7 +67,7 @@ const {
       <ResponsesEmptyState v-else />
     </div>
 
-    <!-- Deals Tab -->
+    <!-- Deals Tab (active) -->
     <div v-if="activeTab === 'deals'">
       <div v-if="activeDeals.length > 0" class="space-y-4">
         <DealCard
@@ -73,10 +75,24 @@ const {
           :key="deal.id"
           :deal="deal"
           @view="viewDealDetails"
+          @start="startDeal"
           @complete="completeDeal"
         />
       </div>
       <DealsEmptyState v-else />
+    </div>
+
+    <!-- Completed Deals Tab -->
+    <div v-if="activeTab === 'deals-completed'">
+      <div v-if="completedDeals.length > 0" class="space-y-4">
+        <DealCard
+          v-for="deal in completedDeals"
+          :key="deal.id"
+          :deal="deal"
+          @view="viewDealDetails"
+        />
+      </div>
+      <DealsEmptyState v-else variant="completed" />
     </div>
   </div>
 </template>

@@ -4,7 +4,7 @@ import { useOrdersPage } from './hooks'
 import { TABS } from './models'
 import type { TabType } from './models'
 
-const { currentTab, isLoading, requests, serviceResponses, deals, switchTab } = useOrdersPage()
+const { currentTab, isLoading, requests, serviceResponses, activeDeals, completedDeals, switchTab } = useOrdersPage()
 </script>
 
 <template>
@@ -33,9 +33,12 @@ const { currentTab, isLoading, requests, serviceResponses, deals, switchTab } = 
       <div v-if="isLoading" class="flex justify-center py-8">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
       </div>
-      <RequestsList v-else-if="currentTab === 'requests'" :items="requests?.items || []" />
-      <ResponsesList v-else-if="currentTab === 'responses'" :items="serviceResponses?.items || []" />
-      <DealsList v-else-if="currentTab === 'deals'" :items="deals?.items || []" />
+      <template v-else>
+        <RequestsList v-if="currentTab === 'requests'" :items="requests?.items ?? []" />
+        <ResponsesList v-else-if="currentTab === 'responses'" :items="serviceResponses?.items ?? []" />
+        <DealsList v-else-if="currentTab === 'deals'" :items="activeDeals?.items ?? []" />
+        <DealsList v-else-if="currentTab === 'deals-completed'" :items="completedDeals?.items ?? []" />
+      </template>
     </div>
   </div>
 </template>

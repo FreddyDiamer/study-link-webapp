@@ -12,6 +12,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@tanstack/vue-query": "^5.92.9",
     "@telegram-apps/sdk-vue": "^2.0.24",
     "@vueuse/core": "^13.3.0",
     "axios": "^1.9.0",

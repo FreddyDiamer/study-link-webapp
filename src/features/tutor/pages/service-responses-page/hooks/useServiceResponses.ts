@@ -1,90 +1,64 @@
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
+import { orderService, serviceService } from '@/services/business'
 import type { ResponseTabId, ServiceInfo, ServiceResponseItem } from '../models'
 import { getResponseStatusInfo, formatResponseDate, formatResponseDeadline } from '../models'
+import type { Service, ServiceResponse } from '@/shared/types'
 
-const MOCK_SERVICE: ServiceInfo = {
-  id: '1',
-  tutorId: 'tutor-1',
-  subjectId: 'math-1',
-  teacherId: 'teacher-1',
-  price: 220000,
-  description: 'Подготовка к ЕГЭ по математике',
-  workingHours: 'Пн-Пт 18:00-22:00',
-  status: 'ACTIVE',
-  deadline: null,
-  createdAt: '2024-01-10T10:00:00',
-  updatedAt: '2024-01-18T10:00:00',
-  subject: { name: 'Математика' },
-  teacher: { fullName: 'Подготовка к ЕГЭ' },
+function mapServiceToInfo(s: Service): ServiceInfo {
+  return {
+    id: s.id,
+    tutorId: s.tutorId,
+    subjectId: s.subjectId,
+    teacherId: s.teacherId,
+    price: s.price ?? 0,
+    description: s.description ?? '',
+    workingHours: '',
+    status: s.status,
+    deadline: s.deadline ?? null,
+    createdAt: s.createdAt,
+    updatedAt: s.updatedAt,
+    subject: { name: s.subject?.name ?? '' },
+    teacher: { fullName: s.teacher?.fullName ?? '' },
+  }
 }
 
-const MOCK_RESPONSES: ServiceResponseItem[] = [
-  {
-    id: '1',
-    studentId: 'student-1',
-    serviceId: 'service-1',
-    message:
-      'Здравствуйте! Мне нужна помощь в подготовке к ЕГЭ по математике. Особенно сложно даются задания по геометрии.',
-    price: 220000,
-    proposedDeadline: '2024-01-22T18:00:00',
-    status: 'PENDING',
-    createdAt: '2024-01-15T10:30:00',
-    updatedAt: '2024-01-15T10:30:00',
-    student: { name: 'Анна Петрова', rating: 4.5 },
-    service: {
-      price: 220000,
-      subject: { name: 'Математика' },
-      teacher: { fullName: 'Подготовка к ЕГЭ' },
+function mapResponseToItem(r: ServiceResponse): ServiceResponseItem {
+  return {
+    id: r.id,
+    studentId: r.studentId,
+    serviceId: r.serviceId,
+    message: r.message ?? '',
+    price: r.price ?? 0,
+    proposedDeadline: r.proposedDeadline ?? null,
+    status: r.status,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+    student: {
+      name: r.student?.name ?? '',
+      rating: 0,
+      telegramUsername: (r.student as any)?.telegramUsername,
     },
-  },
-  {
-    id: '2',
-    studentId: 'student-2',
-    serviceId: 'service-1',
-    message:
-      'Нужна помощь с алгеброй, готовлюсь к ЕГЭ заранее. Хотелось бы заниматься 2 раза в неделю.',
-    price: 200000,
-    proposedDeadline: '2024-01-20T16:00:00',
-    status: 'ACCEPTED',
-    createdAt: '2024-01-14T15:20:00',
-    updatedAt: '2024-01-15T09:30:00',
-    student: { name: 'Максим Иванов', rating: 4.8 },
     service: {
-      price: 220000,
-      subject: { name: 'Математика' },
-      teacher: { fullName: 'Подготовка к ЕГЭ' },
+      price: r.service?.price ?? 0,
+      subject: { name: r.service?.subject?.name ?? '' },
+      teacher: { fullName: r.service?.teacher?.fullName ?? '' },
     },
-  },
-  {
-    id: '3',
-    studentId: 'student-3',
-    serviceId: 'service-1',
-    message: 'Мне нужна интенсивная подготовка к ЕГЭ, до экзамена осталось 3 месяца.',
-    price: 250000,
-    proposedDeadline: '2024-01-25T19:00:00',
-    status: 'PENDING',
-    createdAt: '2024-01-13T18:45:00',
-    updatedAt: '2024-01-13T18:45:00',
-    student: { name: 'Дмитрий Волков', rating: 4.6 },
-    service: {
-      price: 220000,
-      subject: { name: 'Математика' },
-      teacher: { fullName: 'Подготовка к ЕГЭ' },
-    },
-  },
-]
+  }
+}
 
 export function useServiceResponses() {
   const route = useRoute()
   const router = useRouter()
   const telegramStore = useTelegramStore()
 
-  const serviceId = ref(Number(route.params.id))
+  const serviceId = computed(() => route.params.id as string)
   const activeTab = ref<ResponseTabId>('new')
-  const service = ref<ServiceInfo>(MOCK_SERVICE)
-  const responses = ref<ServiceResponseItem[]>([...MOCK_RESPONSES])
+  const service = ref<ServiceInfo | null>(null)
+  const responses = ref<ServiceResponseItem[]>([])
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
 
   const filteredResponses = computed(() => {
     switch (activeTab.value) {
@@ -105,34 +79,78 @@ export function useServiceResponses() {
     () => responses.value.filter((r) => r.status === 'REJECTED' || r.status === 'EXPIRED').length,
   )
 
+  async function loadData() {
+    const id = serviceId.value
+    if (!id) return
+    isLoading.value = true
+    error.value = null
+    try {
+      const [svc, res] = await Promise.all([
+        serviceService.getService(id),
+        orderService.getServiceResponses(id),
+      ])
+      service.value = mapServiceToInfo(svc)
+      responses.value = res.map(mapResponseToItem)
+    } catch (err: any) {
+      error.value = err?.message ?? 'Не удалось загрузить данные'
+      service.value = null
+      responses.value = []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   function goBack() {
     telegramStore.hapticFeedback('light')
     router.back()
   }
 
-  function acceptResponse(response: ServiceResponseItem) {
+  async function acceptResponse(response: ServiceResponseItem) {
     telegramStore.hapticFeedback('medium')
-    response.status = 'ACCEPTED'
-    response.updatedAt = new Date().toISOString()
+    error.value = null
+    try {
+      await orderService.acceptServiceResponse(response.id)
+      await loadData()
+    } catch (err: any) {
+      error.value = err?.message ?? 'Не удалось принять отклик'
+      telegramStore.showAlert(error.value)
+    }
   }
 
-  function rejectResponse(response: ServiceResponseItem) {
+  async function rejectResponse(response: ServiceResponseItem) {
     telegramStore.hapticFeedback('heavy')
-    response.status = 'REJECTED'
-    response.updatedAt = new Date().toISOString()
+    error.value = null
+    try {
+      await orderService.rejectServiceResponse(response.id)
+      await loadData()
+    } catch (err: any) {
+      error.value = err?.message ?? 'Не удалось отклонить отклик'
+      telegramStore.showAlert(error.value)
+    }
   }
 
   function contactStudent(response: ServiceResponseItem) {
     telegramStore.hapticFeedback('light')
+    const username = response.student?.telegramUsername
+    if (username) {
+      const url = username.startsWith('@') ? `https://t.me/${username.slice(1)}` : `https://t.me/${username}`
+      window.open(url, '_blank')
+    } else {
+      telegramStore.showAlert('Контакт студента недоступен')
+    }
   }
 
-  function completeLessons(response: ServiceResponseItem) {
+  function completeLessons(_response: ServiceResponseItem) {
     telegramStore.hapticFeedback('light')
-    response.status = 'REJECTED' // placeholder: would be a separate "completed" state in API
+    telegramStore.showAlert('Завершение занятий — в карточке сделки на вкладке «Активные»')
   }
 
   onMounted(() => {
-    // TODO: load service and responses by serviceId
+    loadData()
+  })
+
+  watch(serviceId, () => {
+    loadData()
   })
 
   return {
@@ -144,11 +162,14 @@ export function useServiceResponses() {
     pendingCount,
     activeCount,
     completedCount,
+    isLoading,
+    error,
     goBack,
     acceptResponse,
     rejectResponse,
     contactStudent,
     completeLessons,
+    loadData,
     getResponseStatusInfo,
     formatDate: formatResponseDate,
     formatDeadline: formatResponseDeadline,

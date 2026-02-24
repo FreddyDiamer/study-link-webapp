@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { PATHS } from './paths'
+import { useAppStore } from '@/stores/app'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -64,6 +65,11 @@ const router = createRouter({
       component: () => import('../features/student/pages/order-details-page'),
     },
     {
+      path: PATHS.STUDENT_DEAL_DETAILS,
+      name: 'student-deal-details',
+      component: () => import('../features/student/pages/deal-details-page/DealDetailsPage.vue'),
+    },
+    {
       path: PATHS.STUDENT_TUTORS,
       name: 'student-tutors',
       component: () => import('../features/student/pages/tutors-list-page'),
@@ -82,6 +88,16 @@ const router = createRouter({
       path: PATHS.STUDENT_EDIT_PROFILE,
       name: 'student-edit-profile',
       component: () => import('../features/student/pages/edit-profile-page'),
+    },
+    {
+      path: PATHS.STUDENT_NOTIFICATIONS,
+      name: 'student-notifications',
+      component: () => import('../features/settings/NotificationsSettingsPage.vue'),
+    },
+    {
+      path: PATHS.STUDENT_REVIEWS,
+      name: 'student-reviews',
+      component: () => import('../features/tutor/pages/reviews-page'),
     },
 
     // Tutor routes
@@ -111,6 +127,11 @@ const router = createRouter({
       component: () => import('../features/tutor/pages/service-responses-page'),
     },
     {
+      path: PATHS.TUTOR_DEAL_DETAILS,
+      name: 'tutor-deal-details',
+      component: () => import('../features/tutor/pages/deal-details-page/DealDetailsPage.vue'),
+    },
+    {
       path: PATHS.TUTOR_ORDERS,
       name: 'tutor-orders',
       component: () => import('../features/tutor/pages/orders-page'),
@@ -125,7 +146,69 @@ const router = createRouter({
       name: 'tutor-edit-profile',
       component: () => import('../features/tutor/pages/edit-profile-page'),
     },
+    {
+      path: PATHS.TUTOR_NOTIFICATIONS,
+      name: 'tutor-notifications',
+      component: () => import('../features/settings/NotificationsSettingsPage.vue'),
+    },
+    {
+      path: PATHS.TUTOR_REVIEWS,
+      name: 'tutor-reviews',
+      component: () => import('../features/tutor/pages/reviews-page'),
+    },
+
+    // Public user profile (available in both flows)
+    {
+      path: '/user/:id',
+      name: 'user-profile',
+      component: () => import('../features/user-profile/UserProfilePage.vue'),
+    },
   ],
+})
+
+// Навигационные гарды для проверки роли пользователя
+router.beforeEach((to, from, next) => {
+  const appStore = useAppStore()
+  const currentFlow = appStore.currentFlow
+
+  // Разрешаем доступ к welcome странице и test странице без проверки роли
+  if (to.path === PATHS.HOME || to.path === '/test') {
+    next()
+    return
+  }
+
+  // Просмотр чужого профиля доступен в обоих потоках
+  if (to.path.startsWith('/user/')) {
+    next()
+    return
+  }
+
+  // Проверяем, является ли путь студентским
+  const isStudentPath = to.path.startsWith('/student')
+  
+  // Проверяем, является ли путь репетиторским
+  const isTutorPath = to.path.startsWith('/tutor')
+
+  // Если пользователь пытается зайти на студентскую страницу, будучи репетитором
+  if (isStudentPath && currentFlow === 'tutor') {
+    next(PATHS.TUTOR_MAIN)
+    return
+  }
+
+  // Если пользователь пытается зайти на страницу репетитора, будучи студентом
+  if (isTutorPath && currentFlow === 'student') {
+    next(PATHS.STUDENT_MAIN)
+    return
+  }
+
+  // Если роль не установлена, разрешаем переход (возможно, пользователь еще не выбрал роль)
+  if (!currentFlow) {
+    next()
+    return
+  }
+
+  // Во всех остальных случаях разрешаем переход
+  next()
 })
 
 export default router

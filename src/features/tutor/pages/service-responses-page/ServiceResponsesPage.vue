@@ -10,11 +10,14 @@ const {
   pendingCount,
   activeCount,
   completedCount,
+  isLoading,
+  error,
   goBack,
   acceptResponse,
   rejectResponse,
   contactStudent,
   completeLessons,
+  loadData,
 } = useServiceResponses()
 </script>
 
@@ -26,7 +29,14 @@ const {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
       </Button>
-      <div class="flex-1">
+      <div v-if="isLoading && !service" class="flex-1 flex items-center justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+      </div>
+      <div v-else-if="error && !service" class="flex-1 py-4">
+        <p class="text-telegram-destructive mb-2">{{ error }}</p>
+        <Button size="sm" @click="loadData">Повторить</Button>
+      </div>
+      <div v-else-if="service" class="flex-1">
         <h1 class="text-xl font-bold text-telegram-text mb-1">
           {{ service.subject.name }} • {{ service.teacher.fullName }}
         </h1>
@@ -36,6 +46,7 @@ const {
       </div>
     </div>
 
+    <template v-if="service">
     <ResponseTabs
       v-model:activeTab="activeTab"
       :pending-count="pendingCount"
@@ -56,5 +67,6 @@ const {
     </div>
 
     <ResponsesEmptyState v-else :active-tab="activeTab" />
+    </template>
   </div>
 </template>

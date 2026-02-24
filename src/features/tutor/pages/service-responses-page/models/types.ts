@@ -21,6 +21,7 @@ export interface ServiceInfo {
 export interface ResponseStudent {
   name: string
   rating: number
+  telegramUsername?: string
 }
 
 export interface ResponseServiceRef {

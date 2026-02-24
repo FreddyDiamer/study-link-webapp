@@ -1,7 +1,8 @@
 import { authApi } from '@/services/api'
 import { useAuthStore, useTelegramStore } from '@/stores'
-import type { TelegramAuthDto, AuthResponse } from '@/shared/types'
+import type { TelegramAuthDto, AuthResponse, User } from '@/shared/types'
 import { STORAGE_KEYS } from '@/shared/constants'
+import { userService } from './user'
 
 export class AuthService {
   private get authStore() {
@@ -20,12 +21,22 @@ export class AuthService {
       // API запрос
       const response = await authApi.telegramAuth(initData)
 
-      // Сохраняем токен и пользователя
-      this.saveAuthData(response)
-
-      // Обновляем состояние
-      this.authStore.setUser(response.user as any)
+      // Сохраняем токен
       this.authStore.setToken(response.accessToken)
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.accessToken)
+
+      // Загружаем полный профиль пользователя
+      try {
+        const fullUser = await userService.getProfile()
+        this.authStore.setUser(fullUser)
+        // Сохраняем полный профиль в localStorage
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(fullUser))
+      } catch (profileError) {
+        // Если не удалось загрузить полный профиль, используем базовые данные
+        console.warn('Failed to load full profile, using basic data:', profileError)
+        this.authStore.setUser(response.user as any)
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user))
+      }
 
       // Показываем уведомление
       this.telegramStore.showAlert('Успешная авторизация!')

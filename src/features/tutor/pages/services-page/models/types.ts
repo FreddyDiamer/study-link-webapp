@@ -1,9 +1,10 @@
-export type TutorServicesTab = 'services' | 'responses' | 'deals'
+export type TutorServicesTab = 'services' | 'responses' | 'deals' | 'deals-completed'
 
 export type ServiceStatus = 'active' | 'frozen' | 'deleted'
 
 export interface TutorServiceCard {
   id: number
+  originalId: string // Оригинальный строковый ID с бэка для навигации
   title: string
   subject: string
   teacher: string
@@ -25,6 +26,7 @@ export interface TutorServiceCard {
 
 export interface TutorActiveDeal {
   id: number
+  originalId: string
   studentId: string
   studentName: string
   studentAvatar?: string
@@ -42,6 +44,7 @@ export interface TutorActiveDeal {
 
 export interface TutorRequestResponse {
   id: number
+  originalId: string // UUID отклика для API (удаление и т.д.)
   tutorId: string
   requestId: number
   studentName: string

@@ -10,6 +10,7 @@ defineProps<{
 
 const emit = defineEmits<{
   view: [deal: TutorActiveDeal]
+  start: [deal: TutorActiveDeal]
   complete: [deal: TutorActiveDeal]
 }>()
 </script>
@@ -101,8 +102,21 @@ const emit = defineEmits<{
         <div class="text-telegram-textSecondary text-xs">начато</div>
       </div>
     </div>
+    <div v-if="deal.status === 'pending' || deal.status === 'accepted'" class="flex space-x-3">
+      <Button
+        @click.stop="emit('start', deal)"
+        size="sm"
+        class="flex-1 bg-telegram-success hover:bg-telegram-success/90 text-white"
+      >
+        Начать
+      </Button>
+    </div>
     <div v-if="deal.status === 'in_progress'" class="flex space-x-3">
-      <Button @click.stop="emit('complete', deal)" size="sm" class="flex-1">
+      <Button
+        @click.stop="emit('complete', deal)"
+        size="sm"
+        class="flex-1 bg-telegram-secondary text-telegram-text hover:bg-telegram-secondary/80"
+      >
         Завершить занятие
       </Button>
     </div>

@@ -10,6 +10,10 @@ export const educationApi = {
     return apiClient.get('/education/subjects')
   },
 
+  getActiveSubjects(): Promise<Subject[]> {
+    return apiClient.get('/education/subjects/active')
+  },
+
   getSubject(id: string): Promise<Subject> {
     return apiClient.get(`/education/subjects/${id}`)
   },

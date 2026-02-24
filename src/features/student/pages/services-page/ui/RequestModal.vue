@@ -18,12 +18,13 @@ const emit = defineEmits<{
 const telegramStore = useTelegramStore()
 const authStore = useAuthStore()
 const { createServiceResponse } = useOrder()
+const createServiceResponseMutation = createServiceResponse()
 
-const form = reactive({ message: '', budget: 'service-price', urgency: 'week' })
+const form = reactive({ message: '', budget: 'service-price', urgency: 'week', customPrice: '' })
 const isLoading = ref(false)
 
 const budgetOptions = computed(() => [
-  { value: 'service-price', label: `${props.service?.price || 1000}₽` },
+  { value: 'service-price', label: `Цена услуги (${props.service?.price ?? 0}₽)` },
   { value: 'flexible', label: 'Готов обсудить цену' },
   { value: 'lower', label: 'Ищу более низкую' },
   { value: 'higher', label: 'Готов доплатить за качество' },
@@ -41,6 +42,7 @@ const handleClose = () => {
   form.message = ''
   form.budget = 'service-price'
   form.urgency = 'week'
+  form.customPrice = ''
 }
 
 function getProposedDeadline(urgency: string): string | undefined {
@@ -55,8 +57,13 @@ function getProposedDeadline(urgency: string): string | undefined {
   }
 }
 
-function getPriceFromBudget(budget: string): number | undefined {
-  if (budget === 'service-price' && props.service) return props.service.price
+/** Цена в рублях из формы; API ожидает копейки, конвертируем при отправке */
+function getPriceRubles(): number | undefined {
+  if (form.budget === 'service-price' && props.service && props.service.price > 0) {
+    return props.service.price
+  }
+  const num = form.customPrice.trim() ? parseFloat(form.customPrice.replace(/\s/g, '')) : NaN
+  if (!Number.isNaN(num) && num > 0) return num
   return undefined
 }
 
@@ -68,11 +75,13 @@ const handleSubmit = async () => {
   isLoading.value = true
   telegramStore.hapticFeedback('medium')
   try {
-    await createServiceResponse({
+    const priceRubles = getPriceRubles()
+    const priceKopecks = priceRubles != null ? Math.round(priceRubles * 100) : undefined
+    await createServiceResponseMutation.mutateAsync({
       studentId: authStore.user.id,
       serviceId: props.service.id,
-      message: form.message || undefined,
-      price: getPriceFromBudget(form.budget),
+      message: form.message.trim() || undefined,
+      price: priceKopecks,
       proposedDeadline: getProposedDeadline(form.urgency),
     })
     telegramStore.showAlert('Отклик отправлен! Репетитор ответит в ближайшее время.')
@@ -113,6 +122,16 @@ watch(() => props.modelValue, (val) => { if (val) { form.budget = 'service-price
         </div>
         <div>
           <Select :value="form.budget" @update:value="(v) => (form.budget = v ?? '')" :options="budgetOptions" label="Бюджет" placeholder="Выберите бюджет" />
+        </div>
+        <div v-if="form.budget !== 'service-price'">
+          <label class="block text-sm font-medium text-telegram-text mb-2">Ваша предложенная сумма (₽)</label>
+          <Input
+            v-model="form.customPrice"
+            type="number"
+            min="1"
+            placeholder="Например: 1500"
+            class="w-full"
+          />
         </div>
         <div>
           <Select :value="form.urgency" @update:value="(v) => (form.urgency = v ?? '')" :options="urgencyOptions" label="Когда нужно?" placeholder="Выберите срочность" />

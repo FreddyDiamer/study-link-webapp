@@ -2,13 +2,12 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { useEducation } from '@/shared/composables'
-import { useTutor } from '@/shared/composables'
+import { tutorService } from '@/services/business'
 import type { Tutor, TutorSearchParams } from '../models'
 
 export function useTutorsList() {
   const route = useRoute()
   const telegramStore = useTelegramStore()
-  const { searchTutors } = useTutor()
   const { activeSubjects, isLoading: educationLoading, error: educationError, isInitialized, initialize } = useEducation()
 
   const searchQuery = ref('')
@@ -39,10 +38,10 @@ export function useTutorsList() {
         page: currentPage.value,
         limit: 10,
       }
-      const response = await searchTutors(params)
-      tutors.value = response.items
-      totalTutors.value = response.total
-      totalPages.value = response.totalPages
+      const response = await tutorService.searchTutors(params)
+      tutors.value = response.items ?? []
+      totalTutors.value = response.total ?? 0
+      totalPages.value = response.totalPages ?? 1
     } catch (err: unknown) {
       error.value = (err as Error).message
       console.error(err)

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import Button from '@/shared/components/ui/Button.vue'
-
 defineEmits<{
   create: []
 }>()
@@ -9,7 +7,7 @@ defineEmits<{
 <template>
   <div class="text-center py-16">
     <div
-      class="w-24 h-24 bg-gradient-to-br from-telegram-accent/20 to-telegram-accent/10 rounded-full mx-auto mb-6 flex items-center justify-center"
+      class="w-24 h-24 bg-gradient-to-br from-telegram-accent/20 to-telegram-accent/10 rounded-full mx-auto mb-4 flex items-center justify-center"
     >
       <svg
         class="w-12 h-12 text-telegram-accent"
@@ -25,19 +23,28 @@ defineEmits<{
         />
       </svg>
     </div>
+
+    
+
     <h2 class="text-2xl font-bold text-telegram-text mb-3">Создайте свои услуги</h2>
-    <p class="text-telegram-textSecondary mb-12 max-w-md mx-auto leading-relaxed">
+    <p class="text-telegram-textSecondary mb-0 max-w-md mx-auto leading-relaxed">
       Добавьте описания ваших услуг репетиторства с указанием предметов, стоимости и условий.
       Студенты смогут найти и выбрать подходящие занятия.
     </p>
-    <Button
+    <div
+      class="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-full bg-telegram-accent/10 border border-telegram-accent/40 shadow-sm mx-auto mb-6 cursor-pointer hover:bg-telegram-accent/20 hover:border-telegram-accent/70 transition-all duration-200 backdrop-blur-sm"
       @click="$emit('create')"
-      class="bg-gradient-to-r from-telegram-accent to-telegram-accent/80 hover:from-telegram-accent/90 hover:to-telegram-accent/70 text-white px-8 py-3 font-semibold rounded-xl shadow-lg"
     >
-      <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      Создать услугу
-    </Button>
+      <div
+        class="w-7 h-7 rounded-full bg-telegram-accent flex items-center justify-center text-white shadow-md"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+      </div>
+      <div class="text-left">
+        <div class="text-sm font-semibold text-telegram-accent">Создать услугу</div>
+      </div>
+    </div>
   </div>
 </template>

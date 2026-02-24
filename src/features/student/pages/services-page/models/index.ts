@@ -14,10 +14,16 @@ export interface Service {
     rating: number
     reviewsCount: number
   }
+  /** ID репетитора (владельца услуги) для перехода в профиль */
+  tutorId?: string
   format: 'online' | 'offline' | 'both'
   workingHours: string
   availability: 'available' | 'busy' | 'limited'
   tags: string[]
+  /** true, если услуга принадлежит текущему пользователю (репетитору) */
+  isOwnService?: boolean
+  /** true, если текущий пользователь уже оставил заявку на эту услугу */
+  currentUserResponded?: boolean
 }
 
 export interface ServiceFilters {

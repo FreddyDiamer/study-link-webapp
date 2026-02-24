@@ -1,4 +1,4 @@
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useTelegramStore } from '@/stores/telegram'
 import { useOrder } from '@/shared/composables'
 import type { TabType } from '../models'
@@ -6,16 +6,37 @@ import type { TabType } from '../models'
 export function useOrdersPage() {
   const telegramStore = useTelegramStore()
   const {
-    requests,
-    serviceResponses,
-    deals,
     getMyRequests,
     getMyServiceResponses,
     getMyStudentDeals,
   } = useOrder()
 
+  const myRequestsQuery = getMyRequests()
+  const myServiceResponsesQuery = getMyServiceResponses()
+  const myStudentDealsQuery = getMyStudentDeals()
+
+  const requests = computed(() => myRequestsQuery.data.value ?? null)
+  const serviceResponses = computed(() => myServiceResponsesQuery.data.value ?? null)
+  const dealsRaw = computed(() => myStudentDealsQuery.data.value ?? null)
+
+  const activeDeals = computed(() => {
+    const data = dealsRaw.value
+    const items = (data?.items ?? []).filter((d) => d.status !== 'COMPLETED')
+    return data ? { ...data, items, total: items.length } : { items: [], total: 0 }
+  })
+  const completedDeals = computed(() => {
+    const data = dealsRaw.value
+    const items = (data?.items ?? []).filter((d) => d.status === 'COMPLETED')
+    return data ? { ...data, items, total: items.length } : { items: [], total: 0 }
+  })
+
   const currentTab = ref<TabType>('requests')
-  const isLoading = ref(false)
+  const isLoading = computed(
+    () =>
+      myRequestsQuery.isLoading.value ||
+      myServiceResponsesQuery.isLoading.value ||
+      myStudentDealsQuery.isLoading.value,
+  )
 
   const switchTab = async (tabId: TabType) => {
     telegramStore.hapticFeedback('light')
@@ -24,23 +45,21 @@ export function useOrdersPage() {
   }
 
   const loadTabData = async (tabId: TabType) => {
-    isLoading.value = true
     try {
       switch (tabId) {
         case 'requests':
-          await getMyRequests()
+          await myRequestsQuery.refetch()
           break
         case 'responses':
-          await getMyServiceResponses()
+          await myServiceResponsesQuery.refetch()
           break
         case 'deals':
-          await getMyStudentDeals()
+        case 'deals-completed':
+          await myStudentDealsQuery.refetch()
           break
       }
     } catch (error) {
       console.error('Ошибка загрузки данных:', error)
-    } finally {
-      isLoading.value = false
     }
   }
 
@@ -53,7 +72,8 @@ export function useOrdersPage() {
     isLoading,
     requests,
     serviceResponses,
-    deals,
+    activeDeals,
+    completedDeals,
     switchTab,
   }
 }

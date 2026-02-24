@@ -57,6 +57,12 @@ const findServices = () => {
 const viewResponseDetails = (_response: ServiceResponse) => {
   telegramStore.hapticFeedback('light')
 }
+
+const openTutorProfile = (e: Event, tutorId: string) => {
+  e.stopPropagation()
+  telegramStore.hapticFeedback('light')
+  router.push(`/user/${tutorId}?view=tutor`)
+}
 </script>
 
 <template>
@@ -84,7 +90,14 @@ const viewResponseDetails = (_response: ServiceResponse) => {
               {{ response.service?.subject?.name || 'Предмет' }} • {{ response.service?.teacher?.fullName || 'Преподаватель' }}
             </h3>
             <div class="flex items-center space-x-2 mb-2">
-              <span class="text-telegram-textSecondary text-sm">{{ response.service?.tutor?.name || 'Репетитор' }}</span>
+              <span
+                v-if="response.service?.tutor?.id"
+                class="text-telegram-accent text-sm cursor-pointer hover:underline"
+                @click="openTutorProfile($event, response.service.tutor.id)"
+              >
+                {{ response.service?.tutor?.name || 'Репетитор' }} →
+              </span>
+              <span v-else class="text-telegram-textSecondary text-sm">{{ response.service?.tutor?.name || 'Репетитор' }}</span>
             </div>
           </div>
           <div class="text-right">

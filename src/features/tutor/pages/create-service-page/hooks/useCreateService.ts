@@ -20,7 +20,7 @@ export interface CreateServiceForm {
 export function useCreateService() {
   const router = useRouter()
   const telegramStore = useTelegramStore()
-  const { createService } = useService()
+  const createServiceMutation = useService().createService()
   const {
     activeSubjects,
     teachers,
@@ -93,7 +93,7 @@ export function useCreateService() {
         price: parseInt(form.price),
         deadline: getDeadlineDate(),
       }
-      await createService(serviceData)
+      await createServiceMutation.mutateAsync(serviceData)
       telegramStore.hapticFeedback('heavy')
       router.push(PATHS.TUTOR_SERVICES)
     } catch (error: any) {

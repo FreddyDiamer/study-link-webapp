@@ -229,8 +229,9 @@ export class OrderService {
 
   async getServiceResponses(serviceId: string): Promise<ServiceResponse[]> {
     try {
-      const responses = await ordersApi.getServiceResponses(serviceId)
-      return responses.map((response) => this.convertServiceResponseToRubles(response))
+      const result = await ordersApi.getServiceResponses(serviceId)
+      const items = result?.items ?? []
+      return items.map((response) => this.convertServiceResponseToRubles(response))
     } catch (error) {
       this.handleError(error, 'Ошибка при получении откликов на услугу')
       throw error
@@ -302,7 +303,31 @@ export class OrderService {
 
       this.telegramStore.showAlert('Отклик удален!')
     } catch (error) {
-      this.handleError(error, 'Ошибка при удалении отклика')
+      this.handleError(error, 'Ошибка при удалении отклика на услугу')
+      throw error
+    }
+  }
+
+  async acceptServiceResponse(id: string): Promise<ServiceResponse> {
+    try {
+      this.telegramStore.hapticFeedback('light')
+      const response = await ordersApi.acceptServiceResponse(id)
+      this.telegramStore.showAlert('Отклик принят!')
+      return this.convertServiceResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при принятии отклика')
+      throw error
+    }
+  }
+
+  async rejectServiceResponse(id: string): Promise<ServiceResponse> {
+    try {
+      this.telegramStore.hapticFeedback('light')
+      const response = await ordersApi.rejectServiceResponse(id)
+      this.telegramStore.showAlert('Отклик отклонён')
+      return this.convertServiceResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при отклонении отклика')
       throw error
     }
   }
@@ -378,6 +403,39 @@ export class OrderService {
     }
   }
 
+  async acceptRequestResponse(id: string): Promise<RequestResponse> {
+    try {
+      const response = await ordersApi.acceptRequestResponse(id)
+      this.telegramStore.showAlert('Отклик принят! Сделка создана.')
+      return this.convertRequestResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при принятии отклика')
+      throw error
+    }
+  }
+
+  async rejectRequestResponse(id: string): Promise<RequestResponse> {
+    try {
+      const response = await ordersApi.rejectRequestResponse(id)
+      this.telegramStore.showAlert('Отклик отклонён')
+      return this.convertRequestResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при отклонении отклика')
+      throw error
+    }
+  }
+
+  async cancelRequestResponse(id: string): Promise<RequestResponse> {
+    try {
+      const response = await ordersApi.cancelRequestResponse(id)
+      this.telegramStore.showAlert('Отклик отменён, сделка закрыта')
+      return this.convertRequestResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при отмене отклика')
+      throw error
+    }
+  }
+
   async deleteRequestResponse(id: string): Promise<void> {
     try {
       this.telegramStore.hapticFeedback('medium')
@@ -429,8 +487,8 @@ export class OrderService {
     if (!data.serviceId) {
       throw new Error('Укажите услугу')
     }
-    if (data.price && data.price < 100) {
-      throw new Error('Цена должна быть не менее 100 рублей')
+    if (data.price !== undefined && data.price !== null && data.price < 100) {
+      throw new Error('Цена должна быть не менее 1 рубля (100 копеек)')
     }
     if (data.message && data.message.length > 500) {
       throw new Error('Сообщение не должно превышать 500 символов')
@@ -441,8 +499,8 @@ export class OrderService {
     if (!data.requestId) {
       throw new Error('Укажите заявку')
     }
-    if (data.price && data.price < 100) {
-      throw new Error('Цена должна быть не менее 100 рублей')
+    if (data.price !== undefined && data.price !== null && data.price < 100) {
+      throw new Error('Цена должна быть не менее 1 рубля (100 копеек)')
     }
     if (data.message && data.message.length > 500) {
       throw new Error('Сообщение не должно превышать 500 символов')

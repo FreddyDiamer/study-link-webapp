@@ -1,5 +1,8 @@
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { orderService } from '@/services/business'
+import { useAuthStore } from '@/stores/auth'
+import { queryKeys } from '@/shared/lib/query-keys'
 import type {
   Request,
   Deal,
@@ -13,303 +16,290 @@ import type {
 } from '@/shared/types'
 
 export const useOrder = () => {
-  const requests = ref<PaginatedResponse<Request> | null>(null)
-  const deals = ref<PaginatedResponse<Deal> | null>(null)
-  const serviceResponses = ref<PaginatedResponse<ServiceResponse> | null>(null)
-  const requestResponses = ref<PaginatedResponse<RequestResponse> | null>(null)
-  const isLoading = ref(false)
+  const queryClient = useQueryClient()
+  const authStore = useAuthStore()
+  const studentDealsEnabled = computed(() => !!authStore.user?.id)
 
   // =============================================================================
   // REQUESTS (Заявки студентов)
   // =============================================================================
 
-  const getRequests = async (params?: any) => {
-    isLoading.value = true
-    try {
-      requests.value = await orderService.getRequests(params)
-      return requests.value
-    } finally {
-      isLoading.value = false
-    }
+  const getRequests = (params?: any) => {
+    return useQuery({
+      queryKey: queryKeys.requests(params),
+      queryFn: () => orderService.getRequests(params),
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getMyRequests = async () => {
-    isLoading.value = true
-    try {
-      requests.value = await orderService.getMyRequests()
-      return requests.value
-    } finally {
-      isLoading.value = false
-    }
+  const getMyRequests = () => {
+    return useQuery({
+      queryKey: queryKeys.myRequests(),
+      queryFn: () => orderService.getMyRequests(),
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getRequest = async (id: string) => {
-    isLoading.value = true
-    try {
-      return await orderService.getRequest(id)
-    } finally {
-      isLoading.value = false
-    }
+  const getRequest = (id: string) => {
+    return useQuery({
+      queryKey: queryKeys.request(id),
+      queryFn: () => orderService.getRequest(id),
+      enabled: !!id,
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const createRequest = async (data: Omit<CreateRequestDto, 'budget'> & { budget?: number }) => {
-    isLoading.value = true
-    try {
-      const request = await orderService.createRequest(data)
-      // Обновляем список заявок
-      await getMyRequests()
-      return request
-    } finally {
-      isLoading.value = false
-    }
+  const createRequest = () => {
+    return useMutation({
+      mutationFn: (data: Omit<CreateRequestDto, 'budget'> & { budget?: number }) =>
+        orderService.createRequest(data),
+      onSuccess: () => {
+        // Инвалидируем кэш заявок после создания
+        queryClient.invalidateQueries({ queryKey: queryKeys.myRequests() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.requests() })
+      },
+    })
   }
 
-  const updateRequest = async (
-    id: string,
-    data: Omit<UpdateRequestDto, 'budget'> & { budget?: number },
-  ) => {
-    isLoading.value = true
-    try {
-      const request = await orderService.updateRequest(id, data)
-      // Обновляем список заявок
-      await getMyRequests()
-      return request
-    } finally {
-      isLoading.value = false
-    }
+  const updateRequest = () => {
+    return useMutation({
+      mutationFn: ({
+        id,
+        data,
+      }: {
+        id: string
+        data: Omit<UpdateRequestDto, 'budget'> & { budget?: number }
+      }) => orderService.updateRequest(id, data),
+      onSuccess: (_, variables) => {
+        // Инвалидируем кэш конкретной заявки и списка
+        queryClient.invalidateQueries({ queryKey: queryKeys.request(variables.id) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myRequests() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.requests() })
+      },
+    })
   }
 
-  const deleteRequest = async (id: string) => {
-    isLoading.value = true
-    try {
-      await orderService.deleteRequest(id)
-      // Обновляем список заявок
-      await getMyRequests()
-    } finally {
-      isLoading.value = false
-    }
+  const deleteRequest = () => {
+    return useMutation({
+      mutationFn: (id: string) => orderService.deleteRequest(id),
+      onSuccess: () => {
+        // Инвалидируем кэш заявок после удаления
+        queryClient.invalidateQueries({ queryKey: queryKeys.myRequests() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.requests() })
+      },
+    })
   }
 
   // =============================================================================
   // DEALS (Сделки)
   // =============================================================================
 
-  const getDeals = async (params?: any) => {
-    isLoading.value = true
-    try {
-      deals.value = await orderService.getDeals(params)
-      return deals.value
-    } finally {
-      isLoading.value = false
-    }
+  const getDeals = (params?: any) => {
+    return useQuery({
+      queryKey: queryKeys.deals(params),
+      queryFn: () => orderService.getDeals(params),
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getMyStudentDeals = async () => {
-    isLoading.value = true
-    try {
-      deals.value = await orderService.getDeals()
-      return deals.value
-    } finally {
-      isLoading.value = false
-    }
+  const getMyStudentDeals = () => {
+    return useQuery({
+      queryKey: queryKeys.myStudentDeals(),
+      queryFn: () => {
+        const userId = authStore.user?.id
+        return orderService.getDeals(userId ? { studentId: userId } : undefined)
+      },
+      enabled: studentDealsEnabled,
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getMyTutorDeals = async () => {
-    try {
-      const response = await orderService.getMyTutorDeals()
-      return response
-    } catch (error) {
-      console.error('Ошибка получения сделок репетитора:', error)
-      throw error
-    }
+  const getMyTutorDeals = () => {
+    return useQuery({
+      queryKey: queryKeys.myTutorDeals(),
+      queryFn: () => orderService.getMyTutorDeals(),
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getDeal = async (id: string) => {
-    isLoading.value = true
-    try {
-      return await orderService.getDeal(id)
-    } finally {
-      isLoading.value = false
-    }
+  const getDeal = (id: string) => {
+    return useQuery({
+      queryKey: queryKeys.deal(id),
+      queryFn: () => orderService.getDeal(id),
+      enabled: !!id,
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const updateDeal = async (
-    id: string,
-    data: Partial<Pick<Deal, 'status' | 'price' | 'deadline'>>,
-  ) => {
-    try {
-      const response = await orderService.updateDeal(id, data)
-      return response
-    } catch (error) {
-      console.error('Ошибка обновления сделки:', error)
-      throw error
-    }
+  const updateDeal = () => {
+    return useMutation({
+      mutationFn: ({
+        id,
+        data,
+      }: {
+        id: string
+        data: Partial<Pick<Deal, 'status' | 'price' | 'deadline'>>
+      }) => orderService.updateDeal(id, data),
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.deal(variables.id) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myTutorDeals() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myStudentDeals() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.deals() })
+      },
+    })
   }
 
-  const acceptDeal = async (dealId: string) => {
-    try {
-      const response = await orderService.acceptDeal(dealId)
-      return response
-    } catch (error) {
-      console.error('Ошибка принятия сделки:', error)
-      throw error
-    }
+  const acceptDeal = () => {
+    return useMutation({
+      mutationFn: (dealId: string) => orderService.acceptDeal(dealId),
+      onSuccess: (_, dealId) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.deal(dealId) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myTutorDeals() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myStudentDeals() })
+      },
+    })
   }
 
-  const rejectDeal = async (dealId: string) => {
-    try {
-      const response = await orderService.rejectDeal(dealId)
-      return response
-    } catch (error) {
-      console.error('Ошибка отклонения сделки:', error)
-      throw error
-    }
+  const rejectDeal = () => {
+    return useMutation({
+      mutationFn: (dealId: string) => orderService.rejectDeal(dealId),
+      onSuccess: (_, dealId) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.deal(dealId) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myTutorDeals() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myStudentDeals() })
+      },
+    })
   }
 
-  const completeDeal = async (dealId: string) => {
-    try {
-      const response = await orderService.completeDeal(dealId)
-      return response
-    } catch (error) {
-      console.error('Ошибка завершения сделки:', error)
-      throw error
-    }
+  const completeDeal = () => {
+    return useMutation({
+      mutationFn: (dealId: string) => orderService.completeDeal(dealId),
+      onSuccess: (_, dealId) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.deal(dealId) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myTutorDeals() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myStudentDeals() })
+      },
+    })
   }
 
   // =============================================================================
   // SERVICE RESPONSES (Отклики студентов на услуги)
   // =============================================================================
 
-  const getServiceResponses = async (serviceId: string) => {
-    isLoading.value = true
-    try {
-      return await orderService.getServiceResponses(serviceId)
-    } finally {
-      isLoading.value = false
-    }
+  const getServiceResponses = (serviceId: string) => {
+    return useQuery({
+      queryKey: queryKeys.serviceResponses(serviceId),
+      queryFn: () => orderService.getServiceResponses(serviceId),
+      enabled: !!serviceId,
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getMyServiceResponses = async () => {
-    isLoading.value = true
-    try {
-      serviceResponses.value = await orderService.getMyServiceResponses()
-      return serviceResponses.value
-    } finally {
-      isLoading.value = false
-    }
+  const getMyServiceResponses = () => {
+    return useQuery({
+      queryKey: queryKeys.myServiceResponses(),
+      queryFn: () => orderService.getMyServiceResponses(),
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const createServiceResponse = async (
-    data: Omit<CreateServiceResponseDto, 'price'> & { price?: number },
-  ) => {
-    isLoading.value = true
-    try {
-      const response = await orderService.createServiceResponse(data)
-      // Обновляем список откликов
-      await getMyServiceResponses()
-      return response
-    } finally {
-      isLoading.value = false
-    }
+  const createServiceResponse = () => {
+    return useMutation({
+      mutationFn: (data: Omit<CreateServiceResponseDto, 'price'> & { price?: number }) =>
+        orderService.createServiceResponse(data),
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.serviceResponses(variables.serviceId) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myServiceResponses() })
+      },
+    })
   }
 
-  const updateServiceResponse = async (
-    id: string,
-    data: Partial<CreateServiceResponseDto> & { price?: number },
-  ) => {
-    isLoading.value = true
-    try {
-      const response = await orderService.updateServiceResponse(id, data)
-      // Обновляем список откликов
-      await getMyServiceResponses()
-      return response
-    } finally {
-      isLoading.value = false
-    }
+  const updateServiceResponse = () => {
+    return useMutation({
+      mutationFn: ({
+        id,
+        data,
+      }: {
+        id: string
+        data: Partial<CreateServiceResponseDto> & { price?: number }
+      }) => orderService.updateServiceResponse(id, data),
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.myServiceResponses() })
+        // Также инвалидируем все service responses, так как мы не знаем serviceId
+        queryClient.invalidateQueries({ queryKey: ['user', 'service-responses'] })
+      },
+    })
   }
 
-  const deleteServiceResponse = async (id: string) => {
-    isLoading.value = true
-    try {
-      await orderService.deleteServiceResponse(id)
-      // Обновляем список откликов
-      await getMyServiceResponses()
-    } finally {
-      isLoading.value = false
-    }
+  const deleteServiceResponse = () => {
+    return useMutation({
+      mutationFn: (id: string) => orderService.deleteServiceResponse(id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.myServiceResponses() })
+        queryClient.invalidateQueries({ queryKey: ['user', 'service-responses'] })
+      },
+    })
   }
 
   // =============================================================================
   // REQUEST RESPONSES (Отклики репетиторов на заявки)
   // =============================================================================
 
-  const getRequestResponses = async (requestId: string) => {
-    isLoading.value = true
-    try {
-      return await orderService.getRequestResponses(requestId)
-    } finally {
-      isLoading.value = false
-    }
+  const getRequestResponses = (requestId: string) => {
+    return useQuery({
+      queryKey: queryKeys.requestResponses(requestId),
+      queryFn: () => orderService.getRequestResponses(requestId),
+      enabled: !!requestId,
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const getMyRequestResponses = async () => {
-    isLoading.value = true
-    try {
-      requestResponses.value = await orderService.getMyRequestResponses()
-      return requestResponses.value
-    } finally {
-      isLoading.value = false
-    }
+  const getMyRequestResponses = () => {
+    return useQuery({
+      queryKey: queryKeys.myRequestResponses(),
+      queryFn: () => orderService.getMyRequestResponses(),
+      refetchInterval: 10000, // Автообновление каждые 10 секунд
+    })
   }
 
-  const createRequestResponse = async (
-    data: Omit<CreateRequestResponseDto, 'price'> & { price?: number },
-  ) => {
-    isLoading.value = true
-    try {
-      const response = await orderService.createRequestResponse(data)
-      // Обновляем список откликов
-      await getMyRequestResponses()
-      return response
-    } finally {
-      isLoading.value = false
-    }
+  const createRequestResponse = () => {
+    return useMutation({
+      mutationFn: (data: Omit<CreateRequestResponseDto, 'price'> & { price?: number }) =>
+        orderService.createRequestResponse(data),
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.requestResponses(variables.requestId) })
+        queryClient.invalidateQueries({ queryKey: queryKeys.myRequestResponses() })
+      },
+    })
   }
 
-  const updateRequestResponse = async (
-    id: string,
-    data: Partial<CreateRequestResponseDto> & { price?: number },
-  ) => {
-    isLoading.value = true
-    try {
-      const response = await orderService.updateRequestResponse(id, data)
-      // Обновляем список откликов
-      await getMyRequestResponses()
-      return response
-    } finally {
-      isLoading.value = false
-    }
+  const updateRequestResponse = () => {
+    return useMutation({
+      mutationFn: ({
+        id,
+        data,
+      }: {
+        id: string
+        data: Partial<CreateRequestResponseDto> & { price?: number }
+      }) => orderService.updateRequestResponse(id, data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.myRequestResponses() })
+        queryClient.invalidateQueries({ queryKey: ['user', 'request-responses'] })
+      },
+    })
   }
 
-  const deleteRequestResponse = async (id: string) => {
-    isLoading.value = true
-    try {
-      await orderService.deleteRequestResponse(id)
-      // Обновляем список откликов
-      await getMyRequestResponses()
-    } finally {
-      isLoading.value = false
-    }
+  const deleteRequestResponse = () => {
+    return useMutation({
+      mutationFn: (id: string) => orderService.deleteRequestResponse(id),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.myRequestResponses() })
+        queryClient.invalidateQueries({ queryKey: ['user', 'request-responses'] })
+      },
+    })
   }
 
   return {
-    // State
-    requests,
-    deals,
-    serviceResponses,
-    requestResponses,
-    isLoading,
-
     // Requests
     getRequests,
     getMyRequests,
@@ -323,6 +313,7 @@ export const useOrder = () => {
     getMyStudentDeals,
     getMyTutorDeals,
     getDeal,
+    updateDeal,
     acceptDeal,
     rejectDeal,
     completeDeal,

@@ -3,10 +3,14 @@ import { RouterView } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import BottomNav from '@/shared/components/layout/BottomNav.vue'
-import { useAppStore, useEducationStore } from '@/stores'
+import DevPanel from '@/shared/components/dev/DevPanel.vue'
+import { useAppStore, useAuthStore, useEducationStore } from '@/stores'
+import { setupQueryCacheWatcher } from '@/shared/lib/query-client'
+import ProfileQueryKeeper from '@/shared/components/ProfileQueryKeeper.vue'
 import { MOCK_INIT_DATA } from './shared/constants'
 
 const appStore = useAppStore()
+const authStore = useAuthStore()
 const educationStore = useEducationStore()
 
 const loading = ref(true)
@@ -29,6 +33,8 @@ const initializeApp = async () => {
 }
 
 onMounted(() => {
+  // Настраиваем отслеживание смены пользователя для очистки кэша Vue Query
+  setupQueryCacheWatcher()
   initializeApp()
 })
 </script>
@@ -43,10 +49,16 @@ onMounted(() => {
   >
     <AppHeader />
 
+    <!-- Держит запрос /users/me активным для автообновления по refetchInterval -->
+    <ProfileQueryKeeper v-if="authStore.isAuthenticated" />
+
     <main class="flex-1 overflow-auto pt-14">
       <RouterView />
     </main>
 
     <BottomNav />
+
+    <!-- Панель разработчика -->
+    <DevPanel />
   </div>
 </template>
