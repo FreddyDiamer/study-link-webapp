@@ -124,7 +124,8 @@ export interface Service {
   price: number // в копейках
   description?: string
   status: ServiceStatus
-  deadline?: string
+  lessonsCount: number
+  lessonDurationMinutes: number
   createdAt: string
   updatedAt: string
   tutor: User
@@ -259,14 +260,16 @@ export interface CreateServiceDto {
   teacherId: string
   price: number
   description?: string
-  deadline?: string
+  lessonsCount: number
+  lessonDurationMinutes: number
 }
 
 export interface UpdateServiceDto {
   price?: number
   description?: string
   status?: ServiceStatus
-  deadline?: string
+  lessonsCount?: number
+  lessonDurationMinutes?: number
 }
 
 export interface ServiceFilterDto {

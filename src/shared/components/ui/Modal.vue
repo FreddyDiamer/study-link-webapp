@@ -61,7 +61,7 @@ const maxWidthClasses = {
           <div
             v-if="modelValue"
             :class="[
-              'w-full bg-telegram-card border border-telegram-border rounded-xl shadow-xl',
+              'w-full bg-telegram-card border border-telegram-border rounded-xl shadow-xl max-h-[80vh] flex flex-col overflow-hidden',
               maxWidthClasses[maxWidth],
             ]"
           >
@@ -92,7 +92,7 @@ const maxWidthClasses = {
             </div>
 
             <!-- Content -->
-            <div class="px-6 pb-6">
+            <div class="px-6 pb-6 flex-1 overflow-y-auto">
               <slot />
             </div>
 

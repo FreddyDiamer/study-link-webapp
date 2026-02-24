@@ -17,12 +17,15 @@ interface Props {
   disabled?: boolean
   required?: boolean
   error?: string
+  /** Позиция дропдауна относительно инпута */
+  placement?: 'top' | 'bottom'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Выберите...',
   disabled: false,
   required: false,
+  placement: 'bottom',
 })
 
 const emit = defineEmits<{
@@ -156,6 +159,15 @@ watch(
 
 watch(() => props.value, handleValueChange)
 
+// Когда подтягиваются options асинхронно, пересинхронизируем выбранный элемент
+watch(
+  () => props.options,
+  () => {
+    handleValueChange(props.value)
+  },
+  { deep: true },
+)
+
 watch(
   () => selectedOption.value,
   (newValue) => {
@@ -218,7 +230,10 @@ onUnmounted(() => {
     >
       <div
         v-if="isOpen && filteredOptions.length > 0"
-        class="absolute z-50 mt-2 w-full bg-telegram-secondary backdrop-blur-sm border border-telegram-border rounded-xl shadow-lg max-h-60 overflow-y-auto"
+        :class="[
+          'absolute z-50 w-full bg-telegram-secondary backdrop-blur-sm border border-telegram-border rounded-xl shadow-lg max-h-[45vh] overflow-y-auto',
+          props.placement === 'top' ? 'bottom-[60%] mb-2' : 'mt-2',
+        ]"
       >
         <button
           v-for="(option, index) in filteredOptions"
@@ -256,7 +271,10 @@ onUnmounted(() => {
     <!-- No results dropdown -->
     <div
       v-if="isOpen && filteredOptions.length === 0 && inputValue"
-      class="absolute z-50 mt-2 w-full bg-telegram-secondary backdrop-blur-sm border border-telegram-border rounded-xl shadow-lg"
+      :class="[
+        'absolute z-50 w-full bg-telegram-secondary backdrop-blur-sm border border-telegram-border rounded-xl shadow-lg',
+        props.placement === 'top' ? 'bottom-full mb-2' : 'mt-2',
+      ]"
     >
       <div class="px-4 py-6 text-center text-telegram-textSecondary">
         <LoupeIcon class="w-8 h-8 mx-auto mb-2 opacity-50" />

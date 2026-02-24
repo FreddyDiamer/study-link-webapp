@@ -1,1 +1,1 @@
-export { DEADLINES } from './constants'
+export { LESSON_DURATION_OPTIONS } from './constants'

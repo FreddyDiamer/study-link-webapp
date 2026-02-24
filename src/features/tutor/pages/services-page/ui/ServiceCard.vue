@@ -47,6 +47,9 @@ const emit = defineEmits<{
           <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-medium">
             {{ service.price }}₽
           </span>
+          <span class="px-2 py-1 text-xs bg-telegram-secondary/50 text-telegram-text rounded-full font-medium">
+            {{ service.lessonsCount }} занятий · {{ service.lessonDurationMinutes }} мин
+          </span>
           <span
             v-if="service.newResponsesCount > 0"
             class="px-2 py-1 text-xs font-medium rounded-full bg-telegram-accent text-white animate-pulse"

@@ -6,15 +6,15 @@ import { useService } from '@/shared/composables'
 import type { SelectOption } from '@/shared/components/ui'
 import type { CreateServiceDto } from '@/shared/types'
 import { PATHS } from '@/router/paths'
-import { DEADLINES } from '../models'
+import { LESSON_DURATION_OPTIONS } from '../models'
 
 export interface CreateServiceForm {
   subject: SelectOption | null
   teacher: SelectOption | null
   description: string
   price: string
-  deadline: SelectOption | null
-  customDate: string
+  lessonsCount: string
+  lessonDurationMinutes: SelectOption | null
 }
 
 export function useCreateService() {
@@ -35,8 +35,8 @@ export function useCreateService() {
     teacher: null,
     description: '',
     price: '',
-    deadline: null,
-    customDate: '',
+    lessonsCount: '',
+    lessonDurationMinutes: null,
   })
 
   const subjectOptions = computed(() =>
@@ -48,39 +48,36 @@ export function useCreateService() {
 
   const isSubmitting = ref(false)
 
-  function getDeadlineDate(): string | undefined {
-    if (!form.deadline) return undefined
-    const now = new Date()
-    switch (form.deadline.value) {
-      case '1':
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString()
-      case '3':
-        return new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString()
-      case '7':
-        return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
-      case 'custom':
-        return form.customDate ? new Date(form.customDate).toISOString() : undefined
-      default:
-        return undefined
-    }
-  }
-
   function validateForm(): boolean {
+    const lessonsNum = parseInt(form.lessonsCount, 10)
     return !!(
       form.subject &&
       form.teacher &&
       form.description.trim() &&
       form.price &&
       parseInt(form.price) > 0 &&
-      form.deadline &&
-      (form.deadline.value !== 'custom' || form.customDate)
+      form.lessonsCount &&
+      !isNaN(lessonsNum) &&
+      lessonsNum >= 1 &&
+      lessonsNum <= 200 &&
+      form.lessonDurationMinutes
     )
   }
 
   async function submitService() {
     if (!validateForm()) return
-    if (!form.subject || !form.teacher) {
-      telegramStore.showAlert('Укажите предмет и преподавателя')
+    if (!form.subject || !form.teacher || !form.lessonDurationMinutes) {
+      telegramStore.showAlert('Укажите предмет, преподавателя и длительность занятия')
+      return
+    }
+    const lessonsNum = parseInt(form.lessonsCount, 10)
+    if (isNaN(lessonsNum) || lessonsNum < 1 || lessonsNum > 200) {
+      telegramStore.showAlert('Количество занятий: от 1 до 200')
+      return
+    }
+    const durationNum = parseInt(form.lessonDurationMinutes.value, 10)
+    if (isNaN(durationNum) || durationNum < 15 || durationNum > 180) {
+      telegramStore.showAlert('Длительность занятия: от 15 до 180 минут')
       return
     }
     isSubmitting.value = true
@@ -91,7 +88,8 @@ export function useCreateService() {
         teacherId: form.teacher.value,
         description: form.description,
         price: parseInt(form.price),
-        deadline: getDeadlineDate(),
+        lessonsCount: lessonsNum,
+        lessonDurationMinutes: durationNum,
       }
       await createServiceMutation.mutateAsync(serviceData)
       telegramStore.hapticFeedback('heavy')
@@ -117,7 +115,7 @@ export function useCreateService() {
     form,
     subjectOptions,
     teacherOptions,
-    deadlines: DEADLINES,
+    lessonDurationOptions: LESSON_DURATION_OPTIONS,
     educationLoading,
     educationError,
     initialize,

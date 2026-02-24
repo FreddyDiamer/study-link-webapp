@@ -20,7 +20,13 @@ const authStore = useAuthStore()
 const { createServiceResponse } = useOrder()
 const createServiceResponseMutation = createServiceResponse()
 
-const form = reactive({ message: '', budget: 'service-price', urgency: 'week', customPrice: '' })
+const form = reactive({
+  message: '',
+  budget: 'service-price',
+  urgency: 'week',
+  customPrice: '',
+  customDate: '',
+})
 const isLoading = ref(false)
 
 const budgetOptions = computed(() => [
@@ -32,9 +38,9 @@ const budgetOptions = computed(() => [
 
 const urgencyOptions = [
   { value: 'today', label: 'Сегодня (срочно)' },
-  { value: 'tomorrow', label: 'Завтра' },
   { value: 'week', label: 'На этой неделе' },
   { value: 'month', label: 'В течение месяца' },
+  { value: 'custom', label: 'Выбрать дату' },
 ]
 
 const handleClose = () => {
@@ -45,20 +51,24 @@ const handleClose = () => {
   form.customPrice = ''
 }
 
-function getProposedDeadline(urgency: string): string | undefined {
+const todayDate = computed(() => new Date().toISOString().slice(0, 10))
+
+function getProposedDeadline(urgency: string, customDate?: string): string | undefined {
   const now = Date.now()
   const dayMs = 24 * 60 * 60 * 1000
   switch (urgency) {
     case 'today': return new Date(now + dayMs).toISOString()
-    case 'tomorrow': return new Date(now + 2 * dayMs).toISOString()
     case 'week': return new Date(now + 7 * dayMs).toISOString()
     case 'month': return new Date(now + 30 * dayMs).toISOString()
+    case 'custom':
+      if (!customDate) return undefined
+      return new Date(customDate).toISOString()
     default: return undefined
   }
 }
 
-/** Цена в рублях из формы; API ожидает копейки, конвертируем при отправке */
-function getPriceRubles(): number | undefined {
+/** Цена из формы в тех же единицах, что и API (целое число) */
+function getPriceValue(): number | undefined {
   if (form.budget === 'service-price' && props.service && props.service.price > 0) {
     return props.service.price
   }
@@ -75,14 +85,30 @@ const handleSubmit = async () => {
   isLoading.value = true
   telegramStore.hapticFeedback('medium')
   try {
-    const priceRubles = getPriceRubles()
-    const priceKopecks = priceRubles != null ? Math.round(priceRubles * 100) : undefined
+    if (form.urgency === 'custom') {
+      if (!form.customDate) {
+        telegramStore.showAlert('Пожалуйста, выберите дату')
+        isLoading.value = false
+        return
+      }
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const selected = new Date(form.customDate)
+      selected.setHours(0, 0, 0, 0)
+      if (selected < today) {
+        telegramStore.showAlert('Нельзя выбрать дату раньше сегодняшней')
+        isLoading.value = false
+        return
+      }
+    }
+
+    const price = getPriceValue()
     await createServiceResponseMutation.mutateAsync({
       studentId: authStore.user.id,
       serviceId: props.service.id,
       message: form.message.trim() || undefined,
-      price: priceKopecks,
-      proposedDeadline: getProposedDeadline(form.urgency),
+      price,
+      proposedDeadline: getProposedDeadline(form.urgency, form.customDate || undefined),
     })
     telegramStore.showAlert('Отклик отправлен! Репетитор ответит в ближайшее время.')
     emit('submit')
@@ -95,7 +121,17 @@ const handleSubmit = async () => {
   }
 }
 
-watch(() => props.modelValue, (val) => { if (val) { form.budget = 'service-price'; form.urgency = 'week' } })
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      form.budget = 'service-price'
+      form.urgency = 'week'
+      form.customPrice = ''
+      form.customDate = ''
+    }
+  },
+)
 </script>
 
 <template>
@@ -134,7 +170,23 @@ watch(() => props.modelValue, (val) => { if (val) { form.budget = 'service-price
           />
         </div>
         <div>
-          <Select :value="form.urgency" @update:value="(v) => (form.urgency = v ?? '')" :options="urgencyOptions" label="Когда нужно?" placeholder="Выберите срочность" />
+          <Select
+            :value="form.urgency"
+            @update:value="(v) => (form.urgency = v ?? '')"
+            :options="urgencyOptions"
+            label="Когда нужно?"
+            placeholder="Выберите срочность"
+            placement="top"
+          />
+        </div>
+        <div v-if="form.urgency === 'custom'">
+          <label class="block text-sm font-medium text-telegram-text mb-2">Выберите дату</label>
+          <Input
+            v-model="form.customDate"
+            type="date"
+            :min="todayDate"
+            class="w-full"
+          />
         </div>
       </div>
       <div class="flex space-x-3 pt-4">

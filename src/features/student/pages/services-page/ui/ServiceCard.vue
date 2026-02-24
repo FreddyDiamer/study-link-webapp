@@ -36,11 +36,19 @@ function openTutorProfile(tutorId: string) {
       </div>
       <div class="text-right">
         <div class="font-bold text-telegram-accent">{{ service.price }} ₽</div>
+        <div class="text-xs text-telegram-textSecondary mt-0.5">
+          {{ service.lessonsCount }} занятий · {{ service.lessonDurationMinutes }} мин
+        </div>
       </div>
     </div>
     <div class="flex items-center space-x-3 mb-3">
       <div class="w-10 h-10 bg-telegram-accent rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-        {{ service.teacher.name.split(' ').map((n) => n[0]).join('') || 'Р' }}
+        {{
+          (service.tutorName || service.teacher.name)
+            .split(' ')
+            .map((n) => n[0])
+            .join('') || 'Р'
+        }}
       </div>
       <div class="flex-1 min-w-0">
         <div
@@ -48,10 +56,14 @@ function openTutorProfile(tutorId: string) {
           class="font-medium text-telegram-text cursor-pointer"
           @click.stop="openTutorProfile(service.tutorId)"
         >
-          <span class="text-telegram-accent hover:underline">{{ service.teacher.name }}</span>
+          <span class="text-telegram-accent hover:underline">
+            {{ service.tutorName || service.teacher.name }}
+          </span>
           <span class="text-xs text-telegram-accent ml-1">Профиль →</span>
         </div>
-        <div v-else class="font-medium text-telegram-text">{{ service.teacher.name }}</div>
+        <div v-else class="font-medium text-telegram-text">
+          {{ service.tutorName || service.teacher.name }}
+        </div>
         <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
           <span>{{ service.teacher.experience }} услуг</span>
           <span>•</span>

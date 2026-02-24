@@ -14,7 +14,7 @@ const { currentTab, isLoading, requests, serviceResponses, activeDeals, complete
       <p class="text-telegram-textSecondary">Заявки, отклики и активные уроки</p>
     </div>
     <div class="px-4 mb-6">
-      <div class="flex bg-telegram-secondary rounded-xl p-1">
+      <div class="flex flex-wrap bg-telegram-secondary rounded-xl p-1">
         <button
           v-for="tab in TABS"
           :key="tab.id"

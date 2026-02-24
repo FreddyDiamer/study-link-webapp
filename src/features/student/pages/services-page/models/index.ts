@@ -7,6 +7,12 @@ export interface Service {
   price: number
   priceType: 'hour' | 'lesson' | 'month'
   subject: string
+  /** Количество занятий для подготовки студента */
+  lessonsCount: number
+  /** Длительность одного занятия в минутах */
+  lessonDurationMinutes: number
+  /** Имя репетитора (пользователь) */
+  tutorName?: string
   teacher: {
     id: string
     name: string

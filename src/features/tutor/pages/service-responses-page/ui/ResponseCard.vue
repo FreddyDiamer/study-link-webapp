@@ -137,7 +137,7 @@ function formatDeadline(dateString: string | null) {
           Завершить
         </Button>
       </template>
-      <template v-else-if="response.status === 'REJECTED' || response.status === 'EXPIRED'">
+      <template v-else-if="response.status === 'EXPIRED'">
         <Button @click="emit('contact', response)" variant="secondary" class="flex-1">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

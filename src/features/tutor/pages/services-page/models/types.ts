@@ -11,7 +11,11 @@ export interface TutorServiceCard {
   level: string
   description: string
   price: number
-  duration: number
+  /** Количество занятий для подготовки студента */
+  lessonsCount: number
+  /** Длительность одного занятия в минутах */
+  lessonDurationMinutes: number
+  duration: number // дублирует lessonDurationMinutes для совместимости
   format: string[]
   status: ServiceStatus
   studentsCount: number

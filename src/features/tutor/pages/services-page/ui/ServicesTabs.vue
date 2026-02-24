@@ -12,7 +12,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex bg-telegram-secondary rounded-xl p-1 mb-6">
+  <div class="flex flex-wrap  bg-telegram-secondary rounded-xl p-1 mb-6">
     <button
       v-for="tab in TABS"
       :key="tab.id"

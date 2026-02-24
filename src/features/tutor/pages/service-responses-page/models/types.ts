@@ -11,7 +11,8 @@ export interface ServiceInfo {
   description: string
   workingHours: string
   status: string
-  deadline: string | null
+  lessonsCount: number
+  lessonDurationMinutes: number
   createdAt: string
   updatedAt: string
   subject: { name: string }

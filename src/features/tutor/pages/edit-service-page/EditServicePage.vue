@@ -7,7 +7,7 @@ const {
   form,
   subjectOptions,
   teacherOptions,
-  deadlines,
+  lessonDurationOptions,
   educationLoading,
   educationError,
   initialize,
@@ -159,18 +159,31 @@ const {
         </Card>
 
         <Card class="p-6">
-          <h2 class="text-lg font-semibold text-telegram-text mb-2">Срок выполнения</h2>
+          <h2 class="text-lg font-semibold text-telegram-text mb-2">Количество занятий</h2>
           <p class="text-telegram-textSecondary text-sm mb-4">
-            Укажите, когда нужно выполнить задание
+            Сколько занятий нужно для подготовки студента
           </p>
-          <Select
-            v-model:value="form.deadline"
-            :options="deadlines"
-            placeholder="Выберите срок"
-            required
+          <Input
+            v-model="form.lessonsCount"
+            type="number"
+            placeholder="10"
+            min="1"
+            max="200"
             class="mb-4"
           />
-          <Input v-if="form.deadline === 'custom'" v-model="form.customDate" type="date" />
+        </Card>
+
+        <Card class="p-6">
+          <h2 class="text-lg font-semibold text-telegram-text mb-2">Длительность занятия</h2>
+          <p class="text-telegram-textSecondary text-sm mb-4">
+            Укажите длительность одного занятия
+          </p>
+          <Select
+            v-model:value="form.lessonDurationMinutes"
+            :options="lessonDurationOptions"
+            placeholder="Выберите длительность"
+            required
+          />
         </Card>
 
         <Card class="p-6">

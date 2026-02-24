@@ -47,11 +47,13 @@ export function useTutorServicesPage() {
       title: `${service.subject.name} - ${service.teacher.fullName}`,
       subject: service.subject.name,
       teacher: service.teacher.fullName,
-      level: '', // TODO: добавить поле level в Service если нужно
+      level: '',
       description: service.description || '',
-      price: service.price, // уже в рублях благодаря бизнес-сервису
-      duration: 60, // TODO: добавить поле duration в Service если нужно
-      format: ['Онлайн', 'Очно'], // TODO: добавить поле format в Service если нужно
+      price: service.price,
+      lessonsCount: service.lessonsCount ?? 1,
+      lessonDurationMinutes: service.lessonDurationMinutes ?? 60,
+      duration: service.lessonDurationMinutes ?? 60,
+      format: ['Онлайн', 'Очно'],
       status: statusMap[service.status] || 'active',
       studentsCount: 0, // TODO: добавить подсчет студентов
       rating: 0, // TODO: добавить рейтинг

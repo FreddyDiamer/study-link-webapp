@@ -17,7 +17,7 @@ const defaultFilters: ServiceFilters = {
 }
 
 function mapApiToViewModel(api: ApiService): Service {
-  const apiWithTutor = api as ApiService & { tutorId?: string; tutor?: { id: string } }
+  const apiWithTutor = api as ApiService & { tutorId?: string; tutor?: { id: string; name?: string } }
   return {
     id: api.id,
     title: api.subject?.name || 'Услуга',
@@ -25,6 +25,8 @@ function mapApiToViewModel(api: ApiService): Service {
     price: api.price,
     priceType: 'hour',
     subject: api.subject?.name || 'Предмет',
+    lessonsCount: api.lessonsCount ?? 1,
+    lessonDurationMinutes: api.lessonDurationMinutes ?? 60,
     teacher: {
       id: api.teacher?.id || '',
       name: api.teacher?.fullName || 'Преподаватель',
@@ -33,6 +35,7 @@ function mapApiToViewModel(api: ApiService): Service {
       reviewsCount: 0,
     },
     tutorId: apiWithTutor.tutorId ?? apiWithTutor.tutor?.id,
+    tutorName: apiWithTutor.tutor?.name ?? undefined,
     format: 'online',
     workingHours: '',
     availability: 'available',
@@ -160,6 +163,9 @@ export function useServicesPage() {
       telegramStore.showAlert('Заявка отправлена! Репетитор ответит в ближайшее время.')
       showRequestModal.value = false
       selectedService.value = null
+      // После успешной заявки обновляем список услуг,
+      // чтобы подтянулось актуальное поле currentUserResponded
+      await loadServices()
     } catch (e) {
       console.error(e)
       telegramStore.showAlert('Ошибка отправки заявки. Попробуйте еще раз.')

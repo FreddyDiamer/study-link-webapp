@@ -2,25 +2,25 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { useEducation } from '@/shared/composables'
-import { useService } from '@/shared/composables'
+import { serviceService } from '@/services/business/service'
+import type { SelectOption } from '@/shared/components/ui'
 import type { Service, UpdateServiceDto } from '@/shared/types'
 import { PATHS } from '@/router/paths'
-import { DEADLINES } from '../models'
+import { LESSON_DURATION_OPTIONS } from '../models'
 
 export interface EditServiceForm {
   subject: string
   teacher: string
   description: string
   price: string
-  deadline: string
-  customDate: string
+  lessonsCount: string
+  lessonDurationMinutes: string
 }
 
 export function useEditService() {
   const router = useRouter()
   const route = useRoute()
   const telegramStore = useTelegramStore()
-  const { getService, updateService, deleteService, activateService, deactivateService } = useService()
   const {
     activeSubjects,
     teachers,
@@ -36,8 +36,8 @@ export function useEditService() {
     teacher: '',
     description: '',
     price: '',
-    deadline: '',
-    customDate: '',
+    lessonsCount: '',
+    lessonDurationMinutes: '',
   })
 
   const subjectOptions = computed(() =>
@@ -53,30 +53,17 @@ export function useEditService() {
   const service = ref<Service | null>(null)
   const error = ref<string | null>(null)
 
-  function getDeadlineDate(): string | undefined {
-    if (!form.deadline) return undefined
-    const now = new Date()
-    switch (form.deadline) {
-      case '1':
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString()
-      case '3':
-        return new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString()
-      case '7':
-        return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
-      case 'custom':
-        return form.customDate ? new Date(form.customDate).toISOString() : undefined
-      default:
-        return undefined
-    }
-  }
-
   function validateForm(): boolean {
+    const lessonsNum = parseInt(form.lessonsCount, 10)
     return !!(
       form.description.trim() &&
       form.price &&
       parseInt(form.price) > 0 &&
-      form.deadline &&
-      (form.deadline !== 'custom' || form.customDate)
+      form.lessonsCount &&
+      !isNaN(lessonsNum) &&
+      lessonsNum >= 1 &&
+      lessonsNum <= 200 &&
+      form.lessonDurationMinutes
     )
   }
 
@@ -85,26 +72,14 @@ export function useEditService() {
     isLoading.value = true
     error.value = null
     try {
-      const data = await getService(serviceId)
+      const data = await serviceService.getService(serviceId)
       service.value = data
       form.subject = data.subjectId || ''
       form.teacher = data.teacherId || ''
       form.description = data.description || ''
       form.price = data.price ? data.price.toString() : ''
-      if (data.deadline) {
-        const deadlineDate = new Date(data.deadline)
-        const now = new Date()
-        const diffDays = Math.ceil(
-          (deadlineDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-        )
-        if (diffDays <= 1) form.deadline = '1'
-        else if (diffDays <= 3) form.deadline = '3'
-        else if (diffDays <= 7) form.deadline = '7'
-        else {
-          form.deadline = 'custom'
-          form.customDate = deadlineDate.toISOString().split('T')[0]
-        }
-      }
+      form.lessonsCount = data.lessonsCount != null ? String(data.lessonsCount) : ''
+      form.lessonDurationMinutes = data.lessonDurationMinutes != null ? String(data.lessonDurationMinutes) : ''
     } catch (err: any) {
       error.value = err.message || 'Ошибка загрузки услуги'
     } finally {
@@ -114,15 +89,26 @@ export function useEditService() {
 
   const updateServiceData = async () => {
     if (!validateForm()) return
+    const lessonsNum = parseInt(form.lessonsCount, 10)
+    const durationNum = parseInt(form.lessonDurationMinutes, 10)
+    if (isNaN(lessonsNum) || lessonsNum < 1 || lessonsNum > 200) {
+      telegramStore.showAlert('Количество занятий: от 1 до 200')
+      return
+    }
+    if (isNaN(durationNum) || durationNum < 15 || durationNum > 180) {
+      telegramStore.showAlert('Длительность занятия: от 15 до 180 минут')
+      return
+    }
     isSubmitting.value = true
     telegramStore.hapticFeedback('medium')
     try {
       const updateData: UpdateServiceDto = {
         price: parseInt(form.price),
         description: form.description,
-        deadline: getDeadlineDate(),
+        lessonsCount: lessonsNum,
+        lessonDurationMinutes: durationNum,
       }
-      await updateService(serviceId, updateData)
+      await serviceService.updateService(serviceId, updateData)
       telegramStore.hapticFeedback('heavy')
       router.push(PATHS.TUTOR_SERVICES)
     } catch (err: any) {
@@ -139,14 +125,14 @@ export function useEditService() {
     telegramStore.hapticFeedback('medium')
     try {
       if (service.value.status === 'ACTIVE') {
-        await deactivateService(serviceId)
+        const updated = await serviceService.deactivateService(serviceId)
+        service.value = updated
         telegramStore.showAlert('Услуга заморожена')
       } else {
-        await activateService(serviceId)
+        const updated = await serviceService.activateService(serviceId)
+        service.value = updated
         telegramStore.showAlert('Услуга активирована')
       }
-      // Перезагружаем данные услуги
-      await loadService()
     } catch (err: any) {
       console.error('Ошибка изменения статуса услуги:', err)
       telegramStore.showAlert('Ошибка при изменении статуса услуги. Попробуйте снова.')
@@ -159,7 +145,7 @@ export function useEditService() {
     isSubmitting.value = true
     telegramStore.hapticFeedback('medium')
     try {
-      await deleteService(serviceId)
+      await serviceService.deleteService(serviceId)
       showDeleteModal.value = false
       telegramStore.hapticFeedback('heavy')
       router.push(PATHS.TUTOR_SERVICES)
@@ -186,7 +172,7 @@ export function useEditService() {
     form,
     subjectOptions,
     teacherOptions,
-    deadlines: DEADLINES,
+    lessonDurationOptions: LESSON_DURATION_OPTIONS,
     educationLoading,
     educationError,
     initialize,
