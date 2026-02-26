@@ -29,8 +29,23 @@ function formatDate(dateString: string) {
   return formatResponseDate(dateString)
 }
 
-function formatDeadline(dateString: string | null) {
-  return formatResponseDeadline(dateString)
+function formatDeadline(dateString: string | null, type?: string) {
+  return formatResponseDeadline(dateString, type)
+}
+
+function formatBudgetType(type?: string) {
+  switch (type) {
+    case 'service-price':
+      return 'Цена услуги'
+    case 'flexible':
+      return 'Готов обсудить цену'
+    case 'lower':
+      return 'Ищу более низкую цену'
+    case 'higher':
+      return 'Готов доплатить за качество'
+    default:
+      return null
+  }
 }
 </script>
 
@@ -82,6 +97,12 @@ function formatDeadline(dateString: string | null) {
       <div>
         <span class="text-xs text-telegram-textSecondary">Предложенная цена:</span>
         <div class="text-sm font-medium text-telegram-success">{{ response.price }}₽</div>
+        <p
+          v-if="formatBudgetType(response.budgetType)"
+          class="mt-1 text-xs text-telegram-textSecondary"
+        >
+          {{ formatBudgetType(response.budgetType) }}
+        </p>
       </div>
       <div>
         <span class="text-xs text-telegram-textSecondary">Цена услуги:</span>
@@ -93,7 +114,7 @@ function formatDeadline(dateString: string | null) {
       <div class="flex items-center justify-between">
         <span class="text-sm text-telegram-textSecondary">Предложенный дедлайн:</span>
         <span class="text-sm font-medium text-telegram-text">
-          {{ formatDeadline(response.proposedDeadline) }}
+          {{ formatDeadline(response.proposedDeadline, response.proposedDeadlineType) }}
         </span>
       </div>
     </div>

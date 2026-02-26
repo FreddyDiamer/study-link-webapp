@@ -38,6 +38,10 @@ export interface ServiceResponseItem {
   message: string
   price: number
   proposedDeadline: string | null
+  // Тип дедлайна (today/week/month/custom), чтобы понимать "в течение месяца" и т.п.
+  proposedDeadlineType?: string
+  // Тип бюджета/ценового ожидания (service-price/flexible/lower/higher)
+  budgetType?: string
   status: ResponseStatus
   createdAt: string
   updatedAt: string

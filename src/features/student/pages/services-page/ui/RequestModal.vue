@@ -29,6 +29,13 @@ const form = reactive({
 })
 const isLoading = ref(false)
 
+const errors = reactive({
+  message: '' as string,
+  budget: '' as string,
+  customPrice: '' as string,
+  customDate: '' as string,
+})
+
 const budgetOptions = computed(() => [
   { value: 'service-price', label: `Цена услуги (${props.service?.price ?? 0}₽)` },
   { value: 'flexible', label: 'Готов обсудить цену' },
@@ -82,33 +89,84 @@ const handleSubmit = async () => {
     telegramStore.showAlert('Ошибка: не удалось определить пользователя')
     return
   }
-  isLoading.value = true
-  telegramStore.hapticFeedback('medium')
-  try {
-    if (form.urgency === 'custom') {
-      if (!form.customDate) {
-        telegramStore.showAlert('Пожалуйста, выберите дату')
-        isLoading.value = false
-        return
+  // сбрасываем ошибки
+  errors.message = ''
+  errors.budget = ''
+  errors.customPrice = ''
+  errors.customDate = ''
+
+  // Валидация сообщения
+  if (form.message.trim().length > 500) {
+    errors.message = 'Сообщение не должно превышать 500 символов'
+  }
+
+  // Валидация бюджета и цены
+  if (!form.budget) {
+    errors.budget = 'Выберите вариант бюджета'
+  }
+
+  const hasCustomPrice = form.budget !== 'service-price'
+  const priceValue = getPriceValue()
+
+  if (hasCustomPrice) {
+    if (!form.customPrice.trim()) {
+      errors.customPrice = 'Укажите сумму'
+    } else if (priceValue === undefined) {
+      errors.customPrice = 'Введите корректную сумму больше 0'
+    }
+  }
+
+  if (props.service) {
+    const servicePrice = props.service.price
+    if (form.budget === 'lower' && priceValue !== undefined) {
+      if (priceValue >= servicePrice) {
+        errors.customPrice = `Сумма должна быть ниже цены услуги (${servicePrice}₽)`
       }
+    }
+    if (form.budget === 'higher' && priceValue !== undefined) {
+      if (priceValue <= servicePrice) {
+        errors.customPrice = `Сумма должна быть выше цены услуги (${servicePrice}₽)`
+      }
+    }
+  }
+
+  // Валидация даты дедлайна
+  if (form.urgency === 'custom') {
+    if (!form.customDate) {
+      errors.customDate = 'Пожалуйста, выберите дату'
+    } else {
       const today = new Date()
       today.setHours(0, 0, 0, 0)
       const selected = new Date(form.customDate)
       selected.setHours(0, 0, 0, 0)
       if (selected < today) {
-        telegramStore.showAlert('Нельзя выбрать дату раньше сегодняшней')
-        isLoading.value = false
-        return
+        errors.customDate = 'Нельзя выбрать дату раньше сегодняшней'
       }
     }
+  }
 
-    const price = getPriceValue()
+  const hasErrors =
+    !!errors.message || !!errors.budget || !!errors.customPrice || !!errors.customDate
+
+  if (hasErrors) {
+    telegramStore.showAlert('Проверьте форму: есть ошибки в заполнении полей')
+    return
+  }
+
+  isLoading.value = true
+  telegramStore.hapticFeedback('medium')
+  try {
+    const price = priceValue
     await createServiceResponseMutation.mutateAsync({
       studentId: authStore.user.id,
       serviceId: props.service.id,
       message: form.message.trim() || undefined,
       price,
       proposedDeadline: getProposedDeadline(form.urgency, form.customDate || undefined),
+      // Сохраняем выбранную протяженность/тип дедлайна, чтобы репетитор видел "в течение месяца" и т.п.
+      proposedDeadlineType: form.urgency,
+      // Сохраняем выбранный тип бюджета/ценового ожидания
+      budgetType: form.budget,
     })
     telegramStore.showAlert('Отклик отправлен! Репетитор ответит в ближайшее время.')
     emit('submit')
@@ -155,9 +213,17 @@ watch(
             placeholder="Здравствуйте! Интересует помощь с ..."
             class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
           />
+          <p v-if="errors.message" class="mt-1 text-xs text-red-500">{{ errors.message }}</p>
         </div>
         <div>
-          <Select :value="form.budget" @update:value="(v) => (form.budget = v ?? '')" :options="budgetOptions" label="Бюджет" placeholder="Выберите бюджет" />
+          <Select
+            :value="form.budget"
+            @update:value="(v) => (form.budget = v ?? '')"
+            :options="budgetOptions"
+            label="Бюджет"
+            placeholder="Выберите бюджет"
+          />
+          <p v-if="errors.budget" class="mt-1 text-xs text-red-500">{{ errors.budget }}</p>
         </div>
         <div v-if="form.budget !== 'service-price'">
           <label class="block text-sm font-medium text-telegram-text mb-2">Ваша предложенная сумма (₽)</label>
@@ -168,6 +234,9 @@ watch(
             placeholder="Например: 1500"
             class="w-full"
           />
+          <p v-if="errors.customPrice" class="mt-1 text-xs text-red-500">
+            {{ errors.customPrice }}
+          </p>
         </div>
         <div>
           <Select
@@ -187,6 +256,9 @@ watch(
             :min="todayDate"
             class="w-full"
           />
+          <p v-if="errors.customDate" class="mt-1 text-xs text-red-500">
+            {{ errors.customDate }}
+          </p>
         </div>
       </div>
       <div class="flex space-x-3 pt-4">

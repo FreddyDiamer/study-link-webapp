@@ -185,6 +185,10 @@ export interface ServiceResponse {
   message?: string
   price?: number // предложенная цена студента
   proposedDeadline?: string
+   /** Тип дедлайна, выбранный студентом (today/week/month/custom) */
+  proposedDeadlineType?: string
+  /** Тип бюджета/ценового ожидания (service-price/flexible/lower/higher) */
+  budgetType?: string
   status: ResponseStatus
   createdAt: string
   updatedAt: string
@@ -302,6 +306,10 @@ export interface CreateServiceResponseDto {
   message?: string
   price?: number
   proposedDeadline?: string
+  /** Тип дедлайна, выбранный студентом (today/week/month/custom) */
+  proposedDeadlineType?: string
+  /** Тип бюджета/ценового ожидания (service-price/flexible/lower/higher) */
+  budgetType?: string
 }
 
 export interface CreateRequestResponseDto {

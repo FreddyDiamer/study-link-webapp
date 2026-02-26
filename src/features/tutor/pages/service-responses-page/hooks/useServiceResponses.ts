@@ -33,6 +33,8 @@ function mapResponseToItem(r: ServiceResponse): ServiceResponseItem {
     message: r.message ?? '',
     price: r.price ?? 0,
     proposedDeadline: r.proposedDeadline ?? null,
+    proposedDeadlineType: (r as any).proposedDeadlineType,
+    budgetType: (r as any).budgetType,
     status: r.status,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,

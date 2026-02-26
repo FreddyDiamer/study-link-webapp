@@ -26,6 +26,8 @@ export interface Service {
   workingHours: string
   availability: 'available' | 'busy' | 'limited'
   tags: string[]
+  /** Дата создания услуги (ISO-строка) */
+  createdAt: string
   /** true, если услуга принадлежит текущему пользователю (репетитору) */
   isOwnService?: boolean
   /** true, если текущий пользователь уже оставил заявку на эту услугу */

@@ -40,6 +40,7 @@ function mapApiToViewModel(api: ApiService): Service {
     workingHours: '',
     availability: 'available',
     tags: [],
+    createdAt: api.createdAt,
     isOwnService: api.isOwnService,
     currentUserResponded: api.currentUserResponded,
   }
@@ -85,6 +86,12 @@ export function useServicesPage() {
         case 'price': c = a.price - b.price; break
         case 'rating': c = a.teacher.rating - b.teacher.rating; break
         case 'experience': c = a.teacher.experience - b.teacher.experience; break
+        case 'date': {
+          const aTime = new Date(a.createdAt).getTime()
+          const bTime = new Date(b.createdAt).getTime()
+          c = aTime - bTime
+          break
+        }
         default: break
       }
       return filters.value.sortOrder === 'asc' ? c : -c
