@@ -15,25 +15,25 @@ const stats = [
     label: 'Репетиторов',
     value: props.totalTutors,
     icon: '👨‍🏫',
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-d-accent/15 text-d-accent',
   },
   {
     label: 'Услуг',
     value: props.totalServices,
     icon: '📚',
-    color: 'bg-green-50 text-green-600',
+    color: 'bg-d-teal/15 text-d-teal',
   },
   {
     label: 'Предметов',
     value: props.activeSubjects,
     icon: '📖',
-    color: 'bg-purple-50 text-purple-600',
+    color: 'bg-d-accent/15 text-d-accent',
   },
   {
     label: 'Заявок',
     value: props.totalRequests,
     icon: '📋',
-    color: 'bg-yellow-50 text-yellow-600',
+    color: 'bg-d-rating/15 text-d-rating',
   },
 ]
 </script>
@@ -43,15 +43,17 @@ const stats = [
     <div
       v-for="stat in stats"
       :key="stat.label"
-      class="bg-telegram-card rounded-xl p-4 border border-telegram-border"
+      class="bg-d-panel rounded-field p-4 border border-d-border"
     >
       <div class="flex items-center justify-between">
         <div class="flex-1">
-          <p class="text-sm text-telegram-textSecondary mb-1">{{ stat.label }}</p>
-          <p class="text-2xl font-bold text-telegram-text">{{ stat.value }}</p>
+          <p class="text-subhead text-d-text-second mb-1">{{ stat.label }}</p>
+          <p class="text-title-l font-bold text-d-text tnum">{{ stat.value }}</p>
         </div>
 
-        <div :class="['w-12 h-12 rounded-lg flex items-center justify-center text-xl', stat.color]">
+        <div
+          :class="['w-12 h-12 rounded-field flex items-center justify-center text-title-m', stat.color]"
+        >
           {{ stat.icon }}
         </div>
       </div>

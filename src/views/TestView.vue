@@ -1,19 +1,19 @@
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4">
+  <div class="min-h-screen bg-d-ink p-4">
     <div class="max-w-4xl mx-auto">
-      <h1 class="text-2xl font-bold text-telegram-text mb-8 text-center">
+      <h1 class="text-title-l font-bold text-d-text mb-8 text-center">
         Тестовая страница иконок
       </h1>
 
       <!-- Заказы -->
       <div class="mb-12">
-        <h2 class="text-xl font-semibold text-telegram-text mb-6">📋 Заказы</h2>
+        <h2 class="text-title-m font-semibold text-d-text mb-6">📋 Заказы</h2>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
           <!-- Вариант 1 - Clipboard (лучший) -->
           <div
-            class="flex flex-col items-center p-4 bg-telegram-card rounded-lg border-2 border-telegram-accent"
+            class="flex flex-col items-center p-4 bg-d-panel rounded-card border-2 border-d-accent"
           >
-            <div class="w-8 h-8 text-telegram-accent mb-2">
+            <div class="w-8 h-8 text-d-accent mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -23,13 +23,13 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text font-medium">Clipboard</span>
-            <span class="text-xs text-telegram-accent">✨ Лучший</span>
+            <span class="text-caption text-d-text font-medium">Clipboard</span>
+            <span class="text-caption text-d-accent">✨ Лучший</span>
           </div>
 
           <!-- Вариант 2 - Document -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -39,12 +39,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Document</span>
+            <span class="text-caption text-d-text">Document</span>
           </div>
 
           <!-- Вариант 3 - List -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -54,12 +54,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">List</span>
+            <span class="text-caption text-d-text">List</span>
           </div>
 
           <!-- Вариант 4 - Shopping bag -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -69,12 +69,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Shopping</span>
+            <span class="text-caption text-d-text">Shopping</span>
           </div>
 
           <!-- Вариант 5 - Folder -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -84,14 +84,14 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Folder</span>
+            <span class="text-caption text-d-text">Folder</span>
           </div>
 
           <!-- Вариант 6 - File text -->
           <div
-            class="flex flex-col items-center p-4 bg-telegram-card rounded-lg border-2 border-blue-500"
+            class="flex flex-col items-center p-4 bg-d-panel rounded-card border-2 border-d-accent"
           >
-            <div class="w-8 h-8 text-blue-500 mb-2">
+            <div class="w-8 h-8 text-d-accent mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -101,13 +101,13 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text font-medium">File Text</span>
-            <span class="text-xs text-blue-500">💙 Хорош</span>
+            <span class="text-caption text-d-text font-medium">File Text</span>
+            <span class="text-caption text-d-accent">💙 Хорош</span>
           </div>
 
           <!-- Вариант 7 - Check square -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -117,12 +117,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Check</span>
+            <span class="text-caption text-d-text">Check</span>
           </div>
 
           <!-- Вариант 8 - Package -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -132,12 +132,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Package</span>
+            <span class="text-caption text-d-text">Package</span>
           </div>
 
           <!-- Вариант 9 - Inbox -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -147,12 +147,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Inbox</span>
+            <span class="text-caption text-d-text">Inbox</span>
           </div>
 
           <!-- Вариант 10 - Calendar -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -162,12 +162,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Calendar</span>
+            <span class="text-caption text-d-text">Calendar</span>
           </div>
 
           <!-- Вариант 11 - Clock -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -177,12 +177,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Clock</span>
+            <span class="text-caption text-d-text">Clock</span>
           </div>
 
           <!-- Вариант 12 - Bookmark -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -192,20 +192,20 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Bookmark</span>
+            <span class="text-caption text-d-text">Bookmark</span>
           </div>
         </div>
       </div>
 
       <!-- Услуги -->
       <div class="mb-12">
-        <h2 class="text-xl font-semibold text-telegram-text mb-6">🛠️ Услуги</h2>
+        <h2 class="text-title-m font-semibold text-d-text mb-6">🛠️ Услуги</h2>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
           <!-- Вариант 1 - Briefcase (лучший) -->
           <div
-            class="flex flex-col items-center p-4 bg-telegram-card rounded-lg border-2 border-telegram-accent"
+            class="flex flex-col items-center p-4 bg-d-panel rounded-card border-2 border-d-accent"
           >
-            <div class="w-8 h-8 text-telegram-accent mb-2">
+            <div class="w-8 h-8 text-d-accent mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -215,13 +215,13 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text font-medium">Briefcase</span>
-            <span class="text-xs text-telegram-accent">✨ Лучший</span>
+            <span class="text-caption text-d-text font-medium">Briefcase</span>
+            <span class="text-caption text-d-accent">✨ Лучший</span>
           </div>
 
           <!-- Вариант 2 - Tools -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -231,12 +231,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Tools</span>
+            <span class="text-caption text-d-text">Tools</span>
           </div>
 
           <!-- Вариант 3 - Grid -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -246,12 +246,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Grid</span>
+            <span class="text-caption text-d-text">Grid</span>
           </div>
 
           <!-- Вариант 4 - Collection -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -261,12 +261,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Collection</span>
+            <span class="text-caption text-d-text">Collection</span>
           </div>
 
           <!-- Вариант 5 - Star -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -276,14 +276,14 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Star</span>
+            <span class="text-caption text-d-text">Star</span>
           </div>
 
           <!-- Вариант 6 - Service -->
           <div
-            class="flex flex-col items-center p-4 bg-telegram-card rounded-lg border-2 border-purple-500"
+            class="flex flex-col items-center p-4 bg-d-panel rounded-card border-2 border-d-accent"
           >
-            <div class="w-8 h-8 text-purple-500 mb-2">
+            <div class="w-8 h-8 text-d-accent mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -293,13 +293,13 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text font-medium">Service</span>
-            <span class="text-xs text-purple-500">💜 Хорош</span>
+            <span class="text-caption text-d-text font-medium">Service</span>
+            <span class="text-caption text-d-accent">💜 Хорош</span>
           </div>
 
           <!-- Вариант 7 - Lightbulb -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -309,12 +309,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Lightbulb</span>
+            <span class="text-caption text-d-text">Lightbulb</span>
           </div>
 
           <!-- Вариант 8 - Puzzle -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -324,12 +324,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Puzzle</span>
+            <span class="text-caption text-d-text">Puzzle</span>
           </div>
 
           <!-- Вариант 9 - Wrench -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -339,12 +339,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Wrench</span>
+            <span class="text-caption text-d-text">Wrench</span>
           </div>
 
           <!-- Вариант 10 - Hand -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -354,12 +354,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Hand</span>
+            <span class="text-caption text-d-text">Hand</span>
           </div>
 
           <!-- Вариант 11 - Shield -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -369,12 +369,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Shield</span>
+            <span class="text-caption text-d-text">Shield</span>
           </div>
 
           <!-- Вариант 12 - Target -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -384,20 +384,20 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Target</span>
+            <span class="text-caption text-d-text">Target</span>
           </div>
         </div>
       </div>
 
       <!-- Репетитор -->
       <div class="mb-12">
-        <h2 class="text-xl font-semibold text-telegram-text mb-6">👨‍🏫 Репетитор</h2>
+        <h2 class="text-title-m font-semibold text-d-text mb-6">👨‍🏫 Репетитор</h2>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
           <!-- Вариант 1 - Presentation (лучший) -->
           <div
-            class="flex flex-col items-center p-4 bg-telegram-card rounded-lg border-2 border-telegram-accent"
+            class="flex flex-col items-center p-4 bg-d-panel rounded-card border-2 border-d-accent"
           >
-            <div class="w-8 h-8 text-telegram-accent mb-2">
+            <div class="w-8 h-8 text-d-accent mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -407,15 +407,15 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text font-medium">Presentation</span>
-            <span class="text-xs text-telegram-accent">✨ Лучший</span>
+            <span class="text-caption text-d-text font-medium">Presentation</span>
+            <span class="text-caption text-d-accent">✨ Лучший</span>
           </div>
 
           <!-- Вариант 2 - Chalkboard -->
           <div
-            class="flex flex-col items-center p-4 bg-telegram-card rounded-lg border-2 border-green-500"
+            class="flex flex-col items-center p-4 bg-d-panel rounded-card border-2 border-d-teal"
           >
-            <div class="w-8 h-8 text-green-500 mb-2">
+            <div class="w-8 h-8 text-d-teal mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -425,13 +425,13 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text font-medium">Chalkboard</span>
-            <span class="text-xs text-green-500">🔥 Топ</span>
+            <span class="text-caption text-d-text font-medium">Chalkboard</span>
+            <span class="text-caption text-d-teal">🔥 Топ</span>
           </div>
 
           <!-- Вариант 3 - Teacher -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -441,12 +441,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Teacher</span>
+            <span class="text-caption text-d-text">Teacher</span>
           </div>
 
           <!-- Вариант 4 - Brain -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -456,14 +456,14 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Brain</span>
+            <span class="text-caption text-d-text">Brain</span>
           </div>
 
           <!-- Вариант 5 - Book -->
           <div
-            class="flex flex-col items-center p-4 bg-telegram-card rounded-lg border-2 border-orange-500"
+            class="flex flex-col items-center p-4 bg-d-panel rounded-card border-2 border-d-rating"
           >
-            <div class="w-8 h-8 text-orange-500 mb-2">
+            <div class="w-8 h-8 text-d-rating mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -473,13 +473,13 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text font-medium">Book</span>
-            <span class="text-xs text-orange-500">🔶 Простой</span>
+            <span class="text-caption text-d-text font-medium">Book</span>
+            <span class="text-caption text-d-rating">🔶 Простой</span>
           </div>
 
           <!-- Вариант 6 - Graduation -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -489,12 +489,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Graduation</span>
+            <span class="text-caption text-d-text">Graduation</span>
           </div>
 
           <!-- Вариант 7 - Calculator -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -504,12 +504,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Calculator</span>
+            <span class="text-caption text-d-text">Calculator</span>
           </div>
 
           <!-- Вариант 8 - Globe -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -519,12 +519,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Globe</span>
+            <span class="text-caption text-d-text">Globe</span>
           </div>
 
           <!-- Вариант 9 - Microscope -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -534,12 +534,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Science</span>
+            <span class="text-caption text-d-text">Science</span>
           </div>
 
           <!-- Вариант 10 - Music -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -549,12 +549,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Music</span>
+            <span class="text-caption text-d-text">Music</span>
           </div>
 
           <!-- Вариант 11 - Trophy -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -564,12 +564,12 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Trophy</span>
+            <span class="text-caption text-d-text">Trophy</span>
           </div>
 
           <!-- Вариант 12 - Clock -->
-          <div class="flex flex-col items-center p-4 bg-telegram-card rounded-lg">
-            <div class="w-8 h-8 text-telegram-text mb-2">
+          <div class="flex flex-col items-center p-4 bg-d-panel rounded-card border border-d-border">
+            <div class="w-8 h-8 text-d-text mb-2">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
@@ -579,39 +579,39 @@
                 />
               </svg>
             </div>
-            <span class="text-xs text-telegram-text">Schedule</span>
+            <span class="text-caption text-d-text">Schedule</span>
           </div>
         </div>
       </div>
 
       <!-- Рекомендации -->
-      <div class="bg-telegram-card p-6 rounded-lg border border-telegram-border">
-        <h3 class="text-lg font-semibold text-telegram-text mb-4">
+      <div class="bg-d-panel p-6 rounded-card border border-d-border">
+        <h3 class="text-title-m font-semibold text-d-text mb-4">
           💡 Мои обновленные рекомендации:
         </h3>
-        <div class="space-y-3 text-sm text-telegram-textSecondary">
-          <div class="p-3 bg-telegram-secondary rounded">
-            <div class="font-medium text-telegram-text">📋 Заказы — ТОП-3:</div>
+        <div class="space-y-3 text-subhead text-d-text-second">
+          <div class="p-3 bg-d-surface rounded-field">
+            <div class="font-medium text-d-text">📋 Заказы — ТОП-3:</div>
             <div>1. <strong>Clipboard</strong> ✨ — четко показывает список задач</div>
             <div>2. <strong>File Text</strong> 💙 — понятно для документов</div>
             <div>3. <strong>Check</strong> — простой и знакомый символ</div>
           </div>
 
-          <div class="p-3 bg-telegram-secondary rounded">
-            <div class="font-medium text-telegram-text">🛠️ Услуги — ТОП-3:</div>
+          <div class="p-3 bg-d-surface rounded-field">
+            <div class="font-medium text-d-text">🛠️ Услуги — ТОП-3:</div>
             <div>1. <strong>Briefcase</strong> ✨ — профессиональные услуги</div>
             <div>2. <strong>Service</strong> 💜 — прямо по назначению</div>
             <div>3. <strong>Grid</strong> — каталог услуг</div>
           </div>
 
-          <div class="p-3 bg-telegram-secondary rounded">
-            <div class="font-medium text-telegram-text">👨‍🏫 Репетитор — ТОП-3:</div>
+          <div class="p-3 bg-d-surface rounded-field">
+            <div class="font-medium text-d-text">👨‍🏫 Репетитор — ТОП-3:</div>
             <div>1. <strong>Chalkboard</strong> 🔥 — классический символ обучения</div>
             <div>2. <strong>Presentation</strong> ✨ — современное преподавание</div>
             <div>3. <strong>Book</strong> 🔶 — простой и понятный</div>
           </div>
 
-          <div class="text-xs text-telegram-textSecondary mt-4">
+          <div class="text-caption text-d-text-second mt-4">
             <strong>Принципы выбора:</strong> простота, узнаваемость, интуитивность для
             пользователей любого возраста
           </div>

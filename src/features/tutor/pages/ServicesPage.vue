@@ -294,11 +294,11 @@ const getStatusLabel = (status: ServiceStatus): string => {
 const getStatusClass = (status: ServiceStatus): string => {
   switch (status) {
     case 'active':
-      return 'bg-telegram-success/20 text-telegram-success'
+      return 'bg-d-teal/15 text-d-teal'
     case 'frozen':
-      return 'bg-yellow-500/20 text-yellow-600'
+      return 'bg-d-text-hint/15 text-d-text-hint'
     case 'deleted':
-      return 'bg-red-500/20 text-red-600'
+      return 'bg-d-coral/15 text-d-coral'
   }
 }
 
@@ -319,13 +319,13 @@ const getResponseStatusLabel = (status: RequestResponse['status']): string => {
 const getResponseStatusClass = (status: RequestResponse['status']): string => {
   switch (status) {
     case 'pending':
-      return 'bg-yellow-500/20 text-yellow-600'
+      return 'bg-d-rating/15 text-d-rating'
     case 'accepted':
-      return 'bg-telegram-success/20 text-telegram-success'
+      return 'bg-d-teal/15 text-d-teal'
     case 'rejected':
-      return 'bg-red-500/20 text-red-600'
+      return 'bg-d-coral/15 text-d-coral'
     case 'expired':
-      return 'bg-gray-500/20 text-gray-600'
+      return 'bg-d-text-hint/15 text-d-text-hint'
   }
 }
 
@@ -345,13 +345,13 @@ const getUrgencyLabel = (urgency?: RequestResponse['urgency']): string => {
 const getUrgencyClass = (urgency?: RequestResponse['urgency']): string => {
   switch (urgency) {
     case 'high':
-      return 'text-red-600'
+      return 'text-d-coral'
     case 'medium':
-      return 'text-yellow-600'
+      return 'text-d-rating'
     case 'low':
-      return 'text-green-600'
+      return 'text-d-teal'
     default:
-      return 'text-telegram-textSecondary'
+      return 'text-d-text-second'
   }
 }
 
@@ -372,13 +372,13 @@ const getDealStatusLabel = (status: ActiveDeal['status']): string => {
 const getDealStatusClass = (status: ActiveDeal['status']): string => {
   switch (status) {
     case 'pending':
-      return 'bg-yellow-500/20 text-yellow-600'
+      return 'bg-d-rating/15 text-d-rating'
     case 'accepted':
-      return 'bg-blue-500/20 text-blue-600'
+      return 'bg-d-teal/15 text-d-teal'
     case 'in_progress':
-      return 'bg-telegram-accent/20 text-telegram-accent'
+      return 'bg-d-accent/15 text-d-accent'
     case 'completed':
-      return 'bg-telegram-success/20 text-telegram-success'
+      return 'bg-d-teal/15 text-d-teal'
   }
 }
 
@@ -439,26 +439,26 @@ const activeDealsCount = ref(
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 pt-6">
+  <div class="min-h-screen bg-d-ink p-4 pt-6">
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-telegram-text mb-2">Управление услугами</h1>
-        <p class="text-telegram-textSecondary">Услуги, отклики и активные занятия</p>
+        <h1 class="text-2xl font-bold text-d-text mb-2">Управление услугами</h1>
+        <p class="text-d-text-second">Услуги, отклики и активные занятия</p>
       </div>
     </div>
 
     <!-- Tabs -->
-    <div class="flex bg-telegram-secondary rounded-xl p-1 mb-6">
+    <div class="flex bg-d-surface rounded-field p-1 mb-6">
       <button
         v-for="tab in tabs"
         :key="tab.id"
         @click="switchTab(tab.id as Tab)"
         :class="[
-          'flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200',
+          'flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg text-subhead font-medium transition-all duration-200',
           activeTab === tab.id
-            ? 'bg-telegram-card text-telegram-text shadow-sm'
-            : 'text-telegram-textSecondary hover:text-telegram-text',
+            ? 'bg-d-panel text-d-text shadow-sm'
+            : 'text-d-text-second hover:text-d-text',
         ]"
       >
         <span class="text-base">{{ tab.icon }}</span>
@@ -471,10 +471,10 @@ const activeDealsCount = ref(
       <!-- Empty State when no services -->
       <div v-if="activeServices.length === 0" class="text-center py-16">
         <div
-          class="w-24 h-24 bg-gradient-to-br from-telegram-accent/20 to-telegram-accent/10 rounded-full mx-auto mb-6 flex items-center justify-center"
+          class="w-24 h-24 bg-d-accent/15 rounded-full mx-auto mb-6 flex items-center justify-center"
         >
           <svg
-            class="w-12 h-12 text-telegram-accent"
+            class="w-12 h-12 text-d-accent"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -488,9 +488,9 @@ const activeDealsCount = ref(
           </svg>
         </div>
 
-        <h2 class="text-2xl font-bold text-telegram-text mb-3">Создайте свои услуги</h2>
+        <h2 class="text-2xl font-bold text-d-text mb-3">Создайте свои услуги</h2>
 
-        <p class="text-telegram-textSecondary mb-12 max-w-md mx-auto leading-relaxed">
+        <p class="text-d-text-second mb-12 max-w-md mx-auto leading-relaxed">
           Добавьте описания ваших услуг репетиторства с указанием предметов, стоимости и условий.
           Студенты смогут найти и выбрать подходящие занятия.
         </p>
@@ -498,7 +498,7 @@ const activeDealsCount = ref(
         <div class="flex justify-center">
           <Button
             @click="createService"
-            class="bg-gradient-to-r from-telegram-accent to-telegram-accent/80 hover:from-telegram-accent/90 hover:to-telegram-accent/70 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-white/20"
+            class="bg-d-accent text-d-ink px-8 py-3 font-semibold rounded-field transition-colors duration-200"
           >
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -517,15 +517,15 @@ const activeDealsCount = ref(
       <div v-else class="space-y-4">
         <!-- Create Service Card -->
         <Card
-          class="p-4 cursor-pointer hover:bg-telegram-accent/5 transition-colors border-2 border-dashed border-telegram-accent/30 hover:border-telegram-accent/50"
+          class="p-4 cursor-pointer hover:bg-d-accent/5 transition-colors border-2 border-dashed border-d-accent/30 hover:border-d-accent/50"
           @click="createService"
         >
           <div class="flex items-center space-x-4">
             <div
-              class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
+              class="w-10 h-10 bg-d-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
             >
               <svg
-                class="w-5 h-5 text-telegram-accent"
+                class="w-5 h-5 text-d-accent"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -539,8 +539,8 @@ const activeDealsCount = ref(
               </svg>
             </div>
             <div>
-              <h3 class="text-base font-semibold text-telegram-accent">Добавить услугу</h3>
-              <p class="text-telegram-textSecondary text-sm">Создайте новую услугу для студентов</p>
+              <h3 class="text-base font-semibold text-d-accent">Добавить услугу</h3>
+              <p class="text-d-text-second text-subhead">Создайте новую услугу для студентов</p>
             </div>
           </div>
         </Card>
@@ -550,7 +550,7 @@ const activeDealsCount = ref(
           <Card
             v-for="service in activeServices"
             :key="service.id"
-            class="p-6 cursor-pointer hover:bg-telegram-secondary/50 transition-colors"
+            class="p-6 cursor-pointer hover:bg-d-surface/50 transition-colors"
             :class="{ 'opacity-60': service.status === 'frozen' }"
             @click="viewService(service)"
           >
@@ -558,10 +558,10 @@ const activeDealsCount = ref(
             <div class="flex items-start justify-between mb-4">
               <div class="flex-1">
                 <div class="flex items-start justify-between">
-                  <h3 class="text-xl font-semibold text-telegram-text">{{ service.title }}</h3>
+                  <h3 class="text-xl font-semibold text-d-text">{{ service.title }}</h3>
                   <button
                     @click.stop="editService(service)"
-                    class="-mr-5 flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-telegram-secondary transition-colors text-telegram-textSecondary text-sm"
+                    class="-mr-5 flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-d-surface transition-colors text-d-text-second text-subhead"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -575,27 +575,27 @@ const activeDealsCount = ref(
                   </button>
                 </div>
 
-                <p class="text-telegram-textSecondary text-sm mb-3">
+                <p class="text-d-text-second text-subhead mb-3">
                   {{ service.teacher }}
                 </p>
 
                 <div class="flex items-center flex-wrap gap-2 mb-3">
                   <span
                     :class="[
-                      'px-2 py-1 text-xs font-medium rounded-full',
+                      'px-2 py-1 text-caption font-medium rounded-full',
                       getStatusClass(service.status),
                     ]"
                   >
                     {{ getStatusLabel(service.status) }}
                   </span>
                   <span
-                    class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-medium"
+                    class="px-2 py-1 text-caption bg-d-teal/15 text-d-teal rounded-full font-medium tnum"
                   >
                     {{ service.price }}₽
                   </span>
                   <span
                     v-if="service.newResponsesCount > 0"
-                    class="px-2 py-1 text-xs font-medium rounded-full bg-telegram-accent text-white animate-pulse"
+                    class="px-2 py-1 text-caption font-medium rounded-full bg-d-accent text-d-ink animate-pulse"
                   >
                     +{{ service.newResponsesCount }} новых
                   </span>
@@ -604,31 +604,31 @@ const activeDealsCount = ref(
             </div>
 
             <!-- Description -->
-            <p class="text-telegram-text text-sm mb-4">{{ service.description }}</p>
+            <p class="text-d-text text-subhead mb-4">{{ service.description }}</p>
 
             <!-- Responses Info -->
-            <div class="mb-4 p-3 bg-telegram-secondary/50 rounded-lg">
+            <div class="mb-4 p-3 bg-d-surface/50 rounded-lg">
               <div class="flex items-center justify-between">
                 <div class="text-center">
-                  <div class="text-lg font-semibold text-telegram-text">
+                  <div class="text-lg font-semibold text-d-text tnum">
                     {{ service.responsesCount }}
                   </div>
-                  <div class="text-xs text-telegram-textSecondary">Всего откликов</div>
+                  <div class="text-caption text-d-text-second">Всего откликов</div>
                 </div>
                 <div class="text-center">
-                  <div class="text-lg font-semibold text-telegram-accent">
+                  <div class="text-lg font-semibold text-d-accent tnum">
                     {{ service.activeResponsesCount }}
                   </div>
-                  <div class="text-xs text-telegram-textSecondary">Активных</div>
+                  <div class="text-caption text-d-text-second">Активных</div>
                 </div>
                 <div class="text-center">
-                  <div class="text-lg font-semibold text-telegram-success">
+                  <div class="text-lg font-semibold text-d-accent tnum">
                     {{ service.newResponsesCount }}
                   </div>
-                  <div class="text-xs text-telegram-textSecondary">Новых</div>
+                  <div class="text-caption text-d-text-second">Новых</div>
                 </div>
                 <svg
-                  class="w-5 h-5 text-telegram-textSecondary"
+                  class="w-5 h-5 text-d-text-second"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -654,15 +654,15 @@ const activeDealsCount = ref(
           <!-- Header -->
           <div class="flex items-start justify-between mb-3">
             <div class="flex-1">
-              <h3 class="text-lg font-semibold text-telegram-text mb-1">
+              <h3 class="text-lg font-semibold text-d-text mb-1">
                 {{ response.requestTitle }}
               </h3>
-              <p class="text-telegram-textSecondary text-sm mb-2">{{ response.studentName }}</p>
+              <p class="text-d-text-second text-subhead mb-2">{{ response.studentName }}</p>
             </div>
             <div class="flex items-center space-x-2">
               <span
                 :class="[
-                  'px-2 py-1 text-xs font-medium rounded-full',
+                  'px-2 py-1 text-caption font-medium rounded-full',
                   getResponseStatusClass(response.status),
                 ]"
               >
@@ -672,44 +672,44 @@ const activeDealsCount = ref(
           </div>
 
           <!-- Description -->
-          <p class="text-telegram-text text-sm mb-3 leading-relaxed">
+          <p class="text-d-text text-subhead mb-3 leading-relaxed">
             {{ response.requestDescription }}
           </p>
 
           <!-- Response Info -->
           <div
-            class="flex items-center justify-between p-3 bg-telegram-secondary/20 rounded-lg mb-3"
+            class="flex items-center justify-between p-3 bg-d-surface/20 rounded-lg mb-3"
           >
             <div class="flex items-center space-x-4">
               <div v-if="response.price" class="text-center">
-                <div class="text-telegram-success font-semibold">{{ response.price }}₽</div>
-                <div class="text-xs text-telegram-textSecondary">Моя цена</div>
+                <div class="text-d-accent font-semibold tnum">{{ response.price }}₽</div>
+                <div class="text-caption text-d-text-second">Моя цена</div>
               </div>
               <div v-if="response.budget" class="text-center">
-                <div class="text-telegram-text font-semibold">{{ response.budget }}₽</div>
-                <div class="text-xs text-telegram-textSecondary">Бюджет</div>
+                <div class="text-d-text font-semibold tnum">{{ response.budget }}₽</div>
+                <div class="text-caption text-d-text-second">Бюджет</div>
               </div>
             </div>
             <div class="text-right">
-              <div class="text-telegram-textSecondary text-xs">
+              <div class="text-d-text-second text-caption">
                 отправлен {{ response.createdAt.toLocaleDateString('ru-RU') }}
               </div>
             </div>
           </div>
 
           <!-- My Response -->
-          <div class="border-l-4 border-telegram-accent/30 pl-3 mb-4">
-            <p class="text-telegram-text text-sm italic">"{{ response.message }}"</p>
+          <div class="border-l-4 border-d-accent/30 pl-3 mb-4">
+            <p class="text-d-text text-subhead italic">"{{ response.message }}"</p>
           </div>
 
           <!-- Action -->
           <div
             v-if="response.status === 'pending'"
-            class="pt-2 border-t border-telegram-secondary/30 text-center"
+            class="pt-2 border-t border-d-surface/30 text-center"
           >
             <button
               @click="withdrawResponse(response)"
-              class="text-xs text-red-500 hover:underline transition-colors"
+              class="text-caption text-d-coral hover:underline transition-colors"
             >
               отозвать отклик
             </button>
@@ -720,10 +720,10 @@ const activeDealsCount = ref(
       <!-- Empty state для откликов -->
       <div v-else class="text-center py-16">
         <div
-          class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
+          class="w-20 h-20 bg-d-surface rounded-full mx-auto mb-6 flex items-center justify-center"
         >
           <svg
-            class="w-10 h-10 text-telegram-textSecondary"
+            class="w-10 h-10 text-d-text-second"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -737,9 +737,9 @@ const activeDealsCount = ref(
           </svg>
         </div>
 
-        <h2 class="text-xl font-semibold text-telegram-text mb-3">Нет откликов на заявки</h2>
+        <h2 class="text-xl font-semibold text-d-text mb-3">Нет откликов на заявки</h2>
 
-        <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+        <p class="text-d-text-second mb-8 max-w-sm mx-auto">
           Вы еще не откликались на заявки студентов. Ищите подходящие заказы в разделе "Заявки"
         </p>
       </div>
@@ -751,24 +751,24 @@ const activeDealsCount = ref(
         <Card
           v-for="deal in activeDeals"
           :key="deal.id"
-          class="p-6 cursor-pointer hover:bg-telegram-secondary/50 transition-colors"
+          class="p-6 cursor-pointer hover:bg-d-surface/50 transition-colors"
           @click="viewDealDetails(deal)"
         >
           <div class="mb-4">
             <div class="flex items-start space-x-4">
               <div
-                class="w-12 h-12 bg-telegram-accent/20 rounded-full flex items-center justify-center"
+                class="w-12 h-12 bg-d-accent/20 rounded-full flex items-center justify-center"
               >
-                <span class="text-telegram-accent font-semibold text-lg">
+                <span class="text-d-accent font-semibold text-lg">
                   {{ deal.studentName.charAt(0) }}
                 </span>
               </div>
               <div class="flex-1">
                 <div class="flex items-center space-x-3 mb-2">
-                  <h3 class="text-lg font-semibold text-telegram-text">{{ deal.studentName }}</h3>
+                  <h3 class="text-lg font-semibold text-d-text">{{ deal.studentName }}</h3>
                   <span
                     :class="[
-                      'px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap',
+                      'px-2 py-1 text-caption font-medium rounded-full whitespace-nowrap',
                       getDealStatusClass(deal.status),
                     ]"
                   >
@@ -779,10 +779,10 @@ const activeDealsCount = ref(
             </div>
 
             <div class="space-y-1">
-              <h4 class="text-lg font-semibold text-telegram-accent">
+              <h4 class="text-lg font-semibold text-d-accent">
                 {{ deal.subject }}
               </h4>
-              <p class="text-telegram-textSecondary text-sm">
+              <p class="text-d-text-second text-subhead">
                 {{ deal.teacher }}
               </p>
             </div>
@@ -792,7 +792,7 @@ const activeDealsCount = ref(
           <div class="mb-4">
             <div class="flex items-center mb-2">
               <svg
-                class="w-4 h-4 text-blue-600 mr-2"
+                class="w-4 h-4 text-d-accent mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -804,11 +804,11 @@ const activeDealsCount = ref(
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                 />
               </svg>
-              <span class="text-telegram-textSecondary text-xs font-medium uppercase tracking-wide"
+              <span class="text-d-text-second text-caption font-medium uppercase tracking-wide"
                 >Задача студента</span
               >
             </div>
-            <p class="text-telegram-text text-sm leading-relaxed pl-6">
+            <p class="text-d-text text-subhead leading-relaxed pl-6">
               {{ deal.taskDescription }}
             </p>
           </div>
@@ -817,7 +817,7 @@ const activeDealsCount = ref(
           <div v-if="deal.tutorComment" class="mb-4">
             <div class="flex items-center mb-2">
               <svg
-                class="w-4 h-4 text-telegram-accent mr-2"
+                class="w-4 h-4 text-d-accent mr-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -829,12 +829,12 @@ const activeDealsCount = ref(
                   d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                 />
               </svg>
-              <span class="text-telegram-textSecondary text-xs font-medium uppercase tracking-wide"
+              <span class="text-d-text-second text-caption font-medium uppercase tracking-wide"
                 >Мой комментарий</span
               >
             </div>
-            <div class="border-l-4 border-telegram-accent/30 pl-3 ml-3">
-              <p class="text-telegram-text text-sm leading-relaxed">
+            <div class="border-l-4 border-d-accent/30 pl-3 ml-3">
+              <p class="text-d-text text-subhead leading-relaxed">
                 {{ deal.tutorComment }}
               </p>
             </div>
@@ -842,25 +842,25 @@ const activeDealsCount = ref(
 
           <!-- Deal Info -->
           <div
-            class="bg-telegram-success/10 border-telegram-success text-telegram-success font-bold text-xl px-4 py-2 rounded-lg text-center mb-3"
+            class="bg-d-accent/10 border-d-accent text-d-accent font-bold text-xl px-4 py-2 rounded-lg text-center mb-3 tnum"
           >
             {{ deal.price }}₽
           </div>
           <div
-            class="flex items-center justify-around mb-4 p-3 bg-telegram-secondary/30 rounded-lg"
+            class="flex items-center justify-around mb-4 p-3 bg-d-surface/30 rounded-lg"
           >
             <div v-if="deal.deadline" class="text-center">
-              <div class="text-telegram-text font-medium">
+              <div class="text-d-text font-medium">
                 {{ deal.deadline.toLocaleDateString('ru-RU') }}
               </div>
-              <div class="text-telegram-textSecondary text-xs">крайний срок</div>
+              <div class="text-d-text-second text-caption">крайний срок</div>
             </div>
-            <div v-if="deal.deadline" class="w-px h-8 bg-telegram-secondary"></div>
+            <div v-if="deal.deadline" class="w-px h-8 bg-d-surface"></div>
             <div class="text-center">
-              <div class="text-telegram-text font-medium">
+              <div class="text-d-text font-medium">
                 {{ deal.createdAt.toLocaleDateString('ru-RU') }}
               </div>
-              <div class="text-telegram-textSecondary text-xs">начато</div>
+              <div class="text-d-text-second text-caption">начато</div>
             </div>
           </div>
 
@@ -875,10 +875,10 @@ const activeDealsCount = ref(
       <!-- Empty state для активных сделок -->
       <div v-else class="text-center py-16">
         <div
-          class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
+          class="w-20 h-20 bg-d-surface rounded-full mx-auto mb-6 flex items-center justify-center"
         >
           <svg
-            class="w-10 h-10 text-telegram-textSecondary"
+            class="w-10 h-10 text-d-text-second"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -892,9 +892,9 @@ const activeDealsCount = ref(
           </svg>
         </div>
 
-        <h2 class="text-xl font-semibold text-telegram-text mb-3">Нет активных занятий</h2>
+        <h2 class="text-xl font-semibold text-d-text mb-3">Нет активных занятий</h2>
 
-        <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+        <p class="text-d-text-second mb-8 max-w-sm mx-auto">
           У вас пока нет активных занятий. Принимайте отклики студентов, чтобы начать заниматься
         </p>
       </div>

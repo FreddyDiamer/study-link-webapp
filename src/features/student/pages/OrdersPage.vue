@@ -5,6 +5,7 @@ import { useOrder } from '@/shared/composables'
 import RequestsList from '../components/RequestsList.vue'
 import ResponsesList from '../components/ResponsesList.vue'
 import DealsList from '../components/DealsList.vue'
+import Loader from '@/shared/components/ui/Loader.vue'
 
 const telegramStore = useTelegramStore()
 const {
@@ -63,25 +64,25 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg pt-6">
+  <div class="min-h-screen bg-d-ink pt-6">
     <!-- Header -->
     <div class="px-4 mb-6">
-      <h1 class="text-2xl font-bold text-telegram-text mb-2">Мои дела</h1>
-      <p class="text-telegram-textSecondary">Заявки, отклики и активные уроки</p>
+      <h1 class="text-2xl font-bold text-d-text mb-2">Мои дела</h1>
+      <p class="text-d-text-second">Заявки, отклики и активные уроки</p>
     </div>
 
     <!-- Tabs -->
     <div class="px-4 mb-6">
-      <div class="flex bg-telegram-secondary rounded-xl p-1">
+      <div class="flex bg-d-surface rounded-field p-1">
         <button
           v-for="tab in tabs"
           :key="tab.id"
           @click="switchTab(tab.id as TabType)"
           :class="[
-            'flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200',
+            'flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg text-subhead font-medium transition-all duration-200',
             currentTab === tab.id
-              ? 'bg-telegram-card text-telegram-text shadow-sm'
-              : 'text-telegram-textSecondary hover:text-telegram-text',
+              ? 'bg-d-panel text-d-text font-semibold'
+              : 'text-d-text-second hover:text-d-text',
           ]"
         >
           <span class="text-base">{{ tab.icon }}</span>
@@ -93,7 +94,7 @@ onMounted(async () => {
     <!-- Tab Content -->
     <div class="flex-1">
       <div v-if="isLoading" class="flex justify-center py-8">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+        <Loader class="size-8 text-d-accent" />
       </div>
 
       <RequestsList v-else-if="currentTab === 'requests'" :items="requests?.items || []" />

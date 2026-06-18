@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
-import { Card, Button } from '@/shared/components/ui'
+import { Card, Button, StatusBadge } from '@/shared/components/ui'
 import type { Deal } from '@/shared/types'
 
 const router = useRouter()
@@ -14,35 +14,6 @@ const props = defineProps<{
 
 // Данные сделок, приходящие сверху
 const myDeals = computed(() => props.items ?? [])
-
-const getDealStatusInfo = (status: string) => {
-  switch (status) {
-    case 'PENDING':
-      return { color: 'bg-orange-500', text: 'Ожидает подтверждения', textColor: 'text-orange-600' }
-    case 'ACCEPTED':
-      return { color: 'bg-blue-500', text: 'Принята', textColor: 'text-blue-600' }
-    case 'IN_PROGRESS':
-      return {
-        color: 'bg-telegram-success',
-        text: 'В процессе',
-        textColor: 'text-telegram-success',
-      }
-    case 'COMPLETED':
-      return {
-        color: 'bg-telegram-textSecondary',
-        text: 'Завершена',
-        textColor: 'text-telegram-textSecondary',
-      }
-    case 'CANCELLED':
-      return { color: 'bg-red-500', text: 'Отменена', textColor: 'text-red-600' }
-    default:
-      return {
-        color: 'bg-telegram-textSecondary',
-        text: 'Неизвестно',
-        textColor: 'text-telegram-textSecondary',
-      }
-  }
-}
 
 const formatDeadline = (dateString: string | null) => {
   if (!dateString) return null
@@ -97,10 +68,10 @@ const startLesson = (deal: any) => {
     <!-- Empty State -->
     <div v-if="myDeals.length === 0" class="text-center py-16">
       <div
-        class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
+        class="w-20 h-20 bg-d-surface rounded-full mx-auto mb-6 flex items-center justify-center"
       >
         <svg
-          class="w-10 h-10 text-telegram-textSecondary"
+          class="w-10 h-10 text-d-text-second"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -113,8 +84,8 @@ const startLesson = (deal: any) => {
           />
         </svg>
       </div>
-      <h2 class="text-xl font-semibold text-telegram-text mb-3">У вас пока нет активных уроков</h2>
-      <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+      <h2 class="text-xl font-semibold text-d-text mb-3">У вас пока нет активных уроков</h2>
+      <p class="text-d-text-second mb-8 max-w-sm mx-auto">
         Найдите репетитора и начните обучение
       </p>
       <Button @click="findTutors" class="mx-auto">Найти репетитора</Button>
@@ -126,42 +97,34 @@ const startLesson = (deal: any) => {
         v-for="deal in myDeals"
         :key="deal.id"
         @click="viewDealDetails(deal)"
-        class="p-6 cursor-pointer hover:border-telegram-accent transition-colors duration-200"
+        class="p-6 cursor-pointer hover:border-d-accent transition-colors duration-200"
       >
         <!-- Header -->
         <div class="flex items-start justify-between mb-4">
           <div class="flex-1">
-            <h3 class="text-telegram-text font-semibold text-lg mb-1">
+            <h3 class="text-d-text font-semibold text-lg mb-1">
               {{ deal.subject?.name || 'Предмет' }} •
               {{ deal.teacher?.fullName || 'Преподаватель' }}
             </h3>
             <div class="flex items-center space-x-2 mb-2">
-              <span class="text-telegram-textSecondary text-sm">{{
+              <span class="text-d-text-second text-subhead">{{
                 deal.tutor?.name || 'Репетитор'
               }}</span>
               <div class="flex items-center space-x-1">
-                <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-4 h-4 text-d-rating" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                   />
                 </svg>
-                <span class="text-telegram-textSecondary text-sm">{{
+                <span class="text-d-text-second text-subhead tnum">{{
                   deal.tutor?.rating ?? '—'
                 }}</span>
               </div>
             </div>
           </div>
-          <div class="text-right">
-            <div
-              :class="[
-                'px-2 py-1 text-xs font-medium rounded-full mb-2',
-                getDealStatusInfo(deal.status).color,
-                'text-white',
-              ]"
-            >
-              {{ getDealStatusInfo(deal.status).text }}
-            </div>
-            <div class="text-telegram-success font-semibold text-sm">
+          <div class="flex flex-col items-end gap-2">
+            <StatusBadge :deal="deal.status" />
+            <div class="text-d-accent font-semibold text-subhead tnum">
               {{ formatPrice(deal.price) }}₽
             </div>
           </div>
@@ -169,9 +132,9 @@ const startLesson = (deal: any) => {
 
         <!-- Source Info -->
         <div class="mb-4">
-          <div class="flex items-center space-x-2 text-sm">
-            <span class="text-telegram-textSecondary">Источник:</span>
-            <span class="text-telegram-text">
+          <div class="flex items-center space-x-2 text-subhead">
+            <span class="text-d-text-second">Источник:</span>
+            <span class="text-d-text">
               {{ deal.serviceResponseId ? 'Отклик на услугу' : 'Отклик на заявку' }}
             </span>
           </div>
@@ -180,10 +143,10 @@ const startLesson = (deal: any) => {
         <!-- Deadline / Action -->
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-telegram-textSecondary text-xs mb-1">
+            <p class="text-d-text-second text-caption mb-1">
               {{ deal.deadline ? 'Дедлайн' : 'Создана' }}
             </p>
-            <p class="text-telegram-text text-sm">
+            <p class="text-d-text text-subhead">
               {{ deal.deadline ? formatDeadline(deal.deadline) : formatDate(deal.createdAt) }}
             </p>
           </div>
@@ -196,10 +159,10 @@ const startLesson = (deal: any) => {
             <Button
               size="sm"
               :class="[
-                'text-xs px-3 py-1.5',
+                'text-caption px-3 py-1.5',
                 deal.status === 'IN_PROGRESS'
-                  ? 'bg-telegram-success hover:bg-telegram-success/90'
-                  : 'bg-telegram-accent hover:bg-telegram-accent/90',
+                  ? 'bg-d-accent hover:bg-d-accent/90'
+                  : 'bg-d-accent hover:bg-d-accent/90',
               ]"
             >
               {{ deal.status === 'IN_PROGRESS' ? 'Продолжить' : 'Начать' }}

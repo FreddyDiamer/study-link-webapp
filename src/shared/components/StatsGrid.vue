@@ -26,12 +26,12 @@ const gridClasses = {
 }
 
 const colorClasses = {
-  blue: 'bg-blue-50 text-blue-600',
-  green: 'bg-green-50 text-green-600',
-  yellow: 'bg-yellow-50 text-yellow-600',
-  purple: 'bg-purple-50 text-purple-600',
-  red: 'bg-red-50 text-red-600',
-  orange: 'bg-orange-50 text-orange-600',
+  blue: 'bg-d-accent/15 text-d-accent',
+  green: 'bg-d-teal/15 text-d-teal',
+  yellow: 'bg-d-rating/15 text-d-rating',
+  purple: 'bg-d-accent/15 text-d-accent',
+  red: 'bg-d-coral/15 text-d-coral',
+  orange: 'bg-d-rating/15 text-d-rating',
 }
 </script>
 
@@ -40,16 +40,19 @@ const colorClasses = {
     <div
       v-for="stat in stats"
       :key="stat.label"
-      class="bg-telegram-card rounded-xl p-4 border border-telegram-border"
+      class="bg-d-panel rounded-field p-4 border border-d-border"
     >
       <div class="flex items-center justify-between">
         <div class="flex-1">
-          <p class="text-sm text-telegram-textSecondary mb-1">{{ stat.label }}</p>
-          <p class="text-2xl font-bold text-telegram-text">{{ stat.value }}</p>
+          <p class="text-subhead text-d-text-second mb-1">{{ stat.label }}</p>
+          <p class="text-title-l font-bold text-d-text tnum">{{ stat.value }}</p>
 
           <div v-if="stat.trend" class="flex items-center mt-2">
             <svg
-              :class="['w-4 h-4 mr-1', stat.trend.isPositive ? 'text-green-500' : 'text-red-500']"
+              :class="[
+                'w-4 h-4 mr-1',
+                stat.trend.isPositive ? 'text-d-teal' : 'text-d-coral',
+              ]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -71,8 +74,8 @@ const colorClasses = {
             </svg>
             <span
               :class="[
-                'text-xs font-medium',
-                stat.trend.isPositive ? 'text-green-600' : 'text-red-600',
+                'text-caption font-medium tnum',
+                stat.trend.isPositive ? 'text-d-teal' : 'text-d-coral',
               ]"
             >
               {{ stat.trend.isPositive ? '+' : '' }}{{ stat.trend.value }}%
@@ -82,7 +85,7 @@ const colorClasses = {
 
         <div
           :class="[
-            'w-12 h-12 rounded-lg flex items-center justify-center text-xl',
+            'w-12 h-12 rounded-card flex items-center justify-center text-title-l',
             colorClasses[stat.color || 'blue'],
           ]"
         >

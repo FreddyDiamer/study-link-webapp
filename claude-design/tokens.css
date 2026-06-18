@@ -1,0 +1,239 @@
+/* ============================================================
+   STUDY LINK — DEFIANT / RESPONSIVE EDITION
+   Дизайн-токены + анимации. Источник: study-link-defiant.dc.html
+   Палитра: холодный сланец + индиго. Золото = только рейтинг/отзывы.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   TAILWIND — вставить в tailwind.config.js → theme.extend
+   ------------------------------------------------------------
+colors: {
+  d: {
+    ink:            '#0E0F13',  // фон приложения
+    panel:          '#15171D',  // карточки, приподнятые блоки
+    surface:        '#21252E',  // вложенные поверхности, треки
+    border:         '#21252E',  // хайрлайн по умолчанию
+    'border-soft':  '#2A2F3A',  // обводка инпутов/иконок
+    'border-hover': '#3A4150',  // бордер карточки в hover
+    text:           '#E8EAED',  // основной текст
+    'text-bright':  '#C9CFD8',  // тело отзыва / акцентный текст
+    'text-second':  '#8A93A3',  // вторичный текст
+    'text-hint':    '#5B6472',  // подписи, мета
+    'text-mute':    '#4B5159',  // неактивная иконка таба
+    accent:         '#7C8CFF',  // ЕДИНСТВЕННЫЙ акцент действия
+    'accent-hi':    '#9AA6FF',  // акцент активного шага
+    rating:         '#FFC247',  // ТОЛЬКО рейтинг и отзывы
+    'rating-dim':   '#A8843C',  // мета рядом с рейтингом
+    teal:           '#3FB5A8',  // завершено / успех
+    coral:          '#E97A6B',  // аватар-чип
+    'sk-base':      '#1A1D24',  // скелетон — база
+    'sk-hi':        '#242833',  // скелетон — блик
+  },
+},
+borderRadius: { chip:'9px', field:'10px', card:'15px', sheet:'16px', avatar:'17px' },
+boxShadow: {
+  'd-logo':  '0 4px 18px rgba(124,140,255,.35)',
+  'd-toast': '0 12px 30px rgba(0,0,0,.4)',
+  'd-phone': '0 30px 90px rgba(0,0,0,.55)',
+},
+transitionTimingFunction: { 'd-spring':'cubic-bezier(.3,.8,.3,1)', 'd-out':'cubic-bezier(.2,.7,.2,1)' },
+   ------------------------------------------------------------ */
+
+:root {
+  /* ---- surfaces ---- */
+  --d-ink:            #0E0F13;
+  --d-panel:          #15171D;
+  --d-surface:        #21252E;
+  --d-border:         #21252E;
+  --d-border-soft:    #2A2F3A;
+  --d-border-hover:   #3A4150;
+
+  /* ---- text ---- */
+  --d-text:           #E8EAED;
+  --d-text-bright:    #C9CFD8;
+  --d-text-second:    #8A93A3;
+  --d-text-hint:      #5B6472;
+  --d-text-mute:      #4B5159;
+
+  /* ---- accent (действие) ---- */
+  --d-accent:         #7C8CFF;
+  --d-accent-hi:      #9AA6FF;
+  --d-accent-soft:    rgba(124,140,255,.16);
+  --d-accent-soft-2:  rgba(124,140,255,.18);
+
+  /* ---- rating (только отзвы/звёзды) ---- */
+  --d-rating:         #FFC247;
+  --d-rating-dim:     #A8843C;
+  --d-rating-soft:    rgba(255,194,71,.12);
+
+  /* ---- semantic / avatar chips ---- */
+  --d-teal:           #3FB5A8;
+  --d-teal-soft:      rgba(63,181,168,.16);
+  --d-coral:          #E97A6B;
+
+  /* ---- skeleton ---- */
+  --d-sk-base:        #1A1D24;
+  --d-sk-hi:          #242833;
+
+  /* ---- radius ---- */
+  --d-r-chip:   9px;   /* мелкие чипы, иконки-аватары шага */
+  --d-r-field:  10px;  /* инпуты, мелкие кнопки */
+  --d-r-card:   15px;  /* карточки ленты */
+  --d-r-sheet:  16px;  /* крупные блоки / репутация */
+  --d-r-avatar: 17px;  /* аватар профиля 60px */
+  --d-r-pill:   99px;  /* плашки, прогресс-треки */
+
+  /* ---- spacing (используемые шаги) ---- */
+  --d-sp-1: 4px;
+  --d-sp-2: 8px;
+  --d-sp-3: 12px;
+  --d-sp-4: 14px;
+  --d-sp-5: 16px;
+  --d-sp-6: 18px;
+
+  /* ---- shadows ---- */
+  --d-shadow-logo:  0 4px 18px rgba(124,140,255,.35);
+  --d-shadow-toast: 0 12px 30px rgba(0,0,0,.4);
+  --d-shadow-phone: 0 30px 90px rgba(0,0,0,.55);
+
+  /* ---- easing ---- */
+  --d-ease-spring: cubic-bezier(.3,.8,.3,1);  /* сегмент, заливка, степпер */
+  --d-ease-out:    cubic-bezier(.2,.7,.2,1);  /* всплытие карточек */
+  --d-ease-pop:    cubic-bezier(.2,.8,.2,1);  /* тост */
+}
+
+/* ---- status badge: единая палитра ----
+   PENDING      bg var(--d-rating-soft)   text var(--d-rating)   "Ожидает"
+   ACCEPTED     bg var(--d-accent-soft)   text var(--d-accent)   "Принята"
+   IN_PROGRESS  bg var(--d-accent-soft)   text var(--d-accent-hi) "В работе"
+   COMPLETED    bg var(--d-teal-soft)     text var(--d-teal)     "Завершена"
+   CANCELLED    bg rgba(91,100,114,.2)    text var(--d-text-second) "Отменена"
+   ------------------------------------------------------------ */
+
+
+/* ============================================================
+   ТИПОГРАФИКА (системный стек, как в Telegram)
+   ============================================================
+   font-family: -apple-system, "SF Pro Text", Roboto, "Segoe UI", sans-serif;
+
+   screen-title  26 / 1.0  700  ls -.02em   — заголовок экрана («Маркет», «Сделки»)
+   profile-name  21 / 1.0  700  ls -.01em
+   card-title    17 / 22   600              — заголовок карточки
+   price         19 / 1.0  700  tabular      — цена в ленте
+   price-lg      22 / 1.0  700  tabular      — цена в детали
+   rating-hero   38–40/.9  700  tabular      — крупный балл рейтинга
+   body          16 / 1.45 400              — текст, описания
+   review        14 / 1.45 400  (bright)    — текст отзыва
+   subhead       14 / 19   400  (second)    — вторичная строка карточки
+   caption       13 / 1.0  400/600 (hint)   — мета, авторы отзывов
+   overline      12 / 1.0  600  ls .05em UPPERCASE (hint) — лейблы секций
+   micro         10–11     600  ls .04em UPPERCASE — подписи степпера/табов
+   ============================================================ */
+
+
+/* ============================================================
+   АНИМАЦИИ — KEYFRAMES
+   ============================================================ */
+
+/* Скелетон: бегущий блик слева направо (бесконечно во время загрузки) */
+@keyframes d-shimmer {
+  0%   { background-position: -340px 0; }
+  100% { background-position:  340px 0; }
+}
+
+/* Всплытие: карточки/блоки появляются снизу со стаггером (one-shot) */
+@keyframes d-fadeup {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Рост по X: заливка полос распределения рейтинга и коннекторов степпера */
+@keyframes d-growx {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Выезд тоста сверху */
+@keyframes d-toastin {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Пружинное появление (для бейджей/галочек при необходимости) */
+@keyframes d-pop {
+  0%   { transform: scale(.6);  opacity: 0; }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* Вращение спиннера (button-level загрузка) */
+@keyframes d-ringspin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* ============================================================
+   АНИМАЦИИ — КЛАССЫ И TRANSITION'Ы
+   ============================================================ */
+
+/* Скелетон-плашка */
+.d-sk {
+  background: linear-gradient(90deg, var(--d-sk-base) 0%, var(--d-sk-hi) 50%, var(--d-sk-base) 100%);
+  background-size: 340px 100%;
+  animation: d-shimmer 1.3s infinite linear;
+  border-radius: 7px;
+}
+
+/* Всплытие при появлении (комбинируй с inline animation-delay для стаггера) */
+.d-reveal { animation: d-fadeup .5s var(--d-ease-out) both; }
+/* стаггер ленты: delay = index * 0.07s ; полосы рейтинга: 0.15s + j*0.06s */
+
+/* Тактильное нажатие — пружинит и реагирует бордером */
+.d-press {
+  transition: transform .12s ease, border-color .2s ease, background .2s ease;
+}
+.d-press:active { transform: scale(.975); }
+
+/* Тост */
+.d-toast { animation: d-toastin .26s var(--d-ease-pop); box-shadow: var(--d-shadow-toast); }
+
+/* Полоса заливки (рейтинг / коннектор степпера): transform-origin:left */
+.d-fill {
+  transform-origin: left;
+  animation: d-growx .7s var(--d-ease-spring) both;
+}
+
+/* Спиннер кнопки */
+.d-spinner { animation: d-ringspin .7s linear infinite; }
+
+/* ---- ОТДЕЛЬНЫЕ TRANSITION'Ы (на inline-элементах прототипа) ---- */
+
+/* Скользящий индикатор сегмент-контрола (двигается transform: translateX(0 | 100%)) */
+.d-seg-indicator { transition: transform .32s var(--d-ease-spring); }
+/* текст сегмента перекрашивается */
+.d-seg-label     { transition: color .25s; }
+
+/* Степпер: точка перекрашивается, коннектор заливается (scaleX 0→1) */
+.d-step-dot   { transition: background .4s, color .4s, border .4s; }
+.d-step-line  { transition: transform .5s var(--d-ease-spring); transform-origin: left; }
+
+/* Таб-бар: цвет активного таба */
+.d-tab        { transition: color .2s; }
+
+/* Карточка: бордер при hover (→ var(--d-border-hover)) */
+.d-card       { transition: border-color .2s ease; }
+
+
+/* ============================================================
+   СВОДКА ДЛИТЕЛЬНОСТЕЙ
+   ------------------------------------------------------------
+   нажатие (press)        120ms  ease
+   таб / текст / бордер   200–250ms
+   сегмент-индикатор      320ms  spring
+   степпер (точка/линия)  400–500ms  spring
+   всплытие карточки      500ms  ease-out  (+ стаггер 70ms)
+   полоса рейтинга        700ms  spring   (+ стаггер 60ms)
+   тост                   260ms  pop
+   скелетон-шиммер        1300ms loop
+   загрузка ленты         ~1500ms до контента
+   ============================================================ */

@@ -50,28 +50,28 @@ const targetLabel = props.targetRole === 'TUTOR' ? 'репетитора' : 'с�
     <div class="space-y-6">
       <!-- Header -->
       <div class="text-center">
-        <h3 class="text-lg font-semibold text-telegram-text mb-2">
+        <h3 class="text-title-m font-semibold text-d-text mb-2">
           Оставить отзыв о {{ targetLabel }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">Поделитесь своим опытом работы</p>
+        <p class="text-subhead text-d-text-second">Поделитесь своим опытом работы</p>
       </div>
 
       <!-- Rating -->
       <div class="text-center">
-        <label class="block text-sm font-medium text-telegram-text mb-3"> Оценка </label>
+        <label class="block text-subhead font-medium text-d-text mb-3"> Оценка </label>
         <Rating v-model:rating="rating" size="lg" :show-count="false" :readonly="false" />
       </div>
 
       <!-- Comment -->
       <div>
-        <label class="block text-sm font-medium text-telegram-text mb-2">
+        <label class="block text-subhead font-medium text-d-text mb-2">
           Комментарий (необязательно)
         </label>
         <textarea
           v-model="comment"
           rows="4"
           placeholder="Расскажите о своем опыте работы..."
-          class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
+          class="w-full px-4 py-3 bg-d-surface border border-d-border rounded-field text-d-text placeholder-d-text-second focus:outline-none focus:border-d-accent transition-colors resize-none"
         />
       </div>
 

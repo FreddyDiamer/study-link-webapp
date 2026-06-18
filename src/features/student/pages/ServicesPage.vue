@@ -13,7 +13,7 @@ import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
 import Input from '@/shared/components/ui/Input.vue'
 import { ArrowIcon, FilterIcon, LoupeIcon } from '@/shared/components/icons'
-import { Select, type SelectOption } from '@/shared/components/ui'
+import { Select, type SelectOption, Loader } from '@/shared/components/ui'
 import RequestModal from '../components/RequestModal.vue'
 
 // Types
@@ -262,14 +262,14 @@ const formatPrice = (price: number, type: string) => {
 
 const formatAvailability = (availability: string) => {
   const map = {
-    available: { text: 'Свободен', color: 'text-telegram-success' },
-    busy: { text: 'Занят', color: 'text-red-500' },
-    limited: { text: 'Ограниченно', color: 'text-yellow-500' },
+    available: { text: 'Свободен', color: 'text-d-accent' },
+    busy: { text: 'Занят', color: 'text-d-coral' },
+    limited: { text: 'Ограниченно', color: 'text-d-rating' },
   }
   return (
     map[availability as keyof typeof map] || {
       text: 'Неизвестно',
-      color: 'text-telegram-textSecondary',
+      color: 'text-d-text-second',
     }
   )
 }
@@ -352,7 +352,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 pt-6">
+  <div class="min-h-screen bg-d-ink p-4 pt-6">
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center">
@@ -360,8 +360,8 @@ onMounted(async () => {
           <ArrowIcon direction="left" />
         </Button>
         <div>
-          <h1 class="text-xl font-semibold text-telegram-text">{{ pageTitle }}</h1>
-          <p class="text-telegram-textSecondary text-sm">{{ resultStats.total }} услуг найдено</p>
+          <h1 class="text-xl font-semibold text-d-text">{{ pageTitle }}</h1>
+          <p class="text-d-text-second text-subhead">{{ resultStats.total }} услуг найдено</p>
         </div>
       </div>
 
@@ -387,7 +387,7 @@ onMounted(async () => {
     <div v-if="showFilters" class="mb-6">
       <Card class="p-4">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold text-telegram-text text-lg">Фильтры</h3>
+          <h3 class="font-semibold text-d-text text-lg">Фильтры</h3>
           <Button variant="ghost" size="sm" @click="resetFilters">Сбросить</Button>
         </div>
 
@@ -437,15 +437,13 @@ onMounted(async () => {
 
     <!-- Loading -->
     <div v-if="isLoading" class="text-center py-8">
-      <div
-        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-accent"
-      ></div>
-      <p class="text-telegram-textSecondary mt-2">Загрузка услуг...</p>
+      <Loader class="inline-block size-8 text-d-accent" />
+      <p class="text-d-text-second mt-2">Загрузка услуг...</p>
     </div>
 
     <!-- Error -->
     <div v-else-if="error" class="text-center py-8">
-      <div class="text-red-500 mb-2">{{ error }}</div>
+      <div class="text-d-coral mb-2">{{ error }}</div>
       <Button @click="loadServices" size="sm">Попробовать снова</Button>
     </div>
 
@@ -454,26 +452,26 @@ onMounted(async () => {
       <Card
         v-for="service in filteredServices"
         :key="service.id"
-        class="p-4 hover:border-telegram-accent transition-colors cursor-pointer"
+        class="p-4 hover:border-d-accent transition-colors cursor-pointer"
         @click="viewServiceDetails(service)"
       >
         <!-- Header -->
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1">
-            <h3 class="font-semibold text-telegram-text mb-1">{{ service.subject }}</h3>
-            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
+            <h3 class="font-semibold text-d-text mb-1">{{ service.subject }}</h3>
+            <div class="flex items-center space-x-2 text-subhead text-d-text-second">
               <span>{{ service.teacher.name }}</span>
             </div>
           </div>
           <div class="text-right">
-            <div class="font-bold text-telegram-accent">{{ service.price }} ₽</div>
+            <div class="font-bold text-d-accent tnum">{{ service.price }} ₽</div>
           </div>
         </div>
 
         <!-- Teacher Info -->
         <div class="flex items-center space-x-3 mb-3">
           <div
-            class="w-10 h-10 bg-telegram-accent rounded-full flex items-center justify-center text-white font-semibold text-sm"
+            class="w-10 h-10 bg-d-accent rounded-full flex items-center justify-center text-d-ink font-semibold text-subhead"
           >
             {{
               service.teacher.name
@@ -483,25 +481,25 @@ onMounted(async () => {
             }}
           </div>
           <div class="flex-1">
-            <div class="font-medium text-telegram-text">{{ service.teacher.name }}</div>
-            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
+            <div class="font-medium text-d-text">{{ service.teacher.name }}</div>
+            <div class="flex items-center space-x-2 text-subhead text-d-text-second">
               <span>{{ service.teacher.experience }} услуг</span>
               <span>•</span>
               <div class="flex items-center space-x-1">
-                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-3 h-3 text-d-rating" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                   />
                 </svg>
-                <span>{{ service.teacher.rating }}</span>
-                <span>({{ service.teacher.reviewsCount }})</span>
+                <span class="tnum">{{ service.teacher.rating }}</span>
+                <span class="tnum">({{ service.teacher.reviewsCount }})</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Description -->
-        <p class="text-telegram-textSecondary text-sm mb-3 line-clamp-5">
+        <p class="text-d-text-second text-subhead mb-3 line-clamp-5">
           {{ service.description }}
         </p>
 
@@ -517,10 +515,10 @@ onMounted(async () => {
     <!-- Empty State -->
     <div v-else class="text-center py-12 flex flex-col items-center justify-center">
       <div
-        class="w-16 h-16 bg-telegram-secondary rounded-full mx-auto mb-4 flex items-center justify-center"
+        class="w-16 h-16 bg-d-surface rounded-full mx-auto mb-4 flex items-center justify-center"
       >
         <svg
-          class="w-8 h-8 text-telegram-textSecondary"
+          class="w-8 h-8 text-d-text-second"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -533,8 +531,8 @@ onMounted(async () => {
           />
         </svg>
       </div>
-      <h3 class="text-telegram-text font-semibold mb-2">Услуги не найдены</h3>
-      <p class="text-telegram-textSecondary mb-4">Попробуйте изменить параметры поиска</p>
+      <h3 class="text-d-text font-semibold mb-2">Услуги не найдены</h3>
+      <p class="text-d-text-second mb-4">Попробуйте изменить параметры поиска</p>
       <Button @click="resetFilters" variant="secondary">Сбросить фильтры</Button>
     </div>
 

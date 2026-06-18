@@ -98,7 +98,7 @@ const isActiveRoute = (path: string) => {
 <template>
   <nav
     v-if="appStore.currentFlow && currentNavItems.length > 0"
-    class="fixed bottom-0 left-0 right-0 bg-telegram-card border-t border-telegram-border z-40"
+    class="fixed bottom-0 left-0 right-0 bg-d-panel border-t border-d-border z-40"
   >
     <div class="flex items-center justify-around px-2 py-2 safe-area-inset-bottom">
       <button
@@ -107,9 +107,8 @@ const isActiveRoute = (path: string) => {
         @click="navigateTo(item.path)"
         class="flex flex-col items-center justify-center py-2 px-3 min-w-0 flex-1 transition-all duration-200"
         :class="{
-          'text-telegram-accent': isActiveRoute(item.path) && appStore.isStudentFlow,
-          'text-telegram-success': isActiveRoute(item.path) && appStore.isTutorFlow,
-          'text-telegram-textSecondary hover:text-telegram-text': !isActiveRoute(item.path),
+          'text-d-accent': isActiveRoute(item.path),
+          'text-d-text-mute': !isActiveRoute(item.path),
         }"
       >
         <!-- Icon -->
@@ -123,7 +122,7 @@ const isActiveRoute = (path: string) => {
           <!-- Badge -->
           <div
             v-if="item.badge && item.badge > 0"
-            class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold min-w-4"
+            class="absolute -top-2 -right-2 w-4 h-4 bg-d-coral rounded-full flex items-center justify-center text-d-ink text-[10px] font-bold min-w-4"
           >
             {{ item.badge > 9 ? '9+' : item.badge }}
           </div>
@@ -131,7 +130,7 @@ const isActiveRoute = (path: string) => {
 
         <!-- Label -->
         <span
-          class="text-xs font-medium leading-none transition-all duration-200 whitespace-nowrap"
+          class="text-[10px] font-medium leading-none transition-all duration-200 whitespace-nowrap"
           :class="{
             'font-semibold': isActiveRoute(item.path),
           }"

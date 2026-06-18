@@ -18,15 +18,15 @@ const myRequests = computed(() => props.items ?? [])
 const getRequestStatusInfo = (status: string) => {
   switch (status) {
     case 'OPEN':
-      return { color: 'bg-telegram-success', text: 'Открыта' }
+      return { color: 'bg-d-accent', text: 'Открыта' }
     case 'MATCHED':
-      return { color: 'bg-blue-500', text: 'Найден репетитор' }
+      return { color: 'bg-d-accent', text: 'Найден репетитор' }
     case 'CLOSED':
-      return { color: 'bg-telegram-textSecondary', text: 'Закрыта' }
+      return { color: 'bg-d-text-second', text: 'Закрыта' }
     case 'CANCELLED':
-      return { color: 'bg-red-500', text: 'Отменена' }
+      return { color: 'bg-d-coral', text: 'Отменена' }
     default:
-      return { color: 'bg-telegram-textSecondary', text: 'Неизвестно' }
+      return { color: 'bg-d-text-second', text: 'Неизвестно' }
   }
 }
 
@@ -82,10 +82,10 @@ const editRequest = (request: any, event: Event) => {
     <!-- Empty State -->
     <div v-if="myRequests.length === 0" class="text-center py-16">
       <div
-        class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
+        class="w-20 h-20 bg-d-surface rounded-full mx-auto mb-6 flex items-center justify-center"
       >
         <svg
-          class="w-10 h-10 text-telegram-textSecondary"
+          class="w-10 h-10 text-d-text-second"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -98,8 +98,8 @@ const editRequest = (request: any, event: Event) => {
           />
         </svg>
       </div>
-      <h2 class="text-xl font-semibold text-telegram-text mb-3">У вас пока нет заявок</h2>
-      <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+      <h2 class="text-xl font-semibold text-d-text mb-3">У вас пока нет заявок</h2>
+      <p class="text-d-text-second mb-8 max-w-sm mx-auto">
         Создайте первую заявку на поиск репетитора и получайте отклики
       </p>
       <Button @click="createRequest" class="mx-auto">Создать заявку</Button>
@@ -109,15 +109,15 @@ const editRequest = (request: any, event: Event) => {
     <div v-else class="space-y-4">
       <!-- Create Request Card -->
       <Card
-        class="p-4 cursor-pointer hover:bg-telegram-accent/5 transition-colors border-2 border-dashed border-telegram-accent/30 hover:border-telegram-accent/50"
+        class="p-4 cursor-pointer hover:bg-d-accent/5 transition-colors border-2 border-dashed border-d-accent/30 hover:border-d-accent/50"
         @click="createRequest"
       >
         <div class="flex items-center space-x-4">
           <div
-            class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
+            class="w-10 h-10 bg-d-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
           >
             <svg
-              class="w-5 h-5 text-telegram-accent"
+              class="w-5 h-5 text-d-accent"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -131,8 +131,8 @@ const editRequest = (request: any, event: Event) => {
             </svg>
           </div>
           <div>
-            <h3 class="text-base font-semibold text-telegram-accent">Создать заявку</h3>
-            <p class="text-telegram-textSecondary text-sm">Найдите репетитора для ваших задач</p>
+            <h3 class="text-base font-semibold text-d-accent">Создать заявку</h3>
+            <p class="text-d-text-second text-subhead">Найдите репетитора для ваших задач</p>
           </div>
         </div>
       </Card>
@@ -142,17 +142,17 @@ const editRequest = (request: any, event: Event) => {
         v-for="request in myRequests"
         :key="request.id"
         @click="viewRequestDetails(request)"
-        class="p-6 cursor-pointer hover:border-telegram-accent transition-colors duration-200"
+        class="p-6 cursor-pointer hover:border-d-accent transition-colors duration-200"
       >
         <!-- Header -->
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1 pr-3">
-            <h3 class="text-lg font-semibold text-telegram-text mb-1">
+            <h3 class="text-title-m font-semibold text-d-text mb-1">
               {{ request.subject?.name || 'Предмет' }} •
               {{ request.teacher?.fullName || 'Преподаватель' }}
             </h3>
             <div class="flex items-center space-x-3">
-              <span class="text-telegram-success font-semibold"
+              <span class="text-d-accent font-semibold tnum"
                 >до {{ formatPrice(request.budget || 0) }}₽</span
               >
             </div>
@@ -160,7 +160,7 @@ const editRequest = (request: any, event: Event) => {
           <!-- TODO: Добавить редактирование заявки -->
           <!-- <button
             @click="editRequest(request, $event)"
-            class="p-2 text-telegram-textSecondary hover:text-telegram-text hover:bg-telegram-secondary/50 rounded-lg transition-colors flex-shrink-0"
+            class="p-2 text-d-text-second hover:text-d-text hover:bg-d-surface/50 rounded-lg transition-colors flex-shrink-0"
             title="Редактировать заявку"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,23 +175,23 @@ const editRequest = (request: any, event: Event) => {
         </div>
 
         <!-- Description -->
-        <p class="text-telegram-text text-sm mb-4">{{ request.description }}</p>
+        <p class="text-d-text text-subhead mb-4">{{ request.description }}</p>
 
         <!-- Details -->
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-telegram-textSecondary text-xs mb-1">Создана</p>
-            <p class="text-telegram-text text-sm">{{ formatDate(request.createdAt) }}</p>
+            <p class="text-d-text-second text-caption mb-1">Создана</p>
+            <p class="text-d-text text-subhead">{{ formatDate(request.createdAt) }}</p>
           </div>
           <div class="text-right">
-            <p class="text-telegram-textSecondary text-xs mb-1">Откликов</p>
+            <p class="text-d-text-second text-caption mb-1">Откликов</p>
             <div class="flex items-center justify-end space-x-2">
-              <span class="text-telegram-text text-lg font-bold">{{
+              <span class="text-d-text text-title-m font-bold tnum">{{
                 (request as any)?._count?.responses ?? 0
               }}</span>
               <div
                 v-if="(request as any)?.newResponsesCount > 0"
-                class="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                class="w-5 h-5 bg-d-coral rounded-full flex items-center justify-center text-d-ink text-caption font-bold tnum"
               >
                 {{ (request as any)?.newResponsesCount }}
               </div>

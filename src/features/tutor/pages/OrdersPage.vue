@@ -145,40 +145,40 @@ const getDealStatusInfo = (status: string) => {
   switch (status) {
     case 'PENDING':
       return {
-        color: 'bg-orange-500',
+        color: 'bg-d-rating',
         text: 'Ожидает подтверждения',
-        textColor: 'text-orange-600',
-        bg: 'bg-orange-100',
+        textColor: 'text-d-rating',
+        bg: 'bg-d-rating/15',
       }
     case 'ACCEPTED':
       return {
-        color: 'bg-blue-500',
+        color: 'bg-d-accent',
         text: 'Принята',
-        textColor: 'text-blue-600',
-        bg: 'bg-blue-100',
+        textColor: 'text-d-accent',
+        bg: 'bg-d-accent/15',
       }
     case 'IN_PROGRESS':
       return {
-        color: 'bg-telegram-success',
+        color: 'bg-d-accent',
         text: 'В процессе',
-        textColor: 'text-telegram-success',
-        bg: 'bg-green-100',
+        textColor: 'text-d-accent',
+        bg: 'bg-d-teal/15',
       }
     case 'COMPLETED':
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-d-text-second',
         text: 'Завершена',
-        textColor: 'text-telegram-textSecondary',
-        bg: 'bg-gray-100',
+        textColor: 'text-d-text-second',
+        bg: 'bg-d-text-hint/20',
       }
     case 'CANCELLED':
-      return { color: 'bg-red-500', text: 'Отменена', textColor: 'text-red-600', bg: 'bg-red-100' }
+      return { color: 'bg-d-coral', text: 'Отменена', textColor: 'text-d-coral', bg: 'bg-d-coral/15' }
     default:
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-d-text-second',
         text: 'Неизвестно',
-        textColor: 'text-telegram-textSecondary',
-        bg: 'bg-gray-100',
+        textColor: 'text-d-text-second',
+        bg: 'bg-d-text-hint/20',
       }
   }
 }
@@ -396,7 +396,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 pt-6">
+  <div class="min-h-screen bg-d-ink p-4 pt-6">
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center">
@@ -411,8 +411,8 @@ onMounted(() => {
           </svg>
         </Button>
         <div>
-          <h1 class="text-xl font-semibold text-telegram-text">{{ pageTitle }}</h1>
-          <p class="text-telegram-textSecondary text-sm">{{ resultStats.total }} заказов найдено</p>
+          <h1 class="text-xl font-semibold text-d-text">{{ pageTitle }}</h1>
+          <p class="text-d-text-second text-subhead">{{ resultStats.total }} заказов найдено</p>
         </div>
       </div>
 
@@ -437,7 +437,7 @@ onMounted(() => {
       >
         <template #prepend>
           <svg
-            class="w-4 h-4 text-telegram-textSecondary"
+            class="w-4 h-4 text-d-text-second"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -457,7 +457,7 @@ onMounted(() => {
     <div v-if="showFilters" class="mb-6">
       <Card class="p-4">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold text-telegram-text">Фильтры</h3>
+          <h3 class="font-semibold text-d-text">Фильтры</h3>
           <Button variant="ghost" size="sm" @click="resetFilters">Сбросить</Button>
         </div>
 
@@ -507,15 +507,13 @@ onMounted(() => {
 
     <!-- Loading -->
     <div v-if="isLoading" class="text-center py-8">
-      <div
-        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-accent"
-      ></div>
-      <p class="text-telegram-textSecondary mt-2">Загрузка заказов...</p>
+      <Loader class="inline-block h-8 w-8 text-d-accent" />
+      <p class="text-d-text-second mt-2">Загрузка заказов...</p>
     </div>
 
     <!-- Error -->
     <div v-else-if="error" class="text-center py-8">
-      <div class="text-red-500 mb-2">{{ error }}</div>
+      <div class="text-d-coral mb-2">{{ error }}</div>
       <Button @click="loadOrders" size="sm">Попробовать снова</Button>
     </div>
 
@@ -525,20 +523,20 @@ onMounted(() => {
         <!-- Header -->
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1">
-            <h3 class="font-semibold text-telegram-text mb-1">{{ order.subject.name }}</h3>
-            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary mb-2">
+            <h3 class="font-semibold text-d-text mb-1">{{ order.subject.name }}</h3>
+            <div class="flex items-center space-x-2 text-subhead text-d-text-second mb-2">
               <span>{{ order.teacher.fullName }}</span>
             </div>
           </div>
           <div class="text-right">
-            <div class="font-bold text-telegram-accent">{{ order.budget ?? '—' }} ₽</div>
+            <div class="font-bold text-d-accent tnum">{{ order.budget ?? '—' }} ₽</div>
           </div>
         </div>
 
         <!-- Student Info -->
         <div class="flex items-center space-x-3 mb-3">
           <div
-            class="w-10 h-10 bg-telegram-accent rounded-full flex items-center justify-center text-white font-semibold text-sm"
+            class="w-10 h-10 bg-d-accent rounded-full flex items-center justify-center text-d-ink font-semibold text-subhead"
           >
             {{
               order.student.name
@@ -548,13 +546,13 @@ onMounted(() => {
             }}
           </div>
           <div class="flex-1">
-            <div class="font-medium text-telegram-text">{{ order.student.name }}</div>
-            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
+            <div class="font-medium text-d-text">{{ order.student.name }}</div>
+            <div class="flex items-center space-x-2 text-subhead text-d-text-second">
               <!-- TODO вернуть -->
               <!-- <span>{{ 5 }} заказов</span>
               <span>•</span>
               <div class="flex items-center space-x-1">
-                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-3 h-3 text-d-rating" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                   />
@@ -565,12 +563,12 @@ onMounted(() => {
           </div>
         </div>
 
-        <p class="text-sm line-clamp-5 leading-relaxed mb-3">
+        <p class="text-subhead line-clamp-5 leading-relaxed mb-3">
           {{ getDealDescription(order) }}
         </p>
 
         <!-- Meta Info -->
-        <div class="flex items-center justify-between text-sm text-telegram-textSecondary mb-3">
+        <div class="flex items-center justify-between text-subhead text-d-text-second mb-3">
           <span>Создан: {{ formatDate(order.createdAt) }}</span>
           <span v-if="order.deadline">Дедлайн: {{ formatDate(order.deadline) }}</span>
         </div>
@@ -587,10 +585,10 @@ onMounted(() => {
     <!-- Empty State -->
     <div v-else class="text-center py-12">
       <div
-        class="w-16 h-16 bg-telegram-secondary rounded-full mx-auto mb-4 flex items-center justify-center"
+        class="w-16 h-16 bg-d-surface rounded-full mx-auto mb-4 flex items-center justify-center"
       >
         <svg
-          class="w-8 h-8 text-telegram-textSecondary"
+          class="w-8 h-8 text-d-text-second"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -603,8 +601,8 @@ onMounted(() => {
           />
         </svg>
       </div>
-      <h3 class="text-telegram-text font-semibold mb-2">Заказы не найдены</h3>
-      <p class="text-telegram-textSecondary mb-4">Попробуйте изменить параметры поиска</p>
+      <h3 class="text-d-text font-semibold mb-2">Заказы не найдены</h3>
+      <p class="text-d-text-second mb-4">Попробуйте изменить параметры поиска</p>
       <Button @click="resetFilters" variant="secondary">Сбросить фильтры</Button>
     </div>
 
@@ -613,9 +611,9 @@ onMounted(() => {
       <div v-if="selectedRequest" class="space-y-5 max-h-[60vh] overflow-y-auto pr-2">
         <div class="space-y-3 mb-7 mt-2">
           <!-- Student Info -->
-          <div class="flex items-center space-x-3 bg-telegram-secondary/20 rounded-xl">
+          <div class="flex items-center space-x-3 bg-d-surface/20 rounded-field">
             <div
-              class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-semibold"
+              class="w-12 h-12 bg-d-accent rounded-full flex items-center justify-center text-d-ink font-semibold"
             >
               {{
                 selectedRequest.student.name
@@ -625,36 +623,36 @@ onMounted(() => {
               }}
             </div>
             <div class="flex-1">
-              <h3 class="font-semibold text-telegram-text">{{ selectedRequest.student.name }}</h3>
+              <h3 class="font-semibold text-d-text">{{ selectedRequest.student.name }}</h3>
             </div>
             <div class="text-right">
-              <div class="font-bold text-telegram-accent text-lg">
+              <div class="font-bold text-d-accent text-lg tnum">
                 {{ selectedRequest.budget ?? '—' }} ₽
               </div>
             </div>
           </div>
           <!-- Order Description -->
-          <div class="bg-telegram-bg/50 border-l-4 border-telegram-accent p-4 rounded-r-lg">
-            <p class="text-telegram-text leading-relaxed italic">
+          <div class="bg-d-ink/50 border-l-4 border-d-accent p-4 rounded-r-lg">
+            <p class="text-d-text leading-relaxed italic">
               {{ getDealDescription(selectedRequest) }}
             </p>
           </div>
           <!-- Meta Info -->
-          <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="grid grid-cols-2 gap-4 text-subhead">
             <div class="flex items-center space-x-2">
-              <div class="w-2 h-2 bg-telegram-accent rounded-full"></div>
-              <span class="text-telegram-textSecondary">
+              <div class="w-2 h-2 bg-d-accent rounded-full"></div>
+              <span class="text-d-text-second">
                 Дедлайн:
-                <span class="text-telegram-text">{{
+                <span class="text-d-text">{{
                   selectedRequest.deadline ? formatDate(selectedRequest.deadline) : 'Не установлен'
                 }}</span>
               </span>
             </div>
             <div class="flex items-center space-x-2">
-              <div class="w-2 h-2 bg-telegram-textSecondary rounded-full"></div>
-              <span class="text-telegram-textSecondary">
+              <div class="w-2 h-2 bg-d-text-second rounded-full"></div>
+              <span class="text-d-text-second">
                 Создан:
-                <span class="text-telegram-text">{{ formatDate(selectedRequest.createdAt) }}</span>
+                <span class="text-d-text">{{ formatDate(selectedRequest.createdAt) }}</span>
               </span>
             </div>
           </div>
@@ -663,21 +661,21 @@ onMounted(() => {
         <!-- Proposed Date and Price -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-telegram-text mb-2">
+            <label class="block text-subhead font-medium text-d-text mb-2">
               Предложить дату и время *
             </label>
             <input
               v-model="proposedDate"
               type="datetime-local"
               required
-              class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:outline-none focus:border-telegram-accent transition-colors"
+              class="w-full px-4 py-3 bg-d-surface border border-d-border rounded-field text-d-text focus:outline-none focus:border-d-accent transition-colors"
             />
-            <p class="text-xs text-telegram-textSecondary mt-1">Когда вы готовы провести занятие</p>
+            <p class="text-caption text-d-text-second mt-1">Когда вы готовы провести занятие</p>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-telegram-text mb-2">
-              Ваша цена <span class="text-telegram-textSecondary">(необязательно)</span>
+            <label class="block text-subhead font-medium text-d-text mb-2">
+              Ваша цена <span class="text-d-text-second">(необязательно)</span>
             </label>
             <div class="relative">
               <input
@@ -686,14 +684,14 @@ onMounted(() => {
                 min="0"
                 step="50"
                 placeholder="₽"
-                class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors"
+                class="w-full px-4 py-3 bg-d-surface border border-d-border rounded-field text-d-text placeholder-d-text-second focus:outline-none focus:border-d-accent transition-colors"
               />
               <span
-                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-telegram-textSecondary text-sm"
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-d-text-second text-subhead"
                 >₽</span
               >
             </div>
-            <p class="text-xs text-telegram-textSecondary mt-1">
+            <p class="text-caption text-d-text-second mt-1">
               Оставьте пустым, если согласны с указанной ценой
             </p>
           </div>
@@ -701,16 +699,16 @@ onMounted(() => {
 
         <!-- Tutor Comment -->
         <div>
-          <label class="block text-sm font-medium text-telegram-text mb-2">
-            Ваш комментарий <span class="text-telegram-textSecondary">(необязательно)</span>
+          <label class="block text-subhead font-medium text-d-text mb-2">
+            Ваш комментарий <span class="text-d-text-second">(необязательно)</span>
           </label>
           <textarea
             v-model="tutorComment"
             rows="3"
             placeholder="Напишите ваши предложения, условия или дополнительную информацию..."
-            class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
+            class="w-full px-4 py-3 bg-d-surface border border-d-border rounded-field text-d-text placeholder-d-text-second focus:outline-none focus:border-d-accent transition-colors resize-none"
           />
-          <p class="text-xs text-telegram-textSecondary mt-1">
+          <p class="text-caption text-d-text-second mt-1">
             Студент увидит ваш комментарий вместе с откликом
           </p>
         </div>

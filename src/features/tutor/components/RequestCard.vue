@@ -37,23 +37,23 @@ const handleViewDetails = () => {
 </script>
 
 <template>
-  <Card class="p-4 mb-4 hover:shadow-lg transition-shadow">
+  <Card class="p-4 mb-4">
     <!-- Header -->
     <div class="flex items-start justify-between mb-3">
       <div class="flex-1">
-        <h3 class="font-semibold text-telegram-text mb-1">
+        <h3 class="font-semibold text-d-text mb-1">
           {{ request.subject?.name || 'Предмет не указан' }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-subhead text-d-text-second">
           {{ request.teacher?.fullName || 'Преподаватель не указан' }}
         </p>
       </div>
 
       <div class="text-right">
-        <div v-if="request.budget" class="font-bold text-telegram-accent">
+        <div v-if="request.budget" class="font-bold text-d-accent tnum">
           {{ formatPrice(request.budget) }}
         </div>
-        <div class="text-xs text-telegram-textSecondary">
+        <div class="text-caption text-d-text-second tnum">
           {{ formatDate(request.createdAt) }}
         </div>
       </div>
@@ -62,13 +62,13 @@ const handleViewDetails = () => {
     <!-- Student info -->
     <div class="flex items-center space-x-3 mb-4">
       <div
-        class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-bold"
+        class="w-12 h-12 bg-d-accent rounded-full flex items-center justify-center text-d-ink font-bold"
       >
         {{ request.student?.name?.charAt(0) || 'С' }}
       </div>
       <div class="flex-1">
-        <div class="font-medium text-telegram-text">{{ request.student?.name || 'Студент' }}</div>
-        <div class="text-sm text-telegram-textSecondary">
+        <div class="font-medium text-d-text">{{ request.student?.name || 'Студент' }}</div>
+        <div class="text-subhead text-d-text-second">
           @{{ request.student?.telegramUsername || 'username' }}
         </div>
       </div>
@@ -76,21 +76,21 @@ const handleViewDetails = () => {
 
     <!-- Description -->
     <div v-if="request.description" class="mb-4">
-      <p class="text-sm text-telegram-text bg-telegram-secondary p-3 rounded-lg">
+      <p class="text-subhead text-d-text bg-d-surface p-3 rounded-field">
         {{ request.description }}
       </p>
     </div>
 
     <!-- Details -->
     <div class="space-y-2 mb-4">
-      <div v-if="request.deadline" class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Дедлайн:</span>
-        <span class="text-telegram-text">{{ formatDate(request.deadline) }}</span>
+      <div v-if="request.deadline" class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Дедлайн:</span>
+        <span class="text-d-text">{{ formatDate(request.deadline) }}</span>
       </div>
 
-      <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Заявка создана:</span>
-        <span class="text-telegram-text">{{ formatDate(request.createdAt) }}</span>
+      <div class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Заявка создана:</span>
+        <span class="text-d-text">{{ formatDate(request.createdAt) }}</span>
       </div>
     </div>
 

@@ -26,9 +26,9 @@ const sizeClasses = {
 }
 
 const textSizeClasses = {
-  sm: 'text-xs',
-  md: 'text-sm',
-  lg: 'text-base',
+  sm: 'text-caption',
+  md: 'text-subhead',
+  lg: 'text-body',
 }
 
 const stars = computed(() => {
@@ -55,7 +55,7 @@ const handleStarClick = (starIndex: number) => {
         :class="[
           sizeClasses[size],
           'cursor-pointer transition-colors',
-          star.filled || star.half ? 'text-yellow-400' : 'text-gray-300',
+          star.filled || star.half ? 'text-d-rating' : 'text-d-text-hint/40',
         ]"
         fill="currentColor"
         viewBox="0 0 20 20"
@@ -78,10 +78,10 @@ const handleStarClick = (starIndex: number) => {
     </div>
 
     <div v-if="showCount" class="flex items-center space-x-1">
-      <span :class="[textSizeClasses[size], 'font-medium text-telegram-text']">
+      <span :class="[textSizeClasses[size], 'font-semibold text-d-text tnum']">
         {{ rating.toFixed(1) }}
       </span>
-      <span v-if="reviewsCount" :class="[textSizeClasses[size], 'text-telegram-textSecondary']">
+      <span v-if="reviewsCount" :class="[textSizeClasses[size], 'text-d-text-hint']">
         ({{ reviewsCount }})
       </span>
     </div>

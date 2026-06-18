@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Study Link — строки для перевода</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #0b1118;
+        color: #fff;
+        font-family: -apple-system, 'SF Pro Text', Roboto, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        padding: 48px 24px 96px;
+        line-height: 1.5;
+      }
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        margin-bottom: 8px;
+      }
+      .lede {
+        font-size: 15px;
+        color: #aab4be;
+        max-width: 620px;
+        margin-bottom: 8px;
+      }
+      .meta {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 12px;
+        color: #6d7883;
+        margin-bottom: 36px;
+      }
+      h2 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #5ea8f0;
+        margin: 40px 0 14px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #111a24;
+        border: 1px solid #1c2836;
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      th {
+        text-align: left;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #6d7883;
+        padding: 12px 16px;
+        background: #0e1621;
+        border-bottom: 1px solid #1c2836;
+      }
+      td {
+        padding: 11px 16px;
+        font-size: 14px;
+        vertical-align: top;
+        border-bottom: 1px solid #18222e;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .key {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 12px;
+        color: #9a9af0;
+        white-space: nowrap;
+      }
+      .ru {
+        font-weight: 500;
+      }
+      .en {
+        color: #aab4be;
+      }
+      .ctx {
+        color: #6d7883;
+        font-size: 13px;
+      }
+      col.c1 {
+        width: 24%;
+      }
+      col.c2 {
+        width: 28%;
+      }
+      col.c3 {
+        width: 26%;
+      }
+      col.c4 {
+        width: 22%;
+      }
+      .note {
+        background: #111a24;
+        border: 1px solid #1c2836;
+        border-left: 3px solid #f5a623;
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: 13px;
+        color: #aab4be;
+        margin: 14px 0 0;
+      }
+      @media print {
+        body {
+          background: #fff;
+          color: #000;
+          padding: 0;
+        }
+        .key {
+          color: #5b21b6;
+        }
+        h2 {
+          color: #1d4ed8;
+        }
+        table {
+          border-color: #ccc;
+        }
+        th {
+          background: #f3f4f6;
+          color: #555;
+        }
+        td {
+          border-color: #eee;
+        }
+        .en,
+        .ctx {
+          color: #444;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Study Link — строки интерфейса</h1>
+      <p class="lede">
+        Полный список текста интерфейса для локализации. RU — исходный текст из дизайна, EN —
+        предлагаемый перевод. Ключи в нотации i18n (<span class="key">namespace.key</span>),
+        форматирование — в стиле ICU / интерполяция в фигурных скобках.
+      </p>
+      <p class="meta">Источник: Study Link.dc.html · тёмная тема · RU → EN</p>
+
+      <h2>Навигация · табы</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Ключ</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Контекст</th>
+        </tr>
+        <tr>
+          <td class="key">nav.market</td>
+          <td class="ru">Маркет</td>
+          <td class="en">Market</td>
+          <td class="ctx">Таб 1 — лента услуг и заявок</td>
+        </tr>
+        <tr>
+          <td class="key">nav.deals</td>
+          <td class="ru">Сделки</td>
+          <td class="en">Deals</td>
+          <td class="ctx">Таб 2</td>
+        </tr>
+        <tr>
+          <td class="key">nav.responses</td>
+          <td class="ru">Отклики</td>
+          <td class="en">Responses</td>
+          <td class="ctx">Таб 3</td>
+        </tr>
+        <tr>
+          <td class="key">nav.profile</td>
+          <td class="ru">Профиль</td>
+          <td class="en">Profile</td>
+          <td class="ctx">Таб 4</td>
+        </tr>
+      </table>
+
+      <h2>Маркет · лента</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Ключ</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Контекст</th>
+        </tr>
+        <tr>
+          <td class="key">market.title</td>
+          <td class="ru">Маркет</td>
+          <td class="en">Market</td>
+          <td class="ctx">Заголовок экрана</td>
+        </tr>
+        <tr>
+          <td class="key">market.seg.services</td>
+          <td class="ru">Услуги</td>
+          <td class="en">Services</td>
+          <td class="ctx">Сегмент</td>
+        </tr>
+        <tr>
+          <td class="key">market.seg.requests</td>
+          <td class="ru">Заявки</td>
+          <td class="en">Requests</td>
+          <td class="ctx">Сегмент</td>
+        </tr>
+        <tr>
+          <td class="key">market.search</td>
+          <td class="ru">Поиск по описанию</td>
+          <td class="en">Search descriptions</td>
+          <td class="ctx">Плейсхолдер поиска</td>
+        </tr>
+        <tr>
+          <td class="key">filter.all</td>
+          <td class="ru">Все</td>
+          <td class="en">All</td>
+          <td class="ctx">Чип фильтра</td>
+        </tr>
+        <tr>
+          <td class="key">filter.active</td>
+          <td class="ru">Активные</td>
+          <td class="en">Active</td>
+          <td class="ctx">Чип · /active</td>
+        </tr>
+        <tr>
+          <td class="key">filter.popular</td>
+          <td class="ru">Популярные</td>
+          <td class="en">Popular</td>
+          <td class="ctx">Чип · /popular</td>
+        </tr>
+        <tr>
+          <td class="key">filter.open</td>
+          <td class="ru">Открытые</td>
+          <td class="en">Open</td>
+          <td class="ctx">Чип · /requests/open</td>
+        </tr>
+        <tr>
+          <td class="key">filter.filters</td>
+          <td class="ru">Фильтры</td>
+          <td class="en">Filters</td>
+          <td class="ctx">Кнопка открытия шторки</td>
+        </tr>
+      </table>
+
+      <h2>Карточки · поля</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Ключ</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Контекст</th>
+        </tr>
+        <tr>
+          <td class="key">card.responses</td>
+          <td class="ru">{count} откликов</td>
+          <td class="en">{count, plural, one{# response} other{# responses}}</td>
+          <td class="ctx">Счётчик · RU мн. число</td>
+        </tr>
+        <tr>
+          <td class="key">card.reviews</td>
+          <td class="ru">{count} отзывов</td>
+          <td class="en">{count, plural, one{# review} other{# reviews}}</td>
+          <td class="ctx">Счётчик отзывов</td>
+        </tr>
+        <tr>
+          <td class="key">card.budgetTo</td>
+          <td class="ru">до {amount}</td>
+          <td class="en">up to {amount}</td>
+          <td class="ctx">Бюджет заявки</td>
+        </tr>
+        <tr>
+          <td class="key">card.budgetNone</td>
+          <td class="ru">Бюджет не указан</td>
+          <td class="en">Budget not set</td>
+          <td class="ctx">Пустой бюджет</td>
+        </tr>
+        <tr>
+          <td class="key">card.deadlineTo</td>
+          <td class="ru">до {date}</td>
+          <td class="en">by {date}</td>
+          <td class="ctx">Дедлайн</td>
+        </tr>
+        <tr>
+          <td class="key">card.dealWith</td>
+          <td class="ru">с {name}</td>
+          <td class="en">with {name}</td>
+          <td class="ctx">Контрагент в сделке</td>
+        </tr>
+        <tr>
+          <td class="key">resp.proposes</td>
+          <td class="ru">Предлагает {amount}</td>
+          <td class="en">Offers {amount}</td>
+          <td class="ctx">Цена в отклике</td>
+        </tr>
+        <tr>
+          <td class="key">resp.byDate</td>
+          <td class="ru">к {date}</td>
+          <td class="en">by {date}</td>
+          <td class="ctx">Предложенный срок</td>
+        </tr>
+      </table>
+
+      <h2>Детали услуги · действия</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Ключ</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Контекст</th>
+        </tr>
+        <tr>
+          <td class="key">detail.service</td>
+          <td class="ru">Услуга</td>
+          <td class="en">Service</td>
+          <td class="ctx">Заголовок</td>
+        </tr>
+        <tr>
+          <td class="key">detail.subject</td>
+          <td class="ru">Предмет</td>
+          <td class="en">Subject</td>
+          <td class="ctx">Строка инфо</td>
+        </tr>
+        <tr>
+          <td class="key">detail.teacher</td>
+          <td class="ru">Преподаватель</td>
+          <td class="en">Teacher</td>
+          <td class="ctx">Строка инфо</td>
+        </tr>
+        <tr>
+          <td class="key">detail.responsesRow</td>
+          <td class="ru">Откликов</td>
+          <td class="en">Responses</td>
+          <td class="ctx">Строка инфо</td>
+        </tr>
+        <tr>
+          <td class="key">detail.description</td>
+          <td class="ru">Описание</td>
+          <td class="en">Description</td>
+          <td class="ctx">Оверлайн</td>
+        </tr>
+        <tr>
+          <td class="key">action.respond</td>
+          <td class="ru">Откликнуться</td>
+          <td class="en">Respond</td>
+          <td class="ctx">MainButton · первичное действие</td>
+        </tr>
+        <tr>
+          <td class="key">action.responded</td>
+          <td class="ru">Вы откликнулись</td>
+          <td class="en">You responded</td>
+          <td class="ctx">Состояние после отклика</td>
+        </tr>
+        <tr>
+          <td class="key">action.edit</td>
+          <td class="ru">Изменить</td>
+          <td class="en">Edit</td>
+          <td class="ctx">Действие владельца</td>
+        </tr>
+        <tr>
+          <td class="key">action.delete</td>
+          <td class="ru">Удалить</td>
+          <td class="en">Delete</td>
+          <td class="ctx">Деструктивное</td>
+        </tr>
+        <tr>
+          <td class="key">action.hide</td>
+          <td class="ru">Скрыть</td>
+          <td class="en">Hide</td>
+          <td class="ctx">Деактивировать услугу</td>
+        </tr>
+        <tr>
+          <td class="key">action.activate</td>
+          <td class="ru">Активировать</td>
+          <td class="en">Activate</td>
+          <td class="ctx">Включить услугу</td>
+        </tr>
+      </table>
+
+      <h2>Форма отклика</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Ключ</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Контекст</th>
+        </tr>
+        <tr>
+          <td class="key">respond.title</td>
+          <td class="ru">Ваш отклик</td>
+          <td class="en">Your response</td>
+          <td class="ctx">Заголовок</td>
+        </tr>
+        <tr>
+          <td class="key">field.message</td>
+          <td class="ru">Сообщение</td>
+          <td class="en">Message</td>
+          <td class="ctx">Лейбл</td>
+        </tr>
+        <tr>
+          <td class="key">field.yourPrice</td>
+          <td class="ru">Ваша цена</td>
+          <td class="en">Your price</td>
+          <td class="ctx">Лейбл · money</td>
+        </tr>
+        <tr>
+          <td class="key">field.deadline</td>
+          <td class="ru">Срок</td>
+          <td class="en">Deadline</td>
+          <td class="ctx">Лейбл</td>
+        </tr>
+        <tr>
+          <td class="key">field.optional</td>
+          <td class="ru">необязательно</td>
+          <td class="en">optional</td>
+          <td class="ctx">Хинт в лейбле</td>
+        </tr>
+        <tr>
+          <td class="key">respond.submit</td>
+          <td class="ru">Отправить отклик</td>
+          <td class="en">Send response</td>
+          <td class="ctx">MainButton</td>
+        </tr>
+        <tr>
+          <td class="key">toast.sent</td>
+          <td class="ru">Отклик отправлен</td>
+          <td class="en">Response sent</td>
+          <td class="ctx">Тост · 2с</td>
+        </tr>
+      </table>
+
+      <h2>Сделки · статус-степпер</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Ключ</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Контекст</th>
+        </tr>
+        <tr>
+          <td class="key">deals.title</td>
+          <td class="ru">Сделки</td>
+          <td class="en">Deals</td>
+          <td class="ctx">Заголовок</td>
+        </tr>
+        <tr>
+          <td class="key">deals.filter.inProgress</td>
+          <td class="ru">В работе</td>
+          <td class="en">In progress</td>
+          <td class="ctx">Чип</td>
+        </tr>
+        <tr>
+          <td class="key">deals.filter.completed</td>
+          <td class="ru">Завершены</td>
+          <td class="en">Completed</td>
+          <td class="ctx">Чип</td>
+        </tr>
+        <tr>
+          <td class="key">deal.title</td>
+          <td class="ru">Сделка</td>
+          <td class="en">Deal</td>
+          <td class="ctx">Заголовок детали</td>
+        </tr>
+        <tr>
+          <td class="key">deal.tutor</td>
+          <td class="ru">Репетитор</td>
+          <td class="en">Tutor</td>
+          <td class="ctx">Строка инфо</td>
+        </tr>
+        <tr>
+          <td class="key">deal.price</td>
+          <td class="ru">Цена</td>
+          <td class="en">Price</td>
+          <td class="ctx">Строка инфо</td>
+        </tr>
+        <tr>
+          <td class="key">deal.advance.confirm</td>
+          <td class="ru">Подтвердить</td>
+          <td class="en">Confirm</td>
+          <td class="ctx">PENDING → ACCEPTED</td>
+        </tr>
+        <tr>
+          <td class="key">deal.advance.start</td>
+          <td class="ru">Перевести в работу</td>
+          <td class="en">Start work</td>
+          <td class="ctx">ACCEPTED → IN_PROGRESS</td>
+        </tr>
+        <tr>
+          <td class="key">deal.advance.finish</td>
+          <td class="ru">Завершить сделку</td>
+          <td class="en">Complete deal</td>
+          <td class="ctx">IN_PROGRESS → COMPLETED</td>
+        </tr>
+        <tr>
+          <td class="key">deal.leaveReview</td>
+          <td class="ru">Оставить отзыв</td>
+          <td class="en">Leave a review</td>
+          <td class="ctx">На COMPLETED</td>
+        </tr>
+        <tr>
+          <td class="key">deal.completedOn</td>
+          <td class="ru">завершена {date}</td>
+          <td class="en">completed {date}</td>
+          <td class="ctx">Подпись</td>
+        </tr>
+      </table>
+
+      <h2>Статусы · бейджи</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Ключ (enum)</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Контекст</th>
+        </tr>
+        <tr>
+          <td class="key">status.deal.PENDING</td>
+          <td class="ru">Ожидает</td>
+          <td class="en">Pending</td>
+          <td class="ctx">DealStatus · amber</td>
+        </tr>
+        <tr>
+          <td class="key">status.deal.ACCEPTED</td>
+          <td class="ru">Принята</td>
+          <td class="en">Accepted</td>
+          <td class="ctx">DealStatus · accent</td>
+        </tr>
+        <tr>
+          <td class="key">status.deal.IN_PROGRESS</td>
+          <td class="ru">В работе</td>
+          <td class="en">In progress</td>
+          <td class="ctx">DealStatus · indigo</td>
+        </tr>
+        <tr>
+          <td class="key">status.deal.COMPLETED</td>
+          <td class="ru">Завершена</td>
+          <td class="en">Completed</td>
+          <td class="ctx">DealStatus · green</td>
+        </tr>
+        <tr>
+          <td class="key">status.deal.CANCELLED</td>
+          <td class="ru">Отменена</td>
+          <td class="en">Cancelled</td>
+          <td class="ctx">DealStatus · gray</td>
+        </tr>
+        <tr>
+          <td class="key">status.resp.PENDING</td>
+          <td class="ru">Ожидает</td>
+          <td class="en">Pending</td>
+          <td class="ctx">ResponseStatus</td>
+        </tr>
+        <tr>
+          <td class="key">status.resp.ACCEPTED</td>
+          <td class="ru">Принят</td>
+          <td class="en">Accepted</td>
+          <td class="ctx">ResponseStatus · м.р.</td>
+        </tr>
+        <tr>
+          <td class="key">status.resp.REJECTED</td>
+          <td class="ru">Отклонён</td>
+          <td class="en">Rejected</td>
+          <td class="ctx">ResponseStatus</td>
+        </tr>
+        <tr>
+          <td class="key">status.resp.EXPIRED</td>
+          <td class="ru">Истёк</td>
+          <td class="en">Expired</td>
+          <td class="ctx">ResponseStatus</td>
+        </tr>
+        <tr>
+          <td class="key">status.svc.ACTIVE</td>
+          <td class="ru">Активна</td>
+          <td class="en">Active</td>
+          <td class="ctx">ServiceStatus</td>
+        </tr>
+        <tr>
+          <td class="key">status.svc.INACTIVE</td>
+          <td class="ru">Скрыта</td>
+          <td class="en">Hidden</td>
+          <td class="ctx">ServiceStatus</td>
+        </tr>
+        <tr>
+          <td class="key">status.svc.SUSPENDED</td>
+          <td class="ru">Заблокирована</td>
+          <td class="en">Suspended</td>
+          <td class="ctx">ServiceStatus</td>
+        </tr>
+        <tr>
+          <td class="key">action.accept</td>
+          <td class="ru">Принять</td>
+          <td class="en">Accept</td>
+          <td class="ctx">Отклик · первичное</td>
+        </tr>
+        <tr>
+          <td class="key">action.reject</td>
+          <td class="ru">Отклонить</td>
+          <td class="en">Reject</td>
+          <td class="ctx">Отклик · вторичное</td>
+        </tr>
+      </table>
+
+      <h2>Отклики · профиль</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Ключ</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Контекст</th>
+        </tr>
+        <tr>
+          <td class="key">responses.title</td>
+          <td class="ru">Отклики</td>
+          <td class="en">Responses</td>
+          <td class="ctx">Заголовок</td>
+        </tr>
+        <tr>
+          <td class="key">responses.empty.title</td>
+          <td class="ru">Пока нет откликов</td>
+          <td class="en">No responses yet</td>
+          <td class="ctx">Пустое состояние</td>
+        </tr>
+        <tr>
+          <td class="key">responses.empty.sub</td>
+          <td class="ru">Откликайтесь на услуги — ответы появятся здесь.</td>
+          <td class="en">Respond to services — replies will appear here.</td>
+          <td class="ctx">Пустое состояние</td>
+        </tr>
+        <tr>
+          <td class="key">profile.balance</td>
+          <td class="ru">Баланс</td>
+          <td class="en">Balance</td>
+          <td class="ctx">Своя страница</td>
+        </tr>
+        <tr>
+          <td class="key">profile.group</td>
+          <td class="ru">Группа {number}</td>
+          <td class="en">Group {number}</td>
+          <td class="ctx">Подзаголовок</td>
+        </tr>
+        <tr>
+          <td class="key">profile.tab.services</td>
+          <td class="ru">Услуги</td>
+          <td class="en">Services</td>
+          <td class="ctx">Сегмент</td>
+        </tr>
+        <tr>
+          <td class="key">profile.tab.requests</td>
+          <td class="ru">Заявки</td>
+          <td class="en">Requests</td>
+          <td class="ctx">Сегмент</td>
+        </tr>
+        <tr>
+          <td class="key">profile.tab.reviews</td>
+          <td class="ru">Отзывы</td>
+          <td class="en">Reviews</td>
+          <td class="ctx">Сегмент</td>
+        </tr>
+        <tr>
+          <td class="key">rating.none</td>
+          <td class="ru">Нет отзывов</td>
+          <td class="en">No reviews</td>
+          <td class="ctx">Пустой рейтинг</td>
+        </tr>
+        <tr>
+          <td class="key">user.inactive</td>
+          <td class="ru">неактивен</td>
+          <td class="en">inactive</td>
+          <td class="ctx">isActive: false</td>
+        </tr>
+      </table>
+
+      <h2>Состояния · ошибки</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Ключ</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Контекст</th>
+        </tr>
+        <tr>
+          <td class="key">error.generic</td>
+          <td class="ru">Что-то пошло не так</td>
+          <td class="en">Something went wrong</td>
+          <td class="ctx">Экран ошибки</td>
+        </tr>
+        <tr>
+          <td class="key">action.retry</td>
+          <td class="ru">Повторить</td>
+          <td class="en">Retry</td>
+          <td class="ctx">Кнопка ошибки</td>
+        </tr>
+        <tr>
+          <td class="key">field.choose</td>
+          <td class="ru">Выберите</td>
+          <td class="en">Choose</td>
+          <td class="ctx">Плейсхолдер селектора</td>
+        </tr>
+        <tr>
+          <td class="key">field.chooseSubject</td>
+          <td class="ru">Выберите предмет</td>
+          <td class="en">Choose a subject</td>
+          <td class="ctx">Плейсхолдер</td>
+        </tr>
+        <tr>
+          <td class="key">overdue</td>
+          <td class="ru">просрочено</td>
+          <td class="en">overdue</td>
+          <td class="ctx">Дедлайн в прошлом</td>
+        </tr>
+      </table>
+
+      <h2>Форматирование · CLDR</h2>
+      <table>
+        <col class="c1" />
+        <col class="c2" />
+        <col class="c3" />
+        <col class="c4" />
+        <tr>
+          <th>Тип</th>
+          <th>RU</th>
+          <th>EN</th>
+          <th>Правило</th>
+        </tr>
+        <tr>
+          <td class="key">money</td>
+          <td class="ru">1 500 ₽</td>
+          <td class="en">₽1,500 / $1,500</td>
+          <td class="ctx">
+            Хранится в копейках; ÷100; пробел-разделитель тысяч в RU, запятая в EN; символ валюты
+            после числа в RU, до — в EN
+          </td>
+        </tr>
+        <tr>
+          <td class="key">date.relative</td>
+          <td class="ru">через 3 дня · вчера</td>
+          <td class="en">in 3 days · yesterday</td>
+          <td class="ctx">В пределах 7 дней — относительно</td>
+        </tr>
+        <tr>
+          <td class="key">date.absolute</td>
+          <td class="ru">1 июня</td>
+          <td class="en">June 1</td>
+          <td class="ctx">Дальше 7 дней — абсолютно</td>
+        </tr>
+        <tr>
+          <td class="key">rating</td>
+          <td class="ru">4.8</td>
+          <td class="en">4.8</td>
+          <td class="ctx">Один знак после запятой</td>
+        </tr>
+      </table>
+
+      <p class="note">
+        <b>Внимание при переводе.</b> ResponseStatus.ACCEPTED — «Принят» (м.р., про отклик), а
+        DealStatus.ACCEPTED — «Принята» (ж.р., про сделку): в RU род зависит от существительного, в
+        EN оба «Accepted». Множественное число (откликов / отзывов) требует ICU plural с формами one
+        / few / many для RU. Род и склонение в шаблонах вида «с {name}» в других языках могут
+        потребовать иной формулировки.
+      </p>
+    </div>
+  </body>
+</html>

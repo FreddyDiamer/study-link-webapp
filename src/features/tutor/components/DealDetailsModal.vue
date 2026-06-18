@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useTelegramStore } from '@/stores/telegram'
-import { Modal, Button } from '@/shared/components/ui'
+import { Modal, Button, StatusBadge } from '@/shared/components/ui'
 import type { Deal } from '@/shared/types'
 
 interface Props {
@@ -35,39 +34,6 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const statusConfig = computed(() => {
-  if (!props.deal) return null
-
-  const configs = {
-    PENDING: {
-      label: 'Ожидает',
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
-    },
-    ACCEPTED: {
-      label: 'Принят',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-    },
-    IN_PROGRESS: {
-      label: 'В работе',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    COMPLETED: {
-      label: 'Завершен',
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-    },
-    CANCELLED: {
-      label: 'Отменен',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-    },
-  }
-  return configs[props.deal.status] || configs.PENDING
-})
-
 const handleClose = () => {
   emit('update:isVisible', false)
 }
@@ -97,20 +63,20 @@ const handleComplete = () => {
       <!-- Student info -->
       <div class="flex items-center space-x-4">
         <div
-          class="w-16 h-16 bg-telegram-accent rounded-full flex items-center justify-center text-white text-xl font-bold"
+          class="w-16 h-16 bg-d-accent rounded-full flex items-center justify-center text-d-ink text-title-m font-bold"
         >
           {{ deal.student?.name?.charAt(0) || 'С' }}
         </div>
         <div class="flex-1">
-          <h3 class="text-lg font-semibold text-telegram-text">
+          <h3 class="text-title-m font-semibold text-d-text">
             {{ deal.student?.name || 'Студент' }}
           </h3>
-          <p class="text-sm text-telegram-textSecondary">
+          <p class="text-subhead text-d-text-second">
             @{{ deal.student?.telegramUsername || 'username' }}
           </p>
         </div>
         <div class="text-right">
-          <div class="text-2xl font-bold text-telegram-accent">
+          <div class="text-title-l font-bold text-d-accent tnum">
             {{ formatPrice(deal.price) }}
           </div>
         </div>
@@ -119,48 +85,39 @@ const handleComplete = () => {
       <!-- Deal details -->
       <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Предмет:</span>
-          <span class="font-medium text-telegram-text">
+          <span class="text-subhead text-d-text-second">Предмет:</span>
+          <span class="font-medium text-d-text">
             {{ deal.subject?.name || 'Не указан' }}
           </span>
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Преподаватель:</span>
-          <span class="font-medium text-telegram-text">
+          <span class="text-subhead text-d-text-second">Преподаватель:</span>
+          <span class="font-medium text-d-text">
             {{ deal.teacher?.fullName || 'Не указан' }}
           </span>
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Статус:</span>
-          <span
-            v-if="statusConfig"
-            :class="[
-              'px-2 py-1 rounded-full text-xs font-medium',
-              statusConfig.bgColor,
-              statusConfig.color,
-            ]"
-          >
-            {{ statusConfig.label }}
-          </span>
+          <span class="text-subhead text-d-text-second">Статус:</span>
+          <StatusBadge :deal="deal.status" />
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Создан:</span>
-          <span class="text-telegram-text">{{ formatDate(deal.createdAt) }}</span>
+          <span class="text-subhead text-d-text-second">Создан:</span>
+          <span class="text-d-text">{{ formatDate(deal.createdAt) }}</span>
         </div>
 
         <div v-if="deal.deadline" class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Дедлайн:</span>
-          <span class="text-telegram-text">{{ formatDate(deal.deadline) }}</span>
+          <span class="text-subhead text-d-text-second">Дедлайн:</span>
+          <span class="text-d-text">{{ formatDate(deal.deadline) }}</span>
         </div>
       </div>
 
       <!-- Description -->
       <div v-if="deal.serviceResponse?.message || deal.requestResponse?.message">
-        <h4 class="font-medium text-telegram-text mb-2">Описание:</h4>
-        <p class="text-sm text-telegram-textSecondary bg-telegram-secondary p-3 rounded-lg">
+        <h4 class="font-medium text-d-text mb-2">Описание:</h4>
+        <p class="text-subhead text-d-text-second bg-d-surface p-3 rounded-field">
           {{ deal.serviceResponse?.message || deal.requestResponse?.message }}
         </p>
       </div>

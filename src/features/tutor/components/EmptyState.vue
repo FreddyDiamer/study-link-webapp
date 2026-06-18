@@ -24,14 +24,14 @@ const handleAction = () => {
 <template>
   <div class="text-center py-16">
     <div
-      class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
+      class="w-20 h-20 bg-d-surface rounded-full mx-auto mb-6 flex items-center justify-center"
     >
       <span class="text-3xl">{{ icon }}</span>
     </div>
 
-    <h2 class="text-xl font-semibold text-telegram-text mb-3">{{ title }}</h2>
+    <h2 class="text-title-l font-semibold text-d-text mb-3">{{ title }}</h2>
 
-    <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+    <p class="text-d-text-second mb-8 max-w-sm mx-auto">
       {{ description }}
     </p>
 

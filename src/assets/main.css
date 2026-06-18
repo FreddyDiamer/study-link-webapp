@@ -3,14 +3,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Основные стили для темной темы */
+/* ============================================================
+   База — Study Link «Defiant» (d-* токены)
+   ============================================================ */
 @layer base {
   html,
   body {
-    @apply bg-telegram-bg text-telegram-text font-sans;
+    @apply bg-d-ink text-d-text font-sl;
     @apply min-h-screen antialiased overflow-x-hidden;
-
-    /* Устранение 300ms задержки на мобильных */
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
@@ -19,7 +19,6 @@
     @apply min-h-screen;
   }
 
-  /* Оптимизация кликов для всех интерактивных элементов */
   button,
   [role='button'],
   .cursor-pointer,
@@ -28,130 +27,159 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Scrollbar styling */
   ::-webkit-scrollbar {
-    @apply w-2;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-telegram-secondary;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-telegram-border rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-telegram-accent;
+    @apply w-0 h-0;
   }
 }
 
-/* Компоненты */
+/* ============================================================
+   Компоненты — на d-* / семантических токенах
+   ============================================================ */
 @layer components {
-  /* App flow */
-  .flow-student {
-    --custom-primary: #64b5f6;
-    --custom-secondary: #242f3d;
-  }
-
-  .flow-tutor {
-    --custom-primary: #48bb78;
-    --custom-secondary: #242f3d;
-  }
-
-  /* Кнопки */
+  /* ---- Кнопки ---- индиго = единственный акцент, текст тёмный (ink) ---- */
   .btn {
-    @apply relative px-4 py-2 rounded-xl;
-    @apply flex items-center justify-center;
-    @apply transition-all duration-200 font-medium;
-    @apply focus:outline-none;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+    @apply relative flex items-center justify-center;
+    @apply rounded-field font-bold;
+    @apply transition-all duration-200 focus:outline-none;
+    @apply active:scale-[0.975];
+    @apply disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none;
   }
 
   .btn-primary {
-    @apply bg-custom-primary text-white;
-    @apply hover:bg-custom-primary active:scale-95;
+    @apply bg-d-accent text-d-ink;
   }
 
   .btn-secondary {
-    @apply bg-telegram-secondary text-telegram-text border border-telegram-border;
-    @apply hover:bg-telegram-card active:scale-95;
+    @apply bg-d-surface text-d-text border border-d-border-soft;
   }
 
   .btn-ghost {
-    @apply text-telegram-accent bg-transparent;
-    @apply hover:bg-telegram-secondary active:scale-95;
+    @apply bg-transparent text-d-accent;
   }
 
-  /* Карточки */
+  .btn-destructive {
+    @apply bg-transparent text-d-coral;
+  }
+
+  /* ---- Карточки ---- хайрлайн, бордер реагирует в hover ---- */
   .card {
-    @apply bg-telegram-card rounded-2xl p-4 border border-telegram-border;
-    @apply shadow-card transition-all duration-200;
+    @apply bg-d-panel rounded-card p-4 border border-d-border;
+    @apply transition-colors duration-200;
   }
 
   .card-hover {
-    @apply hover:shadow-card-hover hover:-translate-y-1;
+    @apply hover:border-d-border-hover;
   }
 
-  .card-gradient {
-    @apply bg-gradient-to-br from-gradient-from to-gradient-to;
-    @apply text-white border-none;
-  }
-
-  /* Поля ввода */
+  /* ---- Поля ввода ---- */
   .input {
-    @apply w-full px-4 py-3 rounded-xl border border-telegram-border;
-    @apply bg-telegram-input text-telegram-text placeholder-telegram-textSecondary;
-    @apply focus:outline-none;
-    @apply transition-all duration-200;
+    @apply w-full px-4 py-3.5 rounded-field;
+    @apply bg-d-panel text-d-text placeholder-d-text-hint;
+    @apply border border-d-border-soft;
+    @apply focus:outline-none focus:border-d-accent;
+    @apply transition-colors duration-200;
   }
 
-  /* Навигация */
-  .nav-item {
-    @apply flex items-center px-4 py-3 rounded-xl text-telegram-textSecondary;
-    @apply hover:bg-telegram-secondary hover:text-telegram-text;
-    @apply transition-all duration-200;
-  }
-
-  .nav-item.active {
-    @apply bg-telegram-accent text-white;
-  }
-
-  /* Бейджи */
+  /* ---- Бейджи статусов ---- единая палитра (см. tokens.css) ---- */
   .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-[11px] py-1 rounded-full;
+    @apply text-[12px] font-semibold whitespace-nowrap;
   }
 
-  .badge-success {
-    @apply bg-telegram-success text-white;
+  .badge-pending {
+    @apply bg-d-rating/[0.12] text-d-rating; /* Ожидает */
   }
 
-  .badge-warning {
-    @apply bg-telegram-warning text-white;
+  .badge-accent {
+    @apply bg-d-accent/[0.16] text-d-accent; /* Принят(а) */
   }
 
-  .badge-error {
-    @apply bg-telegram-destructive text-white;
+  .badge-progress {
+    @apply bg-d-accent/[0.16] text-d-accent-hi; /* В работе */
   }
 
-  /* Анимации */
-  .animate-enter {
-    @apply animate-fade-in;
+  .badge-teal {
+    @apply bg-d-teal/[0.16] text-d-teal; /* Завершена / Активна */
   }
 
-  .animate-slide {
-    @apply animate-slide-up;
+  .badge-coral {
+    @apply bg-d-coral/[0.16] text-d-coral; /* Отклонён / Заблокирована */
+  }
+
+  .badge-neutral {
+    @apply bg-d-text-mute/20 text-d-text-second; /* Отменена / Истёк / Скрыта */
+  }
+
+  /* ---- Сегмент-контрол ---- */
+  .segment {
+    @apply flex bg-d-panel border border-d-border rounded-field p-1;
+  }
+
+  .segment-item {
+    @apply flex-1 text-center py-2 rounded-chip text-subhead font-semibold;
+    @apply text-d-text-second transition-colors cursor-pointer;
+  }
+
+  .segment-item.active {
+    @apply bg-d-accent text-d-ink;
+  }
+
+  /* ---- Чип фильтра ---- */
+  .chip {
+    @apply px-3 py-[7px] rounded-full text-caption font-semibold whitespace-nowrap;
+    @apply bg-d-panel border border-d-border text-d-text-second transition-colors cursor-pointer;
+  }
+
+  .chip.active {
+    @apply bg-d-accent border-d-accent text-d-ink;
+  }
+
+  /* ---- Группа инфо-строк ключ/значение ---- */
+  .info-group {
+    @apply bg-d-panel border border-d-border rounded-card overflow-hidden;
+  }
+
+  .info-row {
+    @apply flex items-center justify-between px-4 py-[14px];
+    @apply border-b border-d-border last:border-b-0;
   }
 }
 
-/* Утилиты */
+/* ============================================================
+   Утилиты + анимации (источник: claude-design/tokens.css)
+   ============================================================ */
 @layer utilities {
-  .text-gradient {
-    @apply bg-gradient-to-r from-telegram-accent to-telegram-button bg-clip-text text-transparent;
+  .tnum {
+    font-variant-numeric: tabular-nums;
   }
 
-  .absolute-center {
-    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+  /* всплытие карточек/блоков снизу (one-shot, + inline animation-delay для стаггера) */
+  .reveal {
+    animation: d-fadeup 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  /* тактильное нажатие — пружинит и реагирует бордером */
+  .press {
+    transition:
+      transform 0.12s ease,
+      border-color 0.2s ease,
+      background 0.2s ease;
+  }
+  .press:active {
+    transform: scale(0.975);
+  }
+
+  /* скелетон-плашка: бегущий блик */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      theme('colors.d.sk-base') 0%,
+      theme('colors.d.sk-hi') 50%,
+      theme('colors.d.sk-base') 100%
+    );
+    background-size: 340px 100%;
+    animation: d-shimmer 1.3s infinite linear;
+    border-radius: 7px;
   }
 
   .safe-area-top {

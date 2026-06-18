@@ -1,35 +1,13 @@
-/* 🌙 Темная тема для Telegram Mini App */
+/* 🌚 Study Link — «Defiant» edition (холодный сланец + индиго) */
 :root {
-  /* Базовые цвета */
-  --vt-c-white: #ffffff;
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
-
-  /* Разделители */
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
-
-  /* Текст */
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
-
-  /* Семантические переменные */
-  --color-background: var(--vt-c-black);
-  --color-background-soft: var(--vt-c-black-soft);
-  --color-background-mute: var(--vt-c-black-mute);
-  --color-border: var(--vt-c-divider-dark-2);
-  --color-border-hover: var(--vt-c-divider-dark-1);
-  --color-heading: var(--vt-c-text-dark-1);
-  --color-text: var(--vt-c-text-dark-2);
+  --color-background: #0e0f13; /* ink */
+  --color-panel: #15171d;
+  --color-surface: #21252e;
+  --color-text: #e8eaed;
+  --color-text-second: #8a93a3;
   --section-gap: 160px;
-
-  /* Кастомные цвета */
-  --custom-primary: #64b5f6;
-  --custom-secondary: #242f3d;
 }
 
-/* Базовые стили */
 *,
 *::before,
 *::after {
@@ -48,29 +26,14 @@ body {
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
-  line-height: 1.6;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  line-height: 1.45;
+  font-family: -apple-system, 'SF Pro Text', Roboto, 'Segoe UI', sans-serif;
   font-size: 16px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-/* Hide scrollbars */
+
 ::-webkit-scrollbar {
   display: none;
 }

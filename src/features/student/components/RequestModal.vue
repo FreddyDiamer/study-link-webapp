@@ -163,9 +163,9 @@ watch(
   >
     <div v-if="service" class="space-y-6">
       <!-- Service Info -->
-      <div class="p-4 bg-telegram-secondary/30 rounded-lg">
-        <h4 class="font-medium text-telegram-text mb-1">{{ service.title }}</h4>
-        <p class="text-sm text-telegram-textSecondary">
+      <div class="p-4 bg-d-surface/30 rounded-card">
+        <h4 class="font-medium text-d-text mb-1">{{ service.title }}</h4>
+        <p class="text-subhead text-d-text-second">
           Репетитор: {{ service.teacher.name }} • {{ service.price }}₽/час
         </p>
       </div>
@@ -174,16 +174,16 @@ watch(
       <div class="space-y-4">
         <!-- Message -->
         <div>
-          <label class="block text-sm font-medium text-telegram-text mb-2">
+          <label class="block text-subhead font-medium text-d-text mb-2">
             Что именно нужно?
           </label>
           <textarea
             v-model="form.message"
             rows="3"
             placeholder="Здравствуйте! Интересует помощь с ..."
-            class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
+            class="w-full px-4 py-3 bg-d-surface border border-d-border rounded-field text-d-text placeholder-d-text-second focus:outline-none focus:border-d-accent transition-colors resize-none"
           />
-          <p class="text-xs text-telegram-textSecondary mt-1">
+          <p class="text-caption text-d-text-second mt-1">
             Опишите задачу, уровень сложности, ваши цели
           </p>
         </div>
@@ -221,7 +221,7 @@ watch(
 
       <!-- Help text -->
       <div class="text-center">
-        <p class="text-xs text-telegram-textSecondary">
+        <p class="text-caption text-d-text-second">
           Репетитор увидит вашу заявку и сможет принять её или предложить свои условия
         </p>
       </div>

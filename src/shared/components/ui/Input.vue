@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { useId } from 'vue'
 
 interface Props {
   modelValue: string
@@ -21,14 +21,18 @@ defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const inputId = computed(() => `input-${Math.random().toString(36).substring(2, 9)}`)
+const inputId = useId()
 </script>
 
 <template>
   <div class="space-y-2">
-    <label v-if="label" :for="inputId" class="block text-sm font-medium text-telegram-text">
+    <label
+      v-if="label"
+      :for="inputId"
+      class="block text-caption font-semibold text-d-text-second"
+    >
       {{ label }}
-      <span v-if="required" class="text-telegram-destructive">*</span>
+      <span v-if="required" class="text-d-coral">*</span>
     </label>
 
     <div class="relative flex items-center">
@@ -58,7 +62,7 @@ const inputId = computed(() => `input-${Math.random().toString(36).substring(2, 
       </div>
     </div>
 
-    <p v-if="error" class="text-sm text-telegram-destructive">
+    <p v-if="error" class="text-caption text-d-coral">
       {{ error }}
     </p>
   </div>

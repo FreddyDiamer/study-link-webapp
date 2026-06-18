@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
+import { StatusBadge } from '@/shared/components/ui'
 import { PATHS } from '@/router/paths'
 import type { Service } from '@/shared/types'
 
@@ -31,7 +32,7 @@ const handleViewResponses = (serviceId: string) => {
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-telegram-text">Активные услуги</h3>
+      <h3 class="text-title-m font-semibold text-d-text">Активные услуги</h3>
       <Button variant="ghost" size="sm" @click="router.push(PATHS.TUTOR_SERVICES)">
         Все услуги
       </Button>
@@ -41,8 +42,8 @@ const handleViewResponses = (serviceId: string) => {
     <div v-if="isLoading" class="space-y-4">
       <Card v-for="i in 3" :key="i" class="p-4">
         <div class="animate-pulse">
-          <div class="h-4 bg-telegram-secondary rounded mb-2"></div>
-          <div class="h-3 bg-telegram-secondary rounded w-2/3"></div>
+          <div class="h-4 bg-d-surface rounded mb-2"></div>
+          <div class="h-3 bg-d-surface rounded w-2/3"></div>
         </div>
       </Card>
     </div>
@@ -58,27 +59,23 @@ const handleViewResponses = (serviceId: string) => {
         <div class="flex items-center justify-between">
           <div class="flex-1">
             <div class="flex items-center space-x-2">
-              <h3 class="font-medium text-telegram-text">{{ service.subject.name }}</h3>
-              <span
-                class="px-2 py-1 bg-telegram-success/10 text-telegram-success text-xs rounded-full"
-              >
-                Активно
-              </span>
+              <h3 class="font-medium text-d-text">{{ service.subject.name }}</h3>
+              <StatusBadge :service="service.status" />
             </div>
-            <p class="text-sm text-telegram-textSecondary mt-1">
+            <p class="text-subhead text-d-text-second mt-1">
               {{ service.teacher.fullName }}
             </p>
             <div class="flex items-center space-x-4 mt-2">
-              <span class="text-sm font-medium text-telegram-text">{{
+              <span class="text-subhead font-medium text-d-text tnum">{{
                 formatPrice(service.price)
               }}</span>
-              <span class="text-xs text-telegram-textSecondary">
+              <span class="text-caption text-d-text-second tnum">
                 {{ service.responses?.length ?? 0 }} откликов
               </span>
             </div>
           </div>
           <svg
-            class="w-5 h-5 text-telegram-textSecondary"
+            class="w-5 h-5 text-d-text-second"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -97,10 +94,10 @@ const handleViewResponses = (serviceId: string) => {
     <!-- Empty state -->
     <div v-else class="text-center py-8">
       <div
-        class="w-16 h-16 bg-telegram-secondary rounded-full mx-auto mb-4 flex items-center justify-center"
+        class="w-16 h-16 bg-d-surface rounded-full mx-auto mb-4 flex items-center justify-center"
       >
         <svg
-          class="w-8 h-8 text-telegram-textSecondary"
+          class="w-8 h-8 text-d-text-second"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -114,8 +111,8 @@ const handleViewResponses = (serviceId: string) => {
         </svg>
       </div>
 
-      <h4 class="text-lg font-medium text-telegram-text mb-2">Нет активных услуг</h4>
-      <p class="text-telegram-textSecondary mb-4">
+      <h4 class="text-title-m font-medium text-d-text mb-2">Нет активных услуг</h4>
+      <p class="text-d-text-second mb-4">
         Создайте свою первую услугу, чтобы начать получать заявки
       </p>
     </div>

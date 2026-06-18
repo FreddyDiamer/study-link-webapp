@@ -2,7 +2,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
-import { Card, Button, Input, Select } from '@/shared/components/ui'
+import { Card, Button, Input, Select, Loader } from '@/shared/components/ui'
 import { ArrowIcon } from '@/shared/components/icons'
 import Modal from '@/shared/components/ui/Modal.vue'
 
@@ -180,15 +180,15 @@ const validateForm = () => {
 const getStatusInfo = (status: string) => {
   switch (status) {
     case 'OPEN':
-      return { color: 'bg-green-100 text-green-700', text: 'Открыта' }
+      return { color: 'bg-d-teal/15 text-d-teal', text: 'Открыта' }
     case 'MATCHED':
-      return { color: 'bg-blue-100 text-blue-700', text: 'Найден репетитор' }
+      return { color: 'bg-d-accent/15 text-d-accent', text: 'Найден репетитор' }
     case 'CLOSED':
-      return { color: 'bg-gray-100 text-gray-700', text: 'Закрыта' }
+      return { color: 'bg-d-text-hint/20 text-d-text-second', text: 'Закрыта' }
     case 'CANCELLED':
-      return { color: 'bg-red-100 text-red-700', text: 'Отменена' }
+      return { color: 'bg-d-coral/15 text-d-coral', text: 'Отменена' }
     default:
-      return { color: 'bg-gray-100 text-gray-700', text: 'Неизвестно' }
+      return { color: 'bg-d-text-hint/20 text-d-text-second', text: 'Неизвестно' }
   }
 }
 
@@ -199,24 +199,22 @@ const goBack = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg">
+  <div class="min-h-screen bg-d-ink">
     <!-- Header -->
-    <div class="bg-telegram-card border-b border-telegram-border px-4 py-3">
+    <div class="bg-d-panel border-b border-d-border px-4 py-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <Button variant="ghost" @click="goBack" class="p-1 -ml-1">
             <ArrowIcon direction="left" class="size-5" />
           </Button>
-          <h1 class="text-lg font-semibold text-telegram-text">Редактировать заявку</h1>
+          <h1 class="text-lg font-semibold text-d-text">Редактировать заявку</h1>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
     <div v-if="isLoading" class="flex justify-center items-center py-20">
-      <div
-        class="animate-spin w-8 h-8 border-4 border-telegram-accent border-t-transparent rounded-full"
-      ></div>
+      <Loader class="size-8 text-d-accent" />
     </div>
 
     <div v-else>
@@ -224,7 +222,7 @@ const goBack = () => {
       <div class="p-4 flex flex-col gap-6">
         <!-- Subject Selection -->
         <Card class="p-6">
-          <h2 class="text-lg font-semibold text-telegram-text mb-4">Предмет</h2>
+          <h2 class="text-lg font-semibold text-d-text mb-4">Предмет</h2>
 
           <Select
             v-model="form.subject"
@@ -243,8 +241,8 @@ const goBack = () => {
 
         <!-- Teacher -->
         <Card class="p-6">
-          <h2 class="text-lg font-semibold text-telegram-text mb-2">Тип подготовки</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">Укажите, к чему нужна подготовка</p>
+          <h2 class="text-lg font-semibold text-d-text mb-2">Тип подготовки</h2>
+          <p class="text-d-text-second text-subhead mb-4">Укажите, к чему нужна подготовка</p>
 
           <Select
             v-model="form.teacher"
@@ -256,8 +254,8 @@ const goBack = () => {
 
         <!-- Description -->
         <Card class="p-6">
-          <h2 class="text-lg font-semibold text-telegram-text mb-2">Описание задач</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">
+          <h2 class="text-lg font-semibold text-d-text mb-2">Описание задач</h2>
+          <p class="text-d-text-second text-subhead mb-4">
             Расскажите, что именно нужно изучить или подготовить
           </p>
 
@@ -270,8 +268,8 @@ const goBack = () => {
 
         <!-- Deadline Selection -->
         <Card class="p-6">
-          <h2 class="text-lg font-semibold text-telegram-text mb-2">Срок выполнения</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">
+          <h2 class="text-lg font-semibold text-d-text mb-2">Срок выполнения</h2>
+          <p class="text-d-text-second text-subhead mb-4">
             Укажите, когда нужно выполнить задание
           </p>
 
@@ -288,8 +286,8 @@ const goBack = () => {
 
         <!-- Urgency -->
         <Card class="p-6">
-          <h2 class="text-lg font-semibold text-telegram-text mb-2">Срочность</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">Насколько срочно нужен репетитор</p>
+          <h2 class="text-lg font-semibold text-d-text mb-2">Срочность</h2>
+          <p class="text-d-text-second text-subhead mb-4">Насколько срочно нужен репетитор</p>
 
           <Select
             v-model="form.urgency"
@@ -301,14 +299,14 @@ const goBack = () => {
 
         <!-- Budget -->
         <Card class="p-6">
-          <h2 class="text-lg font-semibold text-telegram-text mb-2">Бюджет за занятие</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">
+          <h2 class="text-lg font-semibold text-d-text mb-2">Бюджет за занятие</h2>
+          <p class="text-d-text-second text-subhead mb-4">
             Укажите комфортную для вас стоимость
           </p>
 
           <div class="flex items-center space-x-3">
             <Input v-model="form.budget" placeholder="1500" type="number" class="flex-1" />
-            <span class="text-telegram-textSecondary font-medium">₽</span>
+            <span class="text-d-text-second font-medium">₽</span>
           </div>
         </Card>
 
@@ -327,7 +325,7 @@ const goBack = () => {
         <div class="text-center pt-4">
           <button
             @click="showDeleteModal = true"
-            class="text-sm text-red-500 hover:text-red-700 underline transition-colors"
+            class="text-subhead text-d-coral underline transition-colors"
           >
             Удалить заявку
           </button>
@@ -339,9 +337,14 @@ const goBack = () => {
     <Modal v-model="showDeleteModal" title="Удалить заявку">
       <div class="text-center py-4">
         <div
-          class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          class="w-16 h-16 bg-d-coral/15 rounded-full flex items-center justify-center mx-auto mb-4"
         >
-          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-8 h-8 text-d-coral"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -351,14 +354,14 @@ const goBack = () => {
           </svg>
         </div>
 
-        <h3 class="text-lg font-semibold text-telegram-text mb-2">Удалить заявку?</h3>
-        <p class="text-telegram-textSecondary text-sm mb-6">
+        <h3 class="text-lg font-semibold text-d-text mb-2">Удалить заявку?</h3>
+        <p class="text-d-text-second text-subhead mb-6">
           Это действие нельзя отменить. Заявка будет удалена навсегда.
         </p>
 
         <div class="flex space-x-3">
           <Button variant="ghost" @click="showDeleteModal = false" class="flex-1"> Отмена </Button>
-          <Button @click="deleteOrder" class="flex-1 bg-red-600 hover:bg-red-700 text-white">
+          <Button @click="deleteOrder" class="flex-1 bg-d-coral text-d-ink">
             Удалить
           </Button>
         </div>

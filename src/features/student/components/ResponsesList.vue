@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
-import { Card, Button } from '@/shared/components/ui'
+import { Card, Button, StatusBadge } from '@/shared/components/ui'
 import type { ServiceResponse } from '@/shared/types'
 
 const router = useRouter()
@@ -14,29 +14,6 @@ const props = defineProps<{
 
 // Данные откликов, приходящие сверху
 const myResponses = computed(() => props.items ?? [])
-
-const getResponseStatusInfo = (status: string) => {
-  switch (status) {
-    case 'PENDING':
-      return { color: 'bg-orange-500', text: 'Ожидает ответа', textColor: 'text-orange-600' }
-    case 'ACCEPTED':
-      return { color: 'bg-telegram-success', text: 'Принят', textColor: 'text-telegram-success' }
-    case 'REJECTED':
-      return { color: 'bg-red-500', text: 'Отклонен', textColor: 'text-red-600' }
-    case 'EXPIRED':
-      return {
-        color: 'bg-telegram-textSecondary',
-        text: 'Истек',
-        textColor: 'text-telegram-textSecondary',
-      }
-    default:
-      return {
-        color: 'bg-telegram-textSecondary',
-        text: 'Неизвестно',
-        textColor: 'text-telegram-textSecondary',
-      }
-  }
-}
 
 const formatRub = (priceInRubles: number) => Math.round(priceInRubles)
 
@@ -91,10 +68,10 @@ const viewResponseDetails = (response: any) => {
     <!-- Empty State -->
     <div v-if="myResponses.length === 0" class="text-center py-16">
       <div
-        class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
+        class="w-20 h-20 bg-d-surface rounded-full mx-auto mb-6 flex items-center justify-center"
       >
         <svg
-          class="w-10 h-10 text-telegram-textSecondary"
+          class="w-10 h-10 text-d-text-second"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -107,8 +84,8 @@ const viewResponseDetails = (response: any) => {
           />
         </svg>
       </div>
-      <h2 class="text-xl font-semibold text-telegram-text mb-3">У вас пока нет откликов</h2>
-      <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+      <h2 class="text-xl font-semibold text-d-text mb-3">У вас пока нет откликов</h2>
+      <p class="text-d-text-second mb-8 max-w-sm mx-auto">
         Найдите интересные услуги и оставляйте заявки репетиторам
       </p>
       <Button @click="findServices" class="mx-auto">Найти услуги</Button>
@@ -120,42 +97,34 @@ const viewResponseDetails = (response: any) => {
         v-for="response in myResponses"
         :key="response.id"
         @click="viewResponseDetails(response)"
-        class="p-6 cursor-pointer hover:border-telegram-accent transition-colors duration-200"
+        class="p-6 cursor-pointer hover:border-d-accent transition-colors duration-200"
       >
         <!-- Header -->
         <div class="flex items-start justify-between mb-4">
           <div class="flex-1">
-            <h3 class="text-telegram-text font-semibold text-lg mb-1">
+            <h3 class="text-d-text font-semibold text-lg mb-1">
               {{ response.service?.subject?.name || 'Предмет' }} •
               {{ response.service?.teacher?.fullName || 'Преподаватель' }}
             </h3>
             <div class="flex items-center space-x-2 mb-2">
-              <span class="text-telegram-textSecondary text-sm">{{
+              <span class="text-d-text-second text-subhead">{{
                 response.service?.tutor?.name || 'Репетитор'
               }}</span>
               <div class="flex items-center space-x-1">
-                <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-4 h-4 text-d-rating" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                   />
                 </svg>
-                <span class="text-telegram-textSecondary text-sm">{{
+                <span class="text-d-text-second text-subhead tnum">{{
                   response.service?.tutor?.rating ?? '—'
                 }}</span>
               </div>
             </div>
           </div>
-          <div class="text-right">
-            <div
-              :class="[
-                'px-2 py-1 text-xs font-medium rounded-full',
-                getResponseStatusInfo(response.status).color,
-                'text-white mb-2',
-              ]"
-            >
-              {{ getResponseStatusInfo(response.status).text }}
-            </div>
-            <div class="text-telegram-textSecondary text-xs">
+          <div class="flex flex-col items-end gap-2">
+            <StatusBadge :response="response.status" />
+            <div class="text-d-text-second text-caption">
               {{ formatDate(response.createdAt) }}
             </div>
           </div>
@@ -163,23 +132,23 @@ const viewResponseDetails = (response: any) => {
 
         <!-- Message Preview -->
         <div class="mb-4">
-          <p class="text-telegram-text text-sm mb-2">{{ response.message }}</p>
+          <p class="text-d-text text-subhead mb-2">{{ response.message }}</p>
         </div>
 
         <!-- Details -->
-        <div class="flex items-center justify-between text-sm">
+        <div class="flex items-center justify-between text-subhead">
           <div class="flex items-center space-x-4">
             <div>
-              <span class="text-telegram-textSecondary">Моя цена: </span>
-              <span class="text-telegram-text">{{ formatRub(response.price || 0) }}₽</span>
+              <span class="text-d-text-second">Моя цена: </span>
+              <span class="text-d-text tnum">{{ formatRub(response.price || 0) }}₽</span>
             </div>
             <div>
-              <span class="text-telegram-textSecondary">Цена услуги: </span>
-              <span class="text-telegram-text">{{ response.service?.price || 0 }}₽</span>
+              <span class="text-d-text-second">Цена услуги: </span>
+              <span class="text-d-text tnum">{{ response.service?.price || 0 }}₽</span>
             </div>
             <div v-if="response.proposedDeadline">
-              <span class="text-telegram-textSecondary">Дедлайн: </span>
-              <span class="text-telegram-text">{{
+              <span class="text-d-text-second">Дедлайн: </span>
+              <span class="text-d-text">{{
                 formatDeadline(response.proposedDeadline)
               }}</span>
             </div>

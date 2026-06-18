@@ -83,19 +83,13 @@ const handleLogoClick = () => {
 
 <template>
   <header
-    class="bg-telegram-card border-b border-telegram-border fixed top-0 left-0 right-0 z-50 backdrop-blur-sm"
+    class="bg-d-ink border-b border-d-border fixed top-0 left-0 right-0 z-50 backdrop-blur-sm"
   >
     <div class="flex items-center justify-between px-4 h-14">
       <!-- Logo/Title -->
       <div class="flex items-center space-x-3" @click="handleLogoClick">
-        <div
-          class="w-8 h-8 rounded-lg flex items-center justify-center"
-          :class="{
-            'bg-telegram-success': appStore.isTutorFlow,
-            'bg-telegram-accent': appStore.isStudentFlow,
-          }"
-        >
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-8 h-8 rounded-field flex items-center justify-center bg-d-accent">
+          <svg class="w-5 h-5 text-d-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -104,7 +98,7 @@ const handleLogoClick = () => {
             />
           </svg>
         </div>
-        <h1 class="text-lg font-semibold text-telegram-text">KAI</h1>
+        <h1 class="text-title-m text-d-text">KAI</h1>
       </div>
 
       <!-- Flow Selector & Profile -->
@@ -115,16 +109,12 @@ const handleLogoClick = () => {
             variant="ghost"
             @click="toggleFlowSelector"
             size="sm"
-            class="flex items-center gap-2 px-1.5"
-            :class="{
-              'text-telegram-success': appStore.isTutorFlow,
-              'text-telegram-accent': appStore.isStudentFlow,
-            }"
+            class="flex items-center gap-2 px-1.5 text-d-accent"
           >
-            <div v-if="appStore.isStudentFlow" class="icon-wrapper bg-telegram-accent">
+            <div v-if="appStore.isStudentFlow" class="icon-wrapper bg-d-accent">
               <StudentIcon class="size-5" />
             </div>
-            <div v-else class="icon-wrapper bg-telegram-success">
+            <div v-else class="icon-wrapper bg-d-accent">
               <TutorIcon class="size-5" />
             </div>
 
@@ -139,33 +129,33 @@ const handleLogoClick = () => {
           <!-- Flow Dropdown -->
           <div
             v-if="showFlowSelector"
-            class="absolute right-0 top-full mt-2 w-48 bg-telegram-card border border-telegram-border rounded-xl shadow-lg py-2 z-10"
+            class="absolute right-0 top-full mt-2 w-48 bg-d-panel border border-d-border rounded-card shadow-d-toast py-2 z-10"
           >
             <button
               @click="selectFlow('student')"
-              class="w-full px-4 py-3 text-left hover:bg-telegram-secondary transition-colors duration-150 flex items-center space-x-3"
-              :class="{ 'bg-telegram-secondary': appStore.isStudentFlow }"
+              class="w-full px-4 py-3 text-left hover:bg-d-surface transition-colors duration-150 flex items-center space-x-3"
+              :class="{ 'bg-d-surface': appStore.isStudentFlow }"
             >
-              <div class="icon-wrapper bg-telegram-accent">
+              <div class="icon-wrapper bg-d-accent">
                 <StudentIcon class="size-5" />
               </div>
               <div>
-                <div class="text-telegram-text font-medium text-sm">Студент</div>
-                <div class="text-telegram-textSecondary text-xs">Ищу репетитора</div>
+                <div class="text-d-text font-medium text-subhead">Студент</div>
+                <div class="text-d-text-hint text-caption">Ищу репетитора</div>
               </div>
             </button>
 
             <button
               @click="selectFlow('tutor')"
-              class="w-full px-4 py-3 text-left hover:bg-telegram-secondary transition-colors duration-150 flex items-center space-x-3"
-              :class="{ 'bg-telegram-secondary': appStore.isTutorFlow }"
+              class="w-full px-4 py-3 text-left hover:bg-d-surface transition-colors duration-150 flex items-center space-x-3"
+              :class="{ 'bg-d-surface': appStore.isTutorFlow }"
             >
-              <div class="icon-wrapper bg-telegram-success">
+              <div class="icon-wrapper bg-d-accent">
                 <TutorIcon class="size-5" />
               </div>
               <div>
-                <div class="text-telegram-text font-medium text-sm">Репетитор</div>
-                <div class="text-telegram-textSecondary text-xs">Предлагаю услуги</div>
+                <div class="text-d-text font-medium text-subhead">Репетитор</div>
+                <div class="text-d-text-hint text-caption">Предлагаю услуги</div>
               </div>
             </button>
           </div>
@@ -173,11 +163,7 @@ const handleLogoClick = () => {
 
         <!-- Profile Avatar -->
         <div
-          class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-medium"
-          :class="{
-            'bg-telegram-success': appStore.isTutorFlow,
-            'bg-telegram-accent': appStore.isStudentFlow,
-          }"
+          class="w-9 h-9 rounded-full flex items-center justify-center bg-d-accent text-d-ink text-subhead font-medium"
           @click="openProfilePage"
         >
           {{ userInitials }}
@@ -192,7 +178,7 @@ const handleLogoClick = () => {
 
 <style scoped lang="scss">
 .icon-wrapper {
-  @apply w-8 h-8 rounded-lg text-white;
+  @apply w-8 h-8 rounded-field text-d-ink;
   @apply flex items-center justify-center;
 }
 </style>

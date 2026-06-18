@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
+import { StatusBadge } from '@/shared/components/ui'
 import type { Service } from '@/shared/types'
 
 interface Props {
@@ -28,27 +29,6 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const getStatusConfig = (status: string) => {
-  const configs = {
-    ACTIVE: {
-      label: 'Активно',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    INACTIVE: {
-      label: 'Неактивно',
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-    },
-    SUSPENDED: {
-      label: 'Приостановлено',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-    },
-  }
-  return configs[status as keyof typeof configs] || configs.INACTIVE
-}
-
 const handleEditService = () => {
   telegramStore.hapticFeedback('light')
   router.push(`/tutor/services/${props.service.id}/edit`)
@@ -67,34 +47,26 @@ const handleToggleStatus = () => {
 </script>
 
 <template>
-  <Card class="p-4 mb-4 hover:shadow-lg transition-shadow">
+  <Card class="p-4 mb-4">
     <!-- Header -->
     <div class="flex items-start justify-between mb-3">
       <div class="flex-1">
         <div class="flex items-center space-x-2 mb-1">
-          <h3 class="font-semibold text-telegram-text">
+          <h3 class="font-semibold text-d-text">
             {{ service.subject?.name || 'Предмет не указан' }}
           </h3>
-          <span
-            :class="[
-              'px-2 py-1 rounded-full text-xs font-medium',
-              getStatusConfig(service.status).bgColor,
-              getStatusConfig(service.status).color,
-            ]"
-          >
-            {{ getStatusConfig(service.status).label }}
-          </span>
+          <StatusBadge :service="service.status" />
         </div>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-subhead text-d-text-second">
           {{ service.teacher?.fullName || 'Преподаватель не указан' }}
         </p>
       </div>
 
       <div class="text-right">
-        <div class="font-bold text-telegram-accent text-lg">
+        <div class="font-bold text-d-accent text-title-m tnum">
           {{ formatPrice(service.price) }}
         </div>
-        <div v-if="service.deadline" class="text-xs text-telegram-textSecondary">
+        <div v-if="service.deadline" class="text-caption text-d-text-second tnum">
           До {{ formatDate(service.deadline) }}
         </div>
       </div>
@@ -102,15 +74,17 @@ const handleToggleStatus = () => {
 
     <!-- Description -->
     <div v-if="service.description" class="mb-4">
-      <p class="text-sm text-telegram-text line-clamp-2">
+      <p class="text-subhead text-d-text line-clamp-2">
         {{ service.description }}
       </p>
     </div>
 
     <!-- Stats -->
-    <div class="flex items-center justify-between mb-4 text-sm text-telegram-textSecondary">
-      <span>Создано: {{ formatDate(service.createdAt) }}</span>
-      <span v-if="service.responses?.length"> {{ service.responses.length }} откликов </span>
+    <div class="flex items-center justify-between mb-4 text-subhead text-d-text-second">
+      <span class="tnum">Создано: {{ formatDate(service.createdAt) }}</span>
+      <span v-if="service.responses?.length" class="tnum">
+        {{ service.responses.length }} откликов
+      </span>
     </div>
 
     <!-- Actions -->
@@ -122,7 +96,7 @@ const handleToggleStatus = () => {
         @click="handleViewResponses"
         variant="ghost"
         size="sm"
-        class="text-telegram-button"
+        class="text-d-accent"
       >
         Отклики
       </Button>
@@ -131,7 +105,7 @@ const handleToggleStatus = () => {
         @click="handleToggleStatus"
         variant="ghost"
         size="sm"
-        :class="service.status === 'ACTIVE' ? 'text-red-600' : 'text-green-600'"
+        :class="service.status === 'ACTIVE' ? 'text-d-coral' : 'text-d-accent'"
       >
         {{ service.status === 'ACTIVE' ? 'Деактивировать' : 'Активировать' }}
       </Button>

@@ -27,15 +27,15 @@ const formatDate = (dateString: string) => {
     <div class="flex items-start justify-between mb-3">
       <div class="flex items-center space-x-3">
         <div
-          class="w-10 h-10 bg-telegram-accent rounded-full flex items-center justify-center text-white font-bold"
+          class="w-10 h-10 bg-d-accent rounded-full flex items-center justify-center text-d-ink font-bold"
         >
           {{ review.author?.name?.charAt(0) || 'П' }}
         </div>
         <div>
-          <div class="font-medium text-telegram-text">
+          <div class="font-medium text-d-text">
             {{ review.author?.name || 'Пользователь' }}
           </div>
-          <div class="text-sm text-telegram-textSecondary">
+          <div class="text-subhead text-d-text-second">
             {{ formatDate(review.createdAt) }}
           </div>
         </div>
@@ -46,13 +46,13 @@ const formatDate = (dateString: string) => {
 
     <!-- Comment -->
     <div v-if="review.comment" class="mb-3">
-      <p class="text-sm text-telegram-text">
+      <p class="text-subhead text-d-text">
         {{ review.comment }}
       </p>
     </div>
 
     <!-- Deal info -->
-    <div class="text-xs text-telegram-textSecondary">
+    <div class="text-caption text-d-text-second">
       По сделке: {{ review.deal?.subject?.name || 'Не указано' }}
     </div>
   </Card>

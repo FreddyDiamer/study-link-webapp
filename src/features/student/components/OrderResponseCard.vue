@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Card, Button } from '@/shared/components/ui'
+import { Card, Button, StatusBadge } from '@/shared/components/ui'
 import { ContactIcon } from '@/shared/components/icons'
 import { formatDate } from '@/shared/utils'
 import { useTelegramStore } from '@/stores/telegram'
@@ -14,33 +14,6 @@ const emit = defineEmits<{
 defineProps<{
   response: RequestResponse
 }>()
-
-const getStatusInfo = (status: string) => {
-  switch (status) {
-    case 'pending':
-      return {
-        color: 'bg-telegram-accent',
-        text: 'Ожидает',
-        textColor: 'text-telegram-accent',
-      }
-    case 'accepted':
-      return { color: 'bg-orange-500', text: 'Принят', textColor: 'text-orange-600' }
-    case 'in_progress':
-      return { color: 'bg-telegram-success', text: 'В работе', textColor: 'text-telegram-success' }
-    case 'declined':
-      return {
-        color: 'bg-telegram-textSecondary',
-        text: 'Отклонен',
-        textColor: 'text-telegram-textSecondary',
-      }
-    default:
-      return {
-        color: 'bg-telegram-textSecondary',
-        text: 'Неизвестно',
-        textColor: 'text-telegram-textSecondary',
-      }
-  }
-}
 
 const acceptResponse = (response: any) => {
   telegramStore.hapticFeedback('medium')
@@ -87,24 +60,23 @@ const declineService = (response: any) => {
     :key="response.id"
     class="p-6"
     :class="{
-      'border-telegram-accent bg-telegram-accent/5': true,
-      'border-orange-500 bg-orange-500/10': response.status === ResponseStatus.ACCEPTED,
-      'border-telegram-success bg-telegram-success/10': response.status === ResponseStatus.ACCEPTED,
+      'border-d-accent bg-d-accent/5': response.status !== ResponseStatus.ACCEPTED,
+      'border-d-accent bg-d-accent/10': response.status === ResponseStatus.ACCEPTED,
     }"
   >
     <!-- Tutor Header -->
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center space-x-3">
         <div
-          class="w-12 h-12 shrink-0 bg-telegram-accent/20 rounded-full flex items-center justify-center"
+          class="w-12 h-12 shrink-0 bg-d-accent/20 rounded-full flex items-center justify-center"
         >
-          <span class="text-telegram-accent font-semibold">{{ response.tutor.name[0] }}</span>
+          <span class="text-d-accent font-semibold">{{ response.tutor.name[0] }}</span>
         </div>
         <div>
-          <h3 class="font-semibold text-telegram-text">{{ response.tutor.name }}</h3>
-          <div class="flex items-center space-x-3 text-sm text-telegram-textSecondary">
+          <h3 class="font-semibold text-d-text">{{ response.tutor.name }}</h3>
+          <div class="flex items-center space-x-3 text-subhead text-d-text-second">
             <div class="flex items-center space-x-1">
-              <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-4 h-4 text-d-rating" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                 />
@@ -117,30 +89,22 @@ const declineService = (response: any) => {
       </div>
 
       <div class="flex flex-col items-end space-y-2">
-        <span class="text-telegram-success font-semibold">{{ response.price }}₽</span>
-        <span
-          :class="[
-            'px-2 py-1 text-xs font-medium rounded-full',
-            getStatusInfo(response.status).color,
-            'text-white',
-          ]"
-        >
-          {{ getStatusInfo(response.status).text }}
-        </span>
+        <span class="text-d-accent font-semibold tnum">{{ response.price }}₽</span>
+        <StatusBadge :response="response.status" />
       </div>
     </div>
 
     <!-- Message -->
     <div class="mb-4">
-      <p class="text-telegram-text text-sm leading-relaxed">{{ response.message }}</p>
+      <p class="text-d-text text-subhead leading-relaxed">{{ response.message }}</p>
     </div>
 
     <!-- Response Time -->
     <div class="flex items-center justify-between mb-4">
-      <span class="text-telegram-textSecondary text-xs">
+      <span class="text-d-text-second text-caption">
         Отклик отправлен {{ formatDate(response.createdAt) }}
       </span>
-      <div class="w-2 h-2 bg-telegram-accent rounded-full"></div>
+      <div class="w-2 h-2 bg-d-accent rounded-full"></div>
     </div>
 
     <!-- Actions -->
@@ -192,7 +156,7 @@ const declineService = (response: any) => {
           <Button
             @click="declineService(response)"
             variant="ghost"
-            class="w-full mt-3 text-sm text-telegram-textSecondary"
+            class="w-full mt-3 text-subhead text-d-text-second"
           >
             Не подошел
           </Button>
@@ -212,14 +176,14 @@ const declineService = (response: any) => {
           </svg>
           Связаться
         </Button>
-        <div class="flex-1 text-center py-2 text-telegram-success text-sm font-medium">
+        <div class="flex-1 text-center py-2 text-d-accent text-subhead font-medium">
           Услуга принята
         </div>
       </template>
 
       <!-- Declined Response -->
       <template v-else-if="response.status === ResponseStatus.REJECTED">
-        <div class="flex-1 text-center py-2 text-telegram-textSecondary text-sm">
+        <div class="flex-1 text-center py-2 text-d-text-second text-subhead">
           Отклик отклонен
         </div>
       </template>

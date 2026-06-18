@@ -5,6 +5,7 @@ import { useTelegramStore } from '@/stores/telegram'
 import { useEducation } from '@/shared/composables'
 import { useOrder } from '@/shared/composables'
 import Card from '@/shared/components/ui/Card.vue'
+import Loader from '@/shared/components/ui/Loader.vue'
 import OrderResponseCard from '../components/OrderResponseCard.vue'
 import { ArrowIcon } from '@/shared/components/icons'
 import { type Request, type RequestResponse, ResponseStatus } from '@/shared/types'
@@ -115,7 +116,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg pt-6">
+  <div class="min-h-screen bg-d-ink pt-6">
     <!-- Header -->
     <div class="px-4 mb-6">
       <div class="flex items-center">
@@ -123,7 +124,7 @@ onMounted(async () => {
           <ArrowIcon class="w-5 h-5 rotate-90" />
         </Button>
 
-        <h1 class="text-lg font-semibold text-telegram-text">Детали заказа</h1>
+        <h1 class="text-lg font-semibold text-d-text">Детали заказа</h1>
 
         <!-- TODO: Добавить редактирование заявки -->
         <!-- <Button v-if="order" variant="ghost" @click="handleEditOrder" class="!p-2">
@@ -134,13 +135,13 @@ onMounted(async () => {
 
     <!-- Loading state -->
     <div v-if="isLoading" class="flex justify-center py-16">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+      <Loader class="size-8 text-d-accent" />
     </div>
 
     <!-- Error state -->
     <div v-else-if="error" class="px-4">
       <Card class="p-6 text-center">
-        <div class="text-telegram-destructive mb-4">{{ error }}</div>
+        <div class="text-d-coral mb-4">{{ error }}</div>
         <Button @click="loadOrderDetails">Попробовать снова</Button>
       </Card>
     </div>
@@ -151,39 +152,39 @@ onMounted(async () => {
       <Card class="p-6">
         <div class="space-y-4">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold text-telegram-text">{{ subjectName }}</h2>
+            <h2 class="text-xl font-semibold text-d-text">{{ subjectName }}</h2>
             <div class="text-right">
-              <div class="text-lg font-bold text-telegram-button">
+              <div class="text-lg font-bold text-d-accent tnum">
                 {{ order.budget ? formatPrice(order.budget) : 'Бюджет не указан' }}
               </div>
-              <div class="text-sm text-telegram-textSecondary">бюджет</div>
+              <div class="text-subhead text-d-text-second">бюджет</div>
             </div>
           </div>
 
           <div class="space-y-2">
             <div class="flex items-center space-x-2">
-              <span class="text-sm text-telegram-textSecondary">Преподаватель:</span>
-              <span class="text-sm font-medium text-telegram-text">{{ teacherName }}</span>
+              <span class="text-subhead text-d-text-second">Преподаватель:</span>
+              <span class="text-subhead font-medium text-d-text">{{ teacherName }}</span>
             </div>
 
             <div v-if="order.deadline" class="flex items-center space-x-2">
-              <span class="text-sm text-telegram-textSecondary">Срок:</span>
-              <span class="text-sm font-medium text-telegram-text">
+              <span class="text-subhead text-d-text-second">Срок:</span>
+              <span class="text-subhead font-medium text-d-text">
                 {{ formatDate(order.deadline) }}
               </span>
             </div>
 
             <div class="flex items-center space-x-2">
-              <span class="text-sm text-telegram-textSecondary">Создан:</span>
-              <span class="text-sm font-medium text-telegram-text">
+              <span class="text-subhead text-d-text-second">Создан:</span>
+              <span class="text-subhead font-medium text-d-text">
                 {{ formatDate(order.createdAt) }}
               </span>
             </div>
           </div>
 
-          <div v-if="order.description" class="pt-4 border-t border-telegram-border">
-            <h3 class="text-sm font-medium text-telegram-text mb-2">Описание</h3>
-            <p class="text-sm text-telegram-textSecondary">{{ order.description }}</p>
+          <div v-if="order.description" class="pt-4 border-t border-d-border">
+            <h3 class="text-subhead font-medium text-d-text mb-2">Описание</h3>
+            <p class="text-subhead text-d-text-second">{{ order.description }}</p>
           </div>
         </div>
       </Card>
@@ -191,12 +192,12 @@ onMounted(async () => {
       <!-- Responses -->
       <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-telegram-text">Отклики ({{ responses.length }})</h3>
+          <h3 class="text-lg font-semibold text-d-text">Отклики ({{ responses.length }})</h3>
         </div>
 
         <div v-if="responses.length === 0" class="text-center py-8">
-          <div class="text-telegram-textSecondary mb-2">Пока нет откликов</div>
-          <p class="text-sm text-telegram-textSecondary">
+          <div class="text-d-text-second mb-2">Пока нет откликов</div>
+          <p class="text-subhead text-d-text-second">
             Репетиторы увидят вашу заявку и смогут откликнуться
           </p>
         </div>

@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue'
 
 import { Card, Button, Input, Modal } from '@components/ui'
-import { GroupIcon, PlusIcon, TrashIcon } from '@components/icons'
+import { GroupIcon, PlusIcon } from '@components/icons'
+import { Trash2 } from 'lucide-vue-next'
 import { useTelegramStore } from '@/stores'
 import { educationApi } from '@/services/api'
 import type { Group } from '@/shared/types'
@@ -88,8 +89,8 @@ onMounted(() => {
     <!-- Заголовок -->
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-2xl font-bold text-telegram-text">Управление группами</h2>
-        <p class="text-telegram-textSecondary">Создание и удаление групп студентов</p>
+        <h2 class="text-title-l font-bold text-d-text">Управление группами</h2>
+        <p class="text-d-text-second">Создание и удаление групп студентов</p>
       </div>
 
       <Button @click="showCreateModal = true" size="sm">
@@ -102,16 +103,16 @@ onMounted(() => {
     <div class="grid gap-4">
       <Card v-if="loading" class="p-6">
         <div class="flex items-center justify-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-accent"></div>
-          <span class="ml-3 text-telegram-textSecondary">Загрузка групп...</span>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-d-accent"></div>
+          <span class="ml-3 text-d-text-second">Загрузка групп...</span>
         </div>
       </Card>
 
       <Card v-else-if="groups.length === 0" class="p-6">
-        <div class="text-center text-telegram-textSecondary">
-          <GroupIcon class="w-12 h-12 mx-auto mb-4 text-telegram-textSecondary/50" />
+        <div class="text-center text-d-text-second">
+          <GroupIcon class="w-12 h-12 mx-auto mb-4 text-d-text-second/50" />
           <p>Группы не найдены</p>
-          <p class="text-sm">Создайте первую группу</p>
+          <p class="text-subhead">Создайте первую группу</p>
         </div>
       </Card>
 
@@ -119,20 +120,20 @@ onMounted(() => {
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div
-              class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center"
+              class="w-10 h-10 bg-d-accent/10 rounded-full flex items-center justify-center"
             >
-              <GroupIcon class="w-5 h-5 text-telegram-accent" />
+              <GroupIcon class="w-5 h-5 text-d-accent" />
             </div>
             <div>
-              <h3 class="font-semibold text-telegram-text">{{ group.number }}</h3>
-              <p class="text-sm text-telegram-textSecondary">
+              <h3 class="font-semibold text-d-text">{{ group.number }}</h3>
+              <p class="text-subhead text-d-text-second">
                 Создана {{ new Date(group.createdAt).toLocaleDateString() }}
               </p>
             </div>
           </div>
 
-          <Button @click="confirmDelete(group)" variant="danger" size="sm">
-            <TrashIcon class="w-4 h-4" />
+          <Button @click="confirmDelete(group)" variant="destructive" size="sm">
+            <Trash2 class="w-4 h-4" />
           </Button>
         </div>
       </Card>
@@ -142,7 +143,7 @@ onMounted(() => {
     <Modal v-model="showCreateModal" title="Создать новую группу">
       <div class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-telegram-text mb-2"> Номер группы </label>
+          <label class="block text-subhead font-medium text-d-text mb-2"> Номер группы </label>
           <Input v-model="newGroupNumber" placeholder="4212, 6105..." :disabled="creating" />
         </div>
 

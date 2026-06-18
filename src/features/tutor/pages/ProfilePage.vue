@@ -64,30 +64,30 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 pt-6">
+  <div class="min-h-screen bg-d-ink p-4 pt-6">
     <!-- Profile info -->
     <Card class="p-6 mb-6">
       <div v-if="isLoading" class="flex justify-center py-8">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-d-accent"></div>
       </div>
 
       <div v-else-if="user" class="flex items-center space-x-4 mb-6">
         <div
-          class="w-16 h-16 bg-telegram-success rounded-full flex items-center justify-center text-white text-xl font-bold"
+          class="w-16 h-16 bg-d-accent rounded-full flex items-center justify-center text-d-ink text-xl font-bold"
         >
           {{ user.name?.charAt(0) || telegramStore.firstName?.charAt(0) || 'Р' }}
         </div>
 
         <div class="flex-1">
-          <h2 class="text-xl font-semibold text-telegram-text">
+          <h2 class="text-xl font-semibold text-d-text">
             {{ user.name || telegramStore.firstName || 'Репетитор' }}
           </h2>
-          <p class="text-telegram-textSecondary">
+          <p class="text-d-text-second">
             @{{ user.telegramUsername || telegramStore.username || 'username' }}
           </p>
-          <div class="inline-flex items-center mt-2 px-2 py-1 bg-telegram-success/10 rounded-lg">
+          <div class="inline-flex items-center mt-2 px-2 py-1 bg-d-accent/10 rounded-lg">
             <svg
-              class="w-4 h-4 text-telegram-success mr-1"
+              class="w-4 h-4 text-d-accent mr-1"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -99,7 +99,7 @@ onMounted(() => {
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
               />
             </svg>
-            <span class="text-telegram-success text-sm font-medium">Репетитор</span>
+            <span class="text-d-accent text-subhead font-medium">Репетитор</span>
           </div>
         </div>
       </div>
@@ -111,8 +111,8 @@ onMounted(() => {
     <div class="grid grid-cols-2 gap-4 mb-6 mt-6">
       <Card v-for="stat in stats" :key="stat.label" class="p-4 text-center">
         <div class="text-2xl mb-2">{{ stat.icon }}</div>
-        <div class="text-2xl font-bold text-telegram-text mb-1">{{ stat.value }}</div>
-        <div class="text-telegram-textSecondary text-sm">{{ stat.label }}</div>
+        <div class="text-2xl font-bold text-d-text mb-1 tnum">{{ stat.value }}</div>
+        <div class="text-d-text-second text-subhead">{{ stat.label }}</div>
       </Card>
     </div>
 
@@ -122,10 +122,10 @@ onMounted(() => {
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div
-              class="w-10 h-10 bg-telegram-secondary rounded-lg flex items-center justify-center"
+              class="w-10 h-10 bg-d-surface rounded-lg flex items-center justify-center"
             >
               <svg
-                class="w-5 h-5 text-telegram-text"
+                class="w-5 h-5 text-d-text"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -139,12 +139,12 @@ onMounted(() => {
               </svg>
             </div>
             <div>
-              <p class="text-telegram-text font-medium">Отзывы</p>
-              <p class="text-telegram-textSecondary text-sm">Рейтинг и комментарии</p>
+              <p class="text-d-text font-medium">Отзывы</p>
+              <p class="text-d-text-second text-subhead">Рейтинг и комментарии</p>
             </div>
           </div>
           <svg
-            class="w-5 h-5 text-telegram-textSecondary"
+            class="w-5 h-5 text-d-text-second"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -163,10 +163,10 @@ onMounted(() => {
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div
-              class="w-10 h-10 bg-telegram-secondary rounded-lg flex items-center justify-center"
+              class="w-10 h-10 bg-d-surface rounded-lg flex items-center justify-center"
             >
               <svg
-                class="w-5 h-5 text-telegram-text"
+                class="w-5 h-5 text-d-text"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -180,11 +180,11 @@ onMounted(() => {
               </svg>
             </div>
             <div>
-              <p class="text-telegram-text font-medium">Уведомления</p>
+              <p class="text-d-text font-medium">Уведомления</p>
             </div>
           </div>
           <svg
-            class="w-5 h-5 text-telegram-textSecondary"
+            class="w-5 h-5 text-d-text-second"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -201,35 +201,32 @@ onMounted(() => {
     </div>
 
     <!-- Блок обратной связи -->
-    <div class="relative mt-6 group cursor-pointer" @click="openFeedback">
-      <!-- Градиентный фон с анимацией -->
-      <div
-        class="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-xl opacity-75 group-hover:opacity-100 transition-all duration-300 blur-sm group-hover:blur-none"
-      ></div>
-
-      <!-- Основная карточка -->
-      <Card
-        class="relative p-6 backdrop-blur-sm bg-white/10 border border-white/20 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105"
-      >
+    <div class="mt-6 cursor-pointer" @click="openFeedback">
+      <Card class="p-6 hover:border-d-accent transition-colors duration-200">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
-            <!-- Анимированная иконка -->
             <div
-              class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-300"
+              class="w-12 h-12 bg-d-accent/15 rounded-field flex items-center justify-center"
             >
               <div class="text-xl">🌟</div>
             </div>
             <div>
-              <h3 class="text-white font-semibold text-lg mb-1">Сделаем платформу лучше!</h3>
-              <p class="text-white/80 text-sm">Поделись опытом • Предложи улучшения 💪</p>
+              <h3 class="text-d-text font-semibold text-lg mb-1">Сделаем платформу лучше!</h3>
+              <p class="text-d-text-second text-subhead">
+                Поделись опытом • Предложи улучшения 💪
+              </p>
             </div>
           </div>
 
-          <!-- Стрелка с анимацией -->
           <div
-            class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300"
+            class="w-8 h-8 bg-d-accent/15 rounded-full flex items-center justify-center"
           >
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-4 h-4 text-d-accent"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -241,8 +238,8 @@ onMounted(() => {
         </div>
 
         <!-- Дополнительная мотивация -->
-        <div class="mt-4 pt-4 border-t border-white/20">
-          <div class="flex items-center justify-between text-white/70 text-xs">
+        <div class="mt-4 pt-4 border-t border-d-border">
+          <div class="flex items-center justify-between text-d-text-second text-caption">
             <span>🎓 Твой опыт ценен</span>
             <span>🚀 Влияй на развитие</span>
           </div>

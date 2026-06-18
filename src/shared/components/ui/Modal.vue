@@ -61,22 +61,22 @@ const maxWidthClasses = {
           <div
             v-if="modelValue"
             :class="[
-              'w-full bg-telegram-card border border-telegram-border rounded-xl shadow-xl',
+              'w-full bg-d-panel border border-d-border rounded-card shadow-d-toast',
               maxWidthClasses[maxWidth],
             ]"
           >
             <!-- Header -->
             <div v-if="title || closable" class="flex items-center justify-between p-6 pb-4">
-              <h3 v-if="title" class="text-lg font-semibold text-telegram-text">
+              <h3 v-if="title" class="text-title-m text-d-text">
                 {{ title }}
               </h3>
               <button
                 v-if="closable"
                 @click="handleClose"
-                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-telegram-secondary transition-colors"
+                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-d-surface transition-colors"
               >
                 <svg
-                  class="w-5 h-5 text-telegram-textSecondary"
+                  class="w-5 h-5 text-d-text-second"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -97,7 +97,7 @@ const maxWidthClasses = {
             </div>
 
             <!-- Footer -->
-            <div v-if="$slots.footer" class="px-6 py-4 border-t border-telegram-border">
+            <div v-if="$slots.footer" class="px-6 py-4 border-t border-d-border">
               <slot name="footer" />
             </div>
           </div>

@@ -13,7 +13,7 @@ const actions = [
     title: 'Создать заявку',
     description: 'Разместить запрос на помощь',
     icon: PlusIcon,
-    color: 'bg-telegram-button',
+    color: 'bg-d-accent',
     path: PATHS.STUDENT_CREATE_ORDER,
   },
   // TODO вернуть
@@ -21,14 +21,14 @@ const actions = [
   //   title: 'Найти репетиторов',
   //   description: 'Просмотреть доступных преподавателей',
   //   icon: LoupeIcon,
-  //   color: 'bg-telegram-success',
+  //   color: 'bg-d-accent',
   //   path: PATHS.STUDENT_TUTORS,
   // },
   {
     title: 'Мои заявки',
     description: 'Управление заявками и откликами',
     icon: OrderIcon,
-    color: 'bg-purple-500',
+    color: 'bg-d-accent',
     path: PATHS.STUDENT_ORDERS,
   },
 ]
@@ -45,20 +45,20 @@ const handleAction = (path: string) => {
       v-for="action in actions"
       :key="action.title"
       @click="handleAction(action.path)"
-      class="p-4 cursor-pointer hover:border-telegram-accent transition-colors duration-200"
+      class="p-4 cursor-pointer hover:border-d-accent transition-colors duration-200"
     >
       <div class="flex items-center space-x-4">
-        <div :class="[action.color, 'w-12 h-12 rounded-xl flex items-center justify-center']">
+        <div :class="[action.color, 'w-12 h-12 rounded-field flex items-center justify-center']">
           <component :is="action.icon" class="w-6 h-6" />
         </div>
 
         <div class="flex-1">
-          <h3 class="text-telegram-text font-medium">{{ action.title }}</h3>
-          <p class="text-telegram-textSecondary text-sm">{{ action.description }}</p>
+          <h3 class="text-d-text font-medium">{{ action.title }}</h3>
+          <p class="text-d-text-second text-subhead">{{ action.description }}</p>
         </div>
 
         <svg
-          class="w-5 h-5 text-telegram-textSecondary"
+          class="w-5 h-5 text-d-text-second"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

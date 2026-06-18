@@ -5,6 +5,7 @@ import { useTelegramStore } from '@/stores/telegram'
 import { useTutor } from '@/shared/composables'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
+import Loader from '@/shared/components/ui/Loader.vue'
 import { PATHS } from '@/router/paths'
 import type { User } from '@/shared/types'
 
@@ -46,15 +47,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 pt-6">
+  <div class="min-h-screen bg-d-ink p-4 pt-6">
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-telegram-text mb-2">Избранное</h1>
-      <p class="text-telegram-textSecondary">Репетиторы, которых вы добавили в избранное</p>
+      <h1 class="text-2xl font-bold text-d-text mb-2">Избранное</h1>
+      <p class="text-d-text-second">Репетиторы, которых вы добавили в избранное</p>
     </div>
 
     <!-- Loading state -->
     <div v-if="isLoading" class="flex justify-center py-16">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+      <Loader class="size-8 text-d-accent" />
     </div>
 
     <!-- Favorites list -->
@@ -63,13 +64,13 @@ onMounted(() => {
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div
-              class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-bold"
+              class="w-12 h-12 bg-d-accent rounded-full flex items-center justify-center text-d-ink font-bold"
             >
               {{ tutor.name?.charAt(0) || 'Р' }}
             </div>
             <div>
-              <h3 class="font-semibold text-telegram-text">{{ tutor.name || 'Репетитор' }}</h3>
-              <p class="text-sm text-telegram-textSecondary">
+              <h3 class="font-semibold text-d-text">{{ tutor.name || 'Репетитор' }}</h3>
+              <p class="text-subhead text-d-text-second">
                 {{ tutor.description || 'Описание не указано' }}
               </p>
             </div>
@@ -78,7 +79,7 @@ onMounted(() => {
             variant="ghost"
             size="sm"
             @click="handleRemoveFavorite(tutor.id)"
-            class="text-telegram-destructive hover:text-telegram-destructive"
+            class="text-d-coral hover:text-d-coral"
           >
             Удалить
           </Button>
@@ -89,10 +90,10 @@ onMounted(() => {
     <!-- Empty state -->
     <div v-else class="text-center py-16">
       <div
-        class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
+        class="w-20 h-20 bg-d-surface rounded-full mx-auto mb-6 flex items-center justify-center"
       >
         <svg
-          class="w-10 h-10 text-telegram-textSecondary"
+          class="w-10 h-10 text-d-text-second"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -106,9 +107,9 @@ onMounted(() => {
         </svg>
       </div>
 
-      <h2 class="text-xl font-semibold text-telegram-text mb-3">Пока пусто</h2>
+      <h2 class="text-xl font-semibold text-d-text mb-3">Пока пусто</h2>
 
-      <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+      <p class="text-d-text-second mb-8 max-w-sm mx-auto">
         Найдите репетиторов и добавьте понравившихся в избранное для быстрого доступа
       </p>
 

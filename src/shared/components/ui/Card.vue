@@ -22,7 +22,7 @@ const cardClasses = computed(() => {
 
   const variantClasses = {
     default: '',
-    gradient: 'card-gradient',
+    gradient: '',
     hover: 'card-hover',
   }
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
+import { StatusBadge } from '@/shared/components/ui'
 import { PATHS } from '@/router/paths'
 import type { Deal } from '@/shared/types'
 
@@ -17,42 +17,6 @@ interface Props {
 const props = defineProps<Props>()
 const router = useRouter()
 const telegramStore = useTelegramStore()
-
-const statusConfig = computed(() => {
-  const configs = {
-    PENDING: {
-      label: 'Ожидает',
-      color: 'bg-yellow-500',
-      textColor: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
-    },
-    ACCEPTED: {
-      label: 'Принят',
-      color: 'bg-blue-500',
-      textColor: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-    },
-    IN_PROGRESS: {
-      label: 'В работе',
-      color: 'bg-green-500',
-      textColor: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    COMPLETED: {
-      label: 'Завершен',
-      color: 'bg-gray-500',
-      textColor: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-    },
-    CANCELLED: {
-      label: 'Отменен',
-      color: 'bg-red-500',
-      textColor: 'text-red-600',
-      bgColor: 'bg-red-50',
-    },
-  }
-  return configs[props.deal.status] || configs.PENDING
-})
 
 const formatPrice = (price: number) => {
   return `${price} ₽`
@@ -92,44 +56,36 @@ const handleComplete = () => {
     <!-- Header -->
     <div class="flex items-start justify-between mb-3">
       <div class="flex-1">
-        <h3 class="font-semibold text-telegram-text mb-1">
+        <h3 class="font-semibold text-d-text mb-1">
           {{ props.deal.subject?.name || 'Предмет не указан' }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-subhead text-d-text-second">
           Студент: {{ props.deal.student?.name || 'Не указан' }}
         </p>
       </div>
 
-      <div
-        :class="[
-          'px-2 py-1 rounded-full text-xs font-medium',
-          statusConfig.bgColor,
-          statusConfig.textColor,
-        ]"
-      >
-        {{ statusConfig.label }}
-      </div>
+      <StatusBadge :deal="props.deal.status" />
     </div>
 
     <!-- Details -->
     <div class="space-y-2 mb-4">
-      <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Цена:</span>
-        <span class="font-medium text-telegram-text">
+      <div class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Цена:</span>
+        <span class="font-medium text-d-text tnum">
           {{ formatPrice(props.deal.price) }}
         </span>
       </div>
 
-      <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Создан:</span>
-        <span class="text-telegram-text">
+      <div class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Создан:</span>
+        <span class="text-d-text">
           {{ formatDate(props.deal.createdAt) }}
         </span>
       </div>
 
-      <div v-if="props.deal.deadline" class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Дедлайн:</span>
-        <span class="text-telegram-text">
+      <div v-if="props.deal.deadline" class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Дедлайн:</span>
+        <span class="text-d-text">
           {{ formatDate(props.deal.deadline) }}
         </span>
       </div>
@@ -140,7 +96,7 @@ const handleComplete = () => {
       v-if="props.deal.serviceResponse?.message || props.deal.requestResponse?.message"
       class="mb-4"
     >
-      <p class="text-sm text-telegram-text line-clamp-2">
+      <p class="text-subhead text-d-text line-clamp-2">
         {{ props.deal.serviceResponse?.message || props.deal.requestResponse?.message }}
       </p>
     </div>
@@ -160,7 +116,7 @@ const handleComplete = () => {
         variant="ghost"
         size="sm"
         @click="handleReject"
-        class="text-telegram-destructive"
+        class="text-d-coral"
       >
         Отклонить
       </Button>

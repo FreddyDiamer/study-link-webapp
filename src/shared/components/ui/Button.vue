@@ -27,13 +27,13 @@ const buttonClasses = computed(() => {
     primary: 'btn-primary',
     secondary: 'btn-secondary',
     ghost: 'btn-ghost',
-    destructive: 'bg-telegram-destructive text-white hover:bg-red-600',
+    destructive: 'btn-destructive',
   }
 
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base font-semibold',
-    lg: 'px-6 py-3 text-lg font-semibold',
+    sm: 'px-3 py-1.5 text-subhead',
+    md: 'px-4 py-2.5 text-body',
+    lg: 'h-[52px] px-6 text-body rounded-[13px]',
   }
 
   const disabledClasses = props.disabled ? 'opacity-50 cursor-not-allowed' : ''

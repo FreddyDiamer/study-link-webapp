@@ -136,7 +136,7 @@ const highlightSearchText = (text: string) => {
 
   const query = inputValue.value.toLowerCase()
   const regex = new RegExp(`(${query})`, 'gi')
-  return text.replace(regex, '<mark class="bg-telegram-accent/20 text-telegram-accent">$1</mark>')
+  return text.replace(regex, '<mark class="bg-d-accent/20 text-d-accent">$1</mark>')
 }
 
 const handleClickOutside = (event: Event) => {
@@ -218,19 +218,19 @@ onUnmounted(() => {
     >
       <div
         v-if="isOpen && filteredOptions.length > 0"
-        class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg max-h-60 overflow-y-auto"
+        class="absolute z-50 mt-2 w-full bg-d-panel border border-d-border rounded-card shadow-d-toast max-h-60 overflow-y-auto"
       >
         <button
           v-for="(option, index) in filteredOptions"
           :key="option.value"
           @click="selectOption(option)"
-          class="w-full px-4 py-3 text-left hover:bg-telegram-secondary transition-colors border-b border-telegram-border last:border-b-0"
+          class="w-full px-4 py-3 text-left transition-colors border-b border-d-border last:border-b-0"
           :class="{
-            'bg-telegram-accent/10 text-telegram-accent':
+            'bg-d-accent/10 text-d-accent':
               selectedOption?.value === option.value && option.value !== '',
-            'text-telegram-textSecondary italic': option.value === '',
-            'text-telegram-text': selectedOption?.value !== option.value && option.value !== '',
-            'bg-telegram-secondary': highlightedIndex === index,
+            'text-d-text-second italic': option.value === '',
+            'text-d-text': selectedOption?.value !== option.value && option.value !== '',
+            'bg-d-surface': highlightedIndex === index,
           }"
           @mouseenter="highlightedIndex = index"
         >
@@ -238,7 +238,7 @@ onUnmounted(() => {
             <span class="font-medium" v-html="highlightSearchText(option.label)"></span>
             <svg
               v-if="selectedOption?.value === option.value && option.value !== ''"
-              class="w-4 h-4 text-telegram-accent"
+              class="w-4 h-4 text-d-accent"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -256,16 +256,16 @@ onUnmounted(() => {
     <!-- No results dropdown -->
     <div
       v-if="isOpen && filteredOptions.length === 0 && inputValue"
-      class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg"
+      class="absolute z-50 mt-2 w-full bg-d-panel border border-d-border rounded-card shadow-d-toast"
     >
-      <div class="px-4 py-6 text-center text-telegram-textSecondary">
+      <div class="px-4 py-6 text-center text-d-text-second">
         <LoupeIcon class="w-8 h-8 mx-auto mb-2 opacity-50" />
-        <p class="text-sm">Ничего не найдено</p>
-        <p class="text-xs mt-1">Попробуйте изменить запрос</p>
+        <p class="text-subhead">Ничего не найдено</p>
+        <p class="text-caption mt-1">Попробуйте изменить запрос</p>
       </div>
     </div>
 
-    <p v-if="error" class="text-sm text-telegram-destructive">
+    <p v-if="error" class="text-caption text-d-coral">
       {{ error }}
     </p>
   </div>

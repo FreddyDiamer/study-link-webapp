@@ -22,7 +22,7 @@ const quickActions = [
     title: 'Добавить услугу',
     description: 'Создать новое предложение',
     icon: 'M12 6v6m0 0v6m0-6h6m-6 0H6',
-    color: 'bg-telegram-button',
+    color: 'bg-d-accent',
     action: () => {
       telegramStore.hapticFeedback('light')
       router.push('/tutor/services/create')
@@ -33,7 +33,7 @@ const quickActions = [
   //   title: 'Просмотреть заявки по моим предметам',
   //   description: 'Новые запросы студентов',
   //   icon: 'M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4',
-  //   color: 'bg-telegram-success',
+  //   color: 'bg-d-accent',
   //   action: () => {
   //     telegramStore.hapticFeedback('light')
   //     router.push('/tutor/requests')
@@ -43,7 +43,7 @@ const quickActions = [
     title: 'Мои услуги',
     description: 'Управление предложениями',
     icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
-    color: 'bg-purple-500',
+    color: 'bg-d-accent',
     action: () => {
       telegramStore.hapticFeedback('light')
       router.push('/tutor/services')
@@ -76,7 +76,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 pt-6">
+  <div class="min-h-screen bg-d-ink p-4 pt-6">
     <!-- Search -->
     <Card class="p-4 mb-6">
       <div class="space-y-3">
@@ -97,18 +97,18 @@ onMounted(() => {
 
     <!-- Quick actions -->
     <div class="mb-6">
-      <h2 class="text-lg font-semibold text-telegram-text mb-3">Быстрые действия</h2>
+      <h2 class="text-lg font-semibold text-d-text mb-3">Быстрые действия</h2>
 
       <div class="space-y-3">
         <Card
           v-for="action in quickActions"
           :key="action.title"
           @click="action.action"
-          class="p-4 cursor-pointer hover:border-telegram-accent transition-colors duration-200"
+          class="p-4 cursor-pointer hover:border-d-accent transition-colors duration-200"
         >
           <div class="flex items-center space-x-4">
-            <div :class="[action.color, 'w-12 h-12 rounded-xl flex items-center justify-center']">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div :class="[action.color, 'w-12 h-12 rounded-field flex items-center justify-center']">
+              <svg class="w-6 h-6 text-d-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -119,12 +119,12 @@ onMounted(() => {
             </div>
 
             <div class="flex-1">
-              <h3 class="text-telegram-text font-medium">{{ action.title }}</h3>
-              <p class="text-telegram-textSecondary text-sm">{{ action.description }}</p>
+              <h3 class="text-d-text font-medium">{{ action.title }}</h3>
+              <p class="text-d-text-second text-subhead">{{ action.description }}</p>
             </div>
 
             <svg
-              class="w-5 h-5 text-telegram-textSecondary"
+              class="w-5 h-5 text-d-text-second"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

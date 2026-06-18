@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
+import { StatusBadge } from '@/shared/components/ui'
 import type { Deal } from '@/shared/types'
 
 interface Props {
@@ -29,37 +30,6 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const getStatusConfig = (status: string) => {
-  const configs = {
-    PENDING: {
-      label: 'Ожидает',
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
-    },
-    ACCEPTED: {
-      label: 'Принят',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-    },
-    IN_PROGRESS: {
-      label: 'В работе',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    COMPLETED: {
-      label: 'Завершен',
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-    },
-    CANCELLED: {
-      label: 'Отменен',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-    },
-  }
-  return configs[status as keyof typeof configs] || configs.PENDING
-}
-
 const handleContactTutor = () => {
   telegramStore.hapticFeedback('light')
   // TODO: Добавить логику связи с репетитором
@@ -83,40 +53,32 @@ const handleLeaveReview = () => {
     <!-- Header -->
     <div class="flex items-start justify-between mb-4">
       <div class="flex-1">
-        <h3 class="font-semibold text-telegram-text mb-1">
+        <h3 class="font-semibold text-d-text mb-1">
           {{ deal.subject?.name || 'Предмет не указан' }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-subhead text-d-text-second">
           {{ deal.teacher?.fullName || 'Преподаватель не указан' }}
         </p>
       </div>
 
-      <div class="text-right">
-        <div class="font-bold text-telegram-accent text-lg">
+      <div class="flex flex-col items-end gap-1">
+        <div class="font-bold text-d-accent text-title-m tnum">
           {{ formatPrice(deal.price) }}
         </div>
-        <div
-          :class="[
-            'px-2 py-1 rounded-full text-xs font-medium mt-1',
-            getStatusConfig(deal.status).bgColor,
-            getStatusConfig(deal.status).color,
-          ]"
-        >
-          {{ getStatusConfig(deal.status).label }}
-        </div>
+        <StatusBadge :deal="deal.status" />
       </div>
     </div>
 
     <!-- Tutor info -->
     <div class="flex items-center space-x-3 mb-4">
       <div
-        class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-bold"
+        class="w-12 h-12 bg-d-accent rounded-full flex items-center justify-center text-d-ink font-bold"
       >
         {{ deal.tutor?.name?.charAt(0) || 'Р' }}
       </div>
       <div class="flex-1">
-        <div class="font-medium text-telegram-text">{{ deal.tutor?.name || 'Репетитор' }}</div>
-        <div class="text-sm text-telegram-textSecondary">
+        <div class="font-medium text-d-text">{{ deal.tutor?.name || 'Репетитор' }}</div>
+        <div class="text-subhead text-d-text-second">
           @{{ deal.tutor?.telegramUsername || 'username' }}
         </div>
       </div>
@@ -124,19 +86,19 @@ const handleLeaveReview = () => {
 
     <!-- Deal details -->
     <div class="space-y-2 mb-4">
-      <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Создано:</span>
-        <span class="text-telegram-text">{{ formatDate(deal.createdAt) }}</span>
+      <div class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Создано:</span>
+        <span class="text-d-text">{{ formatDate(deal.createdAt) }}</span>
       </div>
 
-      <div v-if="deal.deadline" class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Дедлайн:</span>
-        <span class="text-telegram-text">{{ formatDate(deal.deadline) }}</span>
+      <div v-if="deal.deadline" class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Дедлайн:</span>
+        <span class="text-d-text">{{ formatDate(deal.deadline) }}</span>
       </div>
 
-      <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Обновлено:</span>
-        <span class="text-telegram-text">{{ formatDate(deal.updatedAt) }}</span>
+      <div class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Обновлено:</span>
+        <span class="text-d-text">{{ formatDate(deal.updatedAt) }}</span>
       </div>
     </div>
 
@@ -156,7 +118,7 @@ const handleLeaveReview = () => {
         @click="handleCancelDeal"
         variant="ghost"
         size="sm"
-        class="text-telegram-destructive"
+        class="text-d-coral"
       >
         Отменить
       </Button>

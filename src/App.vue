@@ -35,7 +35,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="min-h-screen bg-telegram-bg text-telegram-text flex flex-col"
+    class="min-h-screen bg-d-ink text-d-text font-sl flex flex-col"
     :class="{
       'flow-student': appStore.isStudentFlow,
       'flow-tutor': appStore.isTutorFlow,

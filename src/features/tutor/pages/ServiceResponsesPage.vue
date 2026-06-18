@@ -4,6 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
+import { StatusBadge } from '@/shared/components/ui'
+import type { ResponseStatus } from '@/shared/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -146,13 +148,13 @@ const getStatusLabel = (status: string): string => {
 const getUrgencyClass = (urgency: string): string => {
   switch (urgency) {
     case 'Срочно':
-      return 'bg-red-500/20 text-red-600'
+      return 'bg-d-coral/20 text-d-coral'
     case 'В течение недели':
-      return 'bg-yellow-500/20 text-yellow-600'
+      return 'bg-d-rating/20 text-d-rating'
     case 'В течение месяца':
-      return 'bg-green-500/20 text-green-600'
+      return 'bg-d-teal/20 text-d-teal'
     default:
-      return 'bg-telegram-secondary text-telegram-textSecondary'
+      return 'bg-d-surface text-d-text-second'
   }
 }
 
@@ -169,22 +171,22 @@ const formatDate = (dateString: string): string => {
 const getResponseStatusInfo = (status: string) => {
   switch (status) {
     case 'PENDING':
-      return { color: 'bg-orange-500', text: 'Ожидает ответа', textColor: 'text-orange-600' }
+      return { color: 'bg-d-rating', text: 'Ожидает ответа', textColor: 'text-d-rating' }
     case 'ACCEPTED':
-      return { color: 'bg-telegram-success', text: 'Принят', textColor: 'text-telegram-success' }
+      return { color: 'bg-d-accent', text: 'Принят', textColor: 'text-d-accent' }
     case 'REJECTED':
-      return { color: 'bg-red-500', text: 'Отклонен', textColor: 'text-red-600' }
+      return { color: 'bg-d-coral', text: 'Отклонен', textColor: 'text-d-coral' }
     case 'EXPIRED':
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-d-text-second',
         text: 'Истек',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-d-text-second',
       }
     default:
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-d-text-second',
         text: 'Неизвестно',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-d-text-second',
       }
   }
 }
@@ -250,15 +252,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 pt-6">
+  <div class="min-h-screen bg-d-ink p-4 pt-6">
     <!-- Header -->
     <div class="flex items-center mb-6">
       <button
         @click="goBack"
-        class="p-2 -ml-2 rounded-lg hover:bg-telegram-secondary transition-colors mr-3"
+        class="p-2 -ml-2 rounded-lg hover:bg-d-surface transition-colors mr-3"
       >
         <svg
-          class="w-5 h-5 text-telegram-text"
+          class="w-5 h-5 text-d-text"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -272,31 +274,31 @@ onMounted(() => {
         </svg>
       </button>
       <div class="flex-1">
-        <h1 class="text-xl font-bold text-telegram-text mb-1">
+        <h1 class="text-xl font-bold text-d-text mb-1">
           {{ service.subject.name }} • {{ service.teacher.fullName }}
         </h1>
-        <p class="text-telegram-textSecondary text-sm">
-          {{ service.description }} • {{ service.price }}₽
+        <p class="text-d-text-second text-subhead">
+          {{ service.description }} • <span class="tnum">{{ service.price }}₽</span>
         </p>
       </div>
     </div>
 
     <!-- Tabs -->
-    <div class="flex space-x-1 mb-6 bg-telegram-secondary rounded-lg p-1">
+    <div class="flex space-x-1 mb-6 bg-d-surface rounded-lg p-1">
       <button
         @click="activeTab = 'new'"
         :class="[
-          'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all',
+          'flex-1 py-2 px-4 rounded-md text-subhead font-medium transition-all',
           activeTab === 'new'
-            ? 'bg-telegram-accent text-white shadow-sm'
-            : 'text-telegram-textSecondary hover:text-telegram-text',
+            ? 'bg-d-accent text-d-ink shadow-sm'
+            : 'text-d-text-second hover:text-d-text',
         ]"
       >
         Новые отклики
         <span
           v-if="responses.filter((r) => r.status === 'PENDING').length > 0"
-          class="ml-2 px-2 py-0.5 rounded-full text-xs"
-          :class="activeTab === 'new' ? 'bg-white/20' : 'bg-telegram-accent text-white'"
+          class="ml-2 px-2 py-0.5 rounded-full text-caption"
+          :class="activeTab === 'new' ? 'bg-d-surface' : 'bg-d-accent text-d-ink'"
         >
           {{ responses.filter((r) => r.status === 'PENDING').length }}
         </span>
@@ -304,17 +306,17 @@ onMounted(() => {
       <button
         @click="activeTab = 'active'"
         :class="[
-          'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all',
+          'flex-1 py-2 px-4 rounded-md text-subhead font-medium transition-all',
           activeTab === 'active'
-            ? 'bg-telegram-accent text-white shadow-sm'
-            : 'text-telegram-textSecondary hover:text-telegram-text',
+            ? 'bg-d-accent text-d-ink shadow-sm'
+            : 'text-d-text-second hover:text-d-text',
         ]"
       >
         Активные
         <span
           v-if="responses.filter((r) => r.status === 'ACCEPTED').length > 0"
-          class="ml-2 px-2 py-0.5 rounded-full text-xs"
-          :class="activeTab === 'active' ? 'bg-white/20' : 'bg-telegram-accent text-white'"
+          class="ml-2 px-2 py-0.5 rounded-full text-caption"
+          :class="activeTab === 'active' ? 'bg-d-surface' : 'bg-d-accent text-d-ink'"
         >
           {{ responses.filter((r) => r.status === 'ACCEPTED').length }}
         </span>
@@ -322,10 +324,10 @@ onMounted(() => {
       <button
         @click="activeTab = 'completed'"
         :class="[
-          'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all',
+          'flex-1 py-2 px-4 rounded-md text-subhead font-medium transition-all',
           activeTab === 'completed'
-            ? 'bg-telegram-accent text-white shadow-sm'
-            : 'text-telegram-textSecondary hover:text-telegram-text',
+            ? 'bg-d-accent text-d-ink shadow-sm'
+            : 'text-d-text-second hover:text-d-text',
         ]"
       >
         Завершенные
@@ -333,8 +335,8 @@ onMounted(() => {
           v-if="
             responses.filter((r) => r.status === 'REJECTED' || r.status === 'EXPIRED').length > 0
           "
-          class="ml-2 px-2 py-0.5 rounded-full text-xs"
-          :class="activeTab === 'completed' ? 'bg-white/20' : 'bg-telegram-accent text-white'"
+          class="ml-2 px-2 py-0.5 rounded-full text-caption"
+          :class="activeTab === 'completed' ? 'bg-d-surface' : 'bg-d-accent text-d-ink'"
         >
           {{ responses.filter((r) => r.status === 'REJECTED' || r.status === 'EXPIRED').length }}
         </span>
@@ -348,9 +350,9 @@ onMounted(() => {
         <div class="flex items-start justify-between mb-4">
           <div class="flex items-center space-x-3">
             <div
-              class="w-12 h-12 bg-telegram-accent/20 rounded-full flex items-center justify-center"
+              class="w-12 h-12 bg-d-accent/20 rounded-full flex items-center justify-center"
             >
-              <span class="text-telegram-accent font-semibold">
+              <span class="text-d-accent font-semibold">
                 {{
                   response.student.name
                     .split(' ')
@@ -360,56 +362,48 @@ onMounted(() => {
               </span>
             </div>
             <div>
-              <h3 class="font-semibold text-telegram-text">{{ response.student.name }}</h3>
-              <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
-                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+              <h3 class="font-semibold text-d-text">{{ response.student.name }}</h3>
+              <div class="flex items-center space-x-2 text-subhead text-d-text-second">
+                <svg class="w-3 h-3 text-d-rating" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                   />
                 </svg>
-                <span>{{ response.student.rating }}</span>
+                <span class="tnum">{{ response.student.rating }}</span>
               </div>
             </div>
           </div>
 
           <div class="flex flex-col items-end space-y-2">
-            <span class="text-xs text-telegram-textSecondary">{{
+            <span class="text-caption text-d-text-second">{{
               formatDate(response.createdAt)
             }}</span>
-            <div
-              :class="[
-                'px-2 py-1 text-xs font-medium rounded-full',
-                getResponseStatusInfo(response.status).color,
-                'text-white',
-              ]"
-            >
-              {{ getResponseStatusInfo(response.status).text }}
-            </div>
+            <StatusBadge :response="response.status as ResponseStatus" />
           </div>
         </div>
 
         <!-- Message -->
         <div class="mb-4">
-          <p class="text-telegram-text text-sm">{{ response.message }}</p>
+          <p class="text-d-text text-subhead">{{ response.message }}</p>
         </div>
 
         <!-- Price Details -->
-        <div class="grid grid-cols-2 gap-4 mb-4 p-3 bg-telegram-secondary/50 rounded-lg">
+        <div class="grid grid-cols-2 gap-4 mb-4 p-3 bg-d-surface/50 rounded-lg">
           <div>
-            <span class="text-xs text-telegram-textSecondary">Предложенная цена:</span>
-            <div class="text-sm font-medium text-telegram-success">{{ response.price }}₽</div>
+            <span class="text-caption text-d-text-second">Предложенная цена:</span>
+            <div class="text-subhead font-medium text-d-accent tnum">{{ response.price }}₽</div>
           </div>
           <div>
-            <span class="text-xs text-telegram-textSecondary">Цена услуги:</span>
-            <div class="text-sm font-medium text-telegram-text">{{ response.service.price }}₽</div>
+            <span class="text-caption text-d-text-second">Цена услуги:</span>
+            <div class="text-subhead font-medium text-d-text tnum">{{ response.service.price }}₽</div>
           </div>
         </div>
 
         <!-- Deadline -->
-        <div v-if="response.proposedDeadline" class="mb-4 p-3 bg-telegram-secondary/30 rounded-lg">
+        <div v-if="response.proposedDeadline" class="mb-4 p-3 bg-d-surface/30 rounded-lg">
           <div class="flex items-center justify-between">
-            <span class="text-sm text-telegram-textSecondary">Предложенный дедлайн:</span>
-            <span class="text-sm font-medium text-telegram-text">
+            <span class="text-subhead text-d-text-second">Предложенный дедлайн:</span>
+            <span class="text-subhead font-medium text-d-text">
               {{ formatDeadline(response.proposedDeadline) }}
             </span>
           </div>
@@ -490,10 +484,10 @@ onMounted(() => {
     <!-- Empty State -->
     <div v-else class="text-center py-16">
       <div
-        class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
+        class="w-20 h-20 bg-d-surface rounded-full mx-auto mb-6 flex items-center justify-center"
       >
         <svg
-          class="w-10 h-10 text-telegram-textSecondary"
+          class="w-10 h-10 text-d-text-second"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -507,7 +501,7 @@ onMounted(() => {
         </svg>
       </div>
 
-      <h2 class="text-xl font-semibold text-telegram-text mb-3">
+      <h2 class="text-xl font-semibold text-d-text mb-3">
         {{
           activeTab === 'new'
             ? 'Пока нет новых откликов'
@@ -517,7 +511,7 @@ onMounted(() => {
         }}
       </h2>
 
-      <p class="text-telegram-textSecondary max-w-sm mx-auto">
+      <p class="text-d-text-second max-w-sm mx-auto">
         {{
           activeTab === 'new'
             ? 'Когда ученики начнут откликаться на вашу услугу, они появятся здесь'

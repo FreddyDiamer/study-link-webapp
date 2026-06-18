@@ -11,7 +11,7 @@ import { useEducation } from '@/shared/composables'
 
 // Components
 import { PlusIcon } from '@components/icons'
-import { Button, Card, Input } from '@components/ui'
+import { Button, Card, Input, Loader } from '@components/ui'
 import QuickActions from '../components/QuickActions.vue'
 import SelectGroupCard from '../components/SelectGroupCard.vue'
 import { PATHS } from '@/router/paths'
@@ -107,29 +107,22 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 flex flex-col gap-6">
+  <div class="min-h-screen bg-d-ink p-4 flex flex-col gap-6">
     <!-- Group Number Input -->
     <SelectGroupCard v-if="appStore.showGroupCard || !authStore.user?.group" />
 
     <!-- Загрузка образовательных данных -->
     <div v-if="educationLoading" class="flex justify-center items-center py-12">
       <div class="text-center">
-        <div
-          class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"
-        ></div>
-        <p class="text-gray-600">Загрузка данных...</p>
+        <Loader class="size-8 text-d-accent mx-auto mb-4" />
+        <p class="text-d-text-second">Загрузка данных...</p>
       </div>
     </div>
 
     <!-- Ошибка образовательных данных -->
     <div v-else-if="educationError" class="text-center py-12">
-      <div class="text-red-600 mb-4">{{ educationError }}</div>
-      <button
-        @click="initialize"
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-      >
-        Попробовать снова
-      </button>
+      <div class="text-d-coral mb-4">{{ educationError }}</div>
+      <Button @click="initialize">Попробовать снова</Button>
     </div>
 
     <!-- Основной контент -->
@@ -148,7 +141,7 @@ onMounted(async () => {
 
       <!-- Quick actions -->
       <div class="space-y-3">
-        <h2 class="text-xl font-semibold text-telegram-text mb-4">Быстрые действия</h2>
+        <h2 class="text-xl font-semibold text-d-text mb-4">Быстрые действия</h2>
         <QuickActions />
       </div>
 
@@ -156,7 +149,7 @@ onMounted(async () => {
       <!-- TODO: Добавить мои предметы -->
       <!-- <div></div>
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-semibold text-telegram-text">Мои предметы</h2>
+          <h2 class="text-xl font-semibold text-d-text">Мои предметы</h2>
           <Button variant="secondary" size="sm" @click="createOrder">
             <PlusIcon class="w-4 h-4 mr-1" />
             Добавить
@@ -165,10 +158,10 @@ onMounted(async () => {
 
         <div v-if="mySubjects.length === 0" class="text-center py-8">
           <div
-            class="w-16 h-16 bg-telegram-secondary rounded-full mx-auto mb-4 flex items-center justify-center"
+            class="w-16 h-16 bg-d-surface rounded-full mx-auto mb-4 flex items-center justify-center"
           >
             <svg
-              class="w-8 h-8 text-telegram-textSecondary"
+              class="w-8 h-8 text-d-text-second"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -181,7 +174,7 @@ onMounted(async () => {
               />
             </svg>
           </div>
-          <p class="text-telegram-textSecondary mb-4">У вас пока нет предметов</p>
+          <p class="text-d-text-second mb-4">У вас пока нет предметов</p>
           <Button @click="createOrder">Добавить первый предмет</Button>
         </div>
 
@@ -190,37 +183,37 @@ onMounted(async () => {
             v-for="subject in mySubjects"
             :key="subject.id"
             @click="findTutorsForSubject(subject)"
-            class="p-4 cursor-pointer hover:border-telegram-accent transition-all duration-200"
-            :class="{ 'border-telegram-accent bg-telegram-accent/5': subject.isActive }"
+            class="p-4 cursor-pointer hover:border-d-accent transition-all duration-200"
+            :class="{ 'border-d-accent bg-d-accent/5': subject.isActive }"
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-3">
                 <div class="text-2xl">{{ subject.name[0] }}</div>
                 <div class="flex-1">
                   <div class="flex items-center space-x-2">
-                    <h3 class="text-telegram-text font-semibold">{{ subject.name }}</h3>
+                    <h3 class="text-d-text font-semibold">{{ subject.name }}</h3>
                     <span
                       v-if="subject.isActive"
-                      class="w-2 h-2 bg-telegram-success rounded-full"
+                      class="w-2 h-2 bg-d-accent rounded-full"
                     ></span>
                   </div>
-                  <p class="text-telegram-textSecondary text-sm">{{ subject.name }}</p>
+                  <p class="text-d-text-second text-subhead">{{ subject.name }}</p>
                   <div class="flex items-center space-x-4 mt-1">
-                    <span class="text-telegram-success text-xs font-medium">
+                    <span class="text-d-accent text-caption font-medium">
                       {{ subject.tutorsCount }} репетиторов
                     </span>
-                    <span class="text-telegram-textSecondary text-xs">
+                    <span class="text-d-text-second text-caption">
                       {{ subject.servicesCount }} услуг
                     </span>
-                    <span class="text-telegram-accent text-xs">
+                    <span class="text-d-accent text-caption">
                       от {{ subject.averagePrice }}₽
                     </span>
                   </div>
                 </div>
               </div>
               <div class="text-right">
-                <div class="text-telegram-textSecondary text-xs mb-1">Последняя активность</div>
-                <div class="text-telegram-text text-sm font-medium">
+                <div class="text-d-text-second text-caption mb-1">Последняя активность</div>
+                <div class="text-d-text text-subhead font-medium">
                   {{ formatDate(subject.lastActivity) }}
                 </div>
               </div>

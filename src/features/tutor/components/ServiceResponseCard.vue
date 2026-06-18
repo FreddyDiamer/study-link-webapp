@@ -2,6 +2,7 @@
 import { useTelegramStore } from '@/stores/telegram'
 import Card from '@/shared/components/ui/Card.vue'
 import Button from '@/shared/components/ui/Button.vue'
+import { StatusBadge } from '@/shared/components/ui'
 import type { ServiceResponse } from '@/shared/types'
 
 interface Props {
@@ -25,32 +26,6 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const getStatusConfig = (status: string) => {
-  const configs = {
-    PENDING: {
-      label: 'Ожидает',
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
-    },
-    ACCEPTED: {
-      label: 'Принят',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    REJECTED: {
-      label: 'Отклонен',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-    },
-    EXPIRED: {
-      label: 'Истек',
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-    },
-  }
-  return configs[status as keyof typeof configs] || configs.PENDING
-}
-
 const handleAccept = () => {
   telegramStore.hapticFeedback('light')
   props.onAccept?.(props.response.id)
@@ -67,43 +42,35 @@ const handleReject = () => {
     <!-- Header -->
     <div class="flex items-start justify-between mb-3">
       <div class="flex-1">
-        <h3 class="font-semibold text-telegram-text mb-1">
+        <h3 class="font-semibold text-d-text mb-1">
           {{ response.service?.subject?.name || 'Предмет не указан' }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-subhead text-d-text-second">
           {{ response.service?.teacher?.fullName || 'Преподаватель не указан' }}
         </p>
       </div>
 
-      <div
-        :class="[
-          'px-2 py-1 rounded-full text-xs font-medium',
-          getStatusConfig(response.status).bgColor,
-          getStatusConfig(response.status).color,
-        ]"
-      >
-        {{ getStatusConfig(response.status).label }}
-      </div>
+      <StatusBadge :response="response.status" />
     </div>
 
     <!-- Student info -->
     <div class="flex items-center space-x-3 mb-4">
       <div
-        class="w-12 h-12 bg-telegram-accent rounded-full flex items-center justify-center text-white font-bold"
+        class="w-12 h-12 bg-d-accent rounded-full flex items-center justify-center text-d-ink font-bold"
       >
         {{ response.student?.name?.charAt(0) || 'С' }}
       </div>
       <div class="flex-1">
-        <div class="font-medium text-telegram-text">{{ response.student?.name || 'Студент' }}</div>
-        <div class="text-sm text-telegram-textSecondary">
+        <div class="font-medium text-d-text">{{ response.student?.name || 'Студент' }}</div>
+        <div class="text-subhead text-d-text-second">
           @{{ response.student?.telegramUsername || 'username' }}
         </div>
       </div>
       <div class="text-right">
-        <div v-if="response.price" class="font-bold text-telegram-accent">
+        <div v-if="response.price" class="font-bold text-d-accent tnum">
           {{ formatPrice(response.price) }}
         </div>
-        <div class="text-xs text-telegram-textSecondary">
+        <div class="text-caption text-d-text-second tnum">
           {{ formatDate(response.createdAt) }}
         </div>
       </div>
@@ -111,21 +78,21 @@ const handleReject = () => {
 
     <!-- Message -->
     <div v-if="response.message" class="mb-4">
-      <p class="text-sm text-telegram-text bg-telegram-secondary p-3 rounded-lg">
+      <p class="text-subhead text-d-text bg-d-surface p-3 rounded-field">
         {{ response.message }}
       </p>
     </div>
 
     <!-- Details -->
     <div class="space-y-2 mb-4">
-      <div v-if="response.proposedDeadline" class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Предложенный дедлайн:</span>
-        <span class="text-telegram-text">{{ formatDate(response.proposedDeadline) }}</span>
+      <div v-if="response.proposedDeadline" class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Предложенный дедлайн:</span>
+        <span class="text-d-text">{{ formatDate(response.proposedDeadline) }}</span>
       </div>
 
-      <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Отклик получен:</span>
-        <span class="text-telegram-text">{{ formatDate(response.createdAt) }}</span>
+      <div class="flex justify-between text-subhead">
+        <span class="text-d-text-second">Отклик получен:</span>
+        <span class="text-d-text">{{ formatDate(response.createdAt) }}</span>
       </div>
     </div>
 
@@ -133,7 +100,7 @@ const handleReject = () => {
     <div v-if="response.status === 'PENDING'" class="flex space-x-2">
       <Button @click="handleAccept" size="sm" class="flex-1"> Принять </Button>
 
-      <Button @click="handleReject" variant="ghost" size="sm" class="text-telegram-destructive">
+      <Button @click="handleReject" variant="ghost" size="sm" class="text-d-coral">
         Отклонить
       </Button>
     </div>

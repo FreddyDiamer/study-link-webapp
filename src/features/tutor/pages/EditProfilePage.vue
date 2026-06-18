@@ -70,14 +70,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-telegram-bg p-4 pt-6">
+  <div class="min-h-screen bg-d-ink p-4 pt-6">
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <Button variant="ghost" @click="handleBack" class="!p-2">
         <ArrowIcon class="w-5 h-5 rotate-180" />
       </Button>
 
-      <h1 class="text-lg font-semibold text-telegram-text">Редактировать профиль</h1>
+      <h1 class="text-lg font-semibold text-d-text">Редактировать профиль</h1>
 
       <div class="w-9"></div>
     </div>
@@ -85,20 +85,20 @@ onMounted(() => {
     <!-- Profile Form -->
     <Card class="p-6 mb-6">
       <div v-if="isLoading" class="flex justify-center py-8">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-button"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-d-accent"></div>
       </div>
 
       <form v-else @submit.prevent="handleSave" class="space-y-6">
         <!-- Avatar Section -->
         <div class="flex items-center space-x-4 mb-6">
           <div
-            class="w-16 h-16 bg-telegram-success rounded-full flex items-center justify-center text-white text-xl font-bold"
+            class="w-16 h-16 bg-d-accent rounded-full flex items-center justify-center text-d-ink text-xl font-bold"
           >
             {{ form.name?.charAt(0) || user?.name?.charAt(0) || 'Р' }}
           </div>
           <div>
-            <h3 class="text-lg font-medium text-telegram-text">Фото профиля</h3>
-            <p class="text-sm text-telegram-textSecondary">
+            <h3 class="text-lg font-medium text-d-text">Фото профиля</h3>
+            <p class="text-subhead text-d-text-second">
               Аватар генерируется автоматически на основе имени
             </p>
           </div>
@@ -109,14 +109,14 @@ onMounted(() => {
           <Input v-model="form.name" label="Имя" placeholder="Введите ваше имя" required />
 
           <div class="space-y-2">
-            <label class="block text-sm font-medium text-telegram-text"> Описание </label>
+            <label class="block text-subhead font-medium text-d-text"> Описание </label>
             <textarea
               v-model="form.description"
               rows="4"
               placeholder="Расскажите о себе, своем опыте преподавания, достижениях..."
-              class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
+              class="w-full px-4 py-3 bg-d-surface border border-d-border rounded-field text-d-text placeholder-d-text-second focus:outline-none focus:border-d-accent transition-colors resize-none"
             />
-            <p class="text-xs text-telegram-textSecondary">
+            <p class="text-caption text-d-text-second">
               Это описание поможет студентам лучше узнать вас
             </p>
           </div>
