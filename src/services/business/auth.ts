@@ -37,6 +37,19 @@ export class AuthService {
     }
   }
 
+  // --- DEV: вход по вебу, только в дев-окружении ---
+  async getDevUsers() {
+    return authApi.devUsers()
+  }
+
+  async devLogin(userId?: string): Promise<AuthResponse> {
+    const response = await authApi.devLogin(userId)
+    this.saveAuthData(response)
+    this.authStore.setUser(response.user as any)
+    this.authStore.setToken(response.accessToken)
+    return response
+  }
+
   async refreshProfile(): Promise<AuthResponse> {
     try {
       const response = await authApi.getProfile()

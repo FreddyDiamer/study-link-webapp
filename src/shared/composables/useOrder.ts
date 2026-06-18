@@ -312,6 +312,7 @@ export const useOrder = () => {
     getDeals,
     getMyTutorDeals,
     getDeal,
+    updateDeal,
     acceptDeal,
     rejectDeal,
     completeDeal,

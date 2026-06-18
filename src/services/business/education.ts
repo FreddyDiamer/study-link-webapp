@@ -20,15 +20,6 @@ export class EducationService {
     }
   }
 
-  async getActiveSubjects(): Promise<Subject[]> {
-    try {
-      return await educationApi.getActiveSubjects()
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении активных предметов')
-      throw error
-    }
-  }
-
   async getSubject(id: string): Promise<Subject> {
     try {
       return await educationApi.getSubject(id)
@@ -97,10 +88,11 @@ export class EducationService {
 
   async getSubjectsWithTeachers(): Promise<Array<Subject & { teachers: Teacher[] }>> {
     try {
-      const [subjects, teacherSubjects] = await Promise.all([
-        this.getActiveSubjects(),
+      const [allSubjects, teacherSubjects] = await Promise.all([
+        this.getSubjects(),
         this.getTeacherSubjects(),
       ])
+      const subjects = allSubjects.filter((subject) => subject.isActive)
 
       return subjects.map((subject) => ({
         ...subject,

@@ -1,6 +1,4 @@
-export { useAuth } from './useAuth'
 export { useTelegram } from './useTelegram'
 export { useEducation } from './useEducation'
 export { useOrder } from './useOrder'
-export { useTutor } from './useTutor'
 export { useService } from './useService'

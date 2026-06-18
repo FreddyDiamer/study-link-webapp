@@ -8,5 +8,4 @@ export { telegramService } from './integrations/telegram'
 export * from './business'
 
 // Types
-export type { TutorService } from './business/tutor'
 export type { OrderService } from './business/order'

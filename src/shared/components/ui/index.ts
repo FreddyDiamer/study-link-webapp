@@ -1,8 +1,1 @@
-export { default as Button } from './Button.vue'
-export { default as Input } from './Input.vue'
-export { default as Card } from './Card.vue'
-export { default as Select, type SelectOption } from './Select.vue'
-export { default as Modal } from './Modal.vue'
-export { default as Loader } from './Loader.vue'
-export { default as Rating } from './Rating.vue'
 export { default as StatusBadge } from './StatusBadge.vue'

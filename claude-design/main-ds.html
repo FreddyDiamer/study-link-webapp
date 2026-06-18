@@ -94,13 +94,28 @@
           <div style="position:absolute;top:42px;left:16px;right:16px;z-index:30;background:#21252E;border:1px solid #2A2F3A;color:#E8EAED;border-radius:12px;padding:12px 16px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:9px;animation:toastin .26s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 30px rgba(0,0,0,.4)"><span style="width:18px;height:18px;border-radius:99px;background:#7C8CFF;color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">✓</span>{{ toast }}</div>
         </sc-if>
 
+        <!-- ===== APP HEADER (persistent) ===== -->
+        <div style="flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:6px 16px 14px;border-bottom:1px solid #1A1D24">
+          <sc-if value="{{ headerBack }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ back }}" class="press" style="width:40px;height:40px;border-radius:12px;background:#15171D;border:1px solid #21252E;display:flex;align-items:center;justify-content:center;color:#7C8CFF;font-size:24px;line-height:1;cursor:pointer;flex:0 0 auto">‹</div>
+          </sc-if>
+          <sc-if value="{{ headerLogo }}" hint-placeholder-val="{{ true }}">
+            <div style="width:40px;height:40px;border-radius:12px;background:#7C8CFF;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 4px 16px rgba(124,140,255,.32)">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z" fill="#0E0F13"/><path d="M6.5 11.2V15c0 1 2.5 2.2 5.5 2.2s5.5-1.2 5.5-2.2v-3.8" stroke="#0E0F13" stroke-width="1.7"/></svg>
+            </div>
+          </sc-if>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:19px;font-weight:700;letter-spacing:-.015em;line-height:1.15">{{ headerTitle }}</div>
+            <sc-if value="{{ hasHeaderSub }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;color:#5B6472;line-height:1.2;margin-top:1px">{{ headerSub }}</div></sc-if>
+          </div>
+          <sc-if value="{{ headerReload }}" hint-placeholder-val="{{ true }}">
+            <div onClick="{{ reload }}" class="press" style="width:40px;height:40px;border-radius:12px;background:#15171D;border:1px solid #21252E;display:flex;align-items:center;justify-content:center;color:#8A93A3;font-size:18px;cursor:pointer;flex:0 0 auto">↻</div>
+          </sc-if>
+        </div>
+
         <!-- ===== MARKET ===== -->
         <sc-if value="{{ isMarket }}" hint-placeholder-val="{{ true }}">
-          <div style="flex:0 0 auto;padding:6px 18px 12px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-              <h3 style="font-size:26px;font-weight:700;letter-spacing:-.02em">Маркет</h3>
-              <div onClick="{{ reload }}" class="press" style="width:34px;height:34px;border-radius:99px;border:1px solid #2A2F3A;display:flex;align-items:center;justify-content:center;color:#8A93A3;font-size:17px;cursor:pointer">↻</div>
-            </div>
+          <div style="flex:0 0 auto;padding:14px 18px 12px">
             <!-- sliding segment -->
             <div style="position:relative;display:flex;background:#15171D;border:1px solid #21252E;border-radius:12px;padding:4px;margin-bottom:14px;height:44px">
               <div style="position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:9px;background:#7C8CFF;transition:transform .32s cubic-bezier(.3,.8,.3,1);transform:translateX({{ segShift }})"></div>
@@ -159,11 +174,7 @@
 
         <!-- ===== DETAIL (reviews-forward) ===== -->
         <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
-          <div style="flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:2px 14px 10px">
-            <span onClick="{{ back }}" class="press" style="font-size:24px;color:#7C8CFF;cursor:pointer;padding:0 5px;line-height:1">‹</span>
-            <span style="font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#5B6472">Репетитор</span>
-          </div>
-          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:0 18px 18px">
+          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:16px 18px 18px">
             <!-- tutor + big reputation -->
             <div class="reveal" style="display:flex;align-items:center;gap:13px;margin-bottom:18px">
               <span style="width:54px;height:54px;border-radius:15px;background:{{ cur.chip }};color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">{{ cur.initials }}</span>
@@ -220,11 +231,7 @@
 
         <!-- ===== RESPOND ===== -->
         <sc-if value="{{ isRespond }}" hint-placeholder-val="{{ false }}">
-          <div style="flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:2px 14px 10px">
-            <span onClick="{{ back }}" class="press" style="font-size:24px;color:#7C8CFF;cursor:pointer;padding:0 5px;line-height:1">‹</span>
-            <span style="font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#5B6472">Ваш отклик</span>
-          </div>
-          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:0 18px 18px">
+          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:16px 18px 18px">
             <div class="reveal" style="background:#15171D;border-left:3px solid #7C8CFF;border-radius:10px;padding:14px 16px;margin-bottom:22px">
               <div style="font-size:15px;font-weight:600;margin-bottom:3px">{{ cur.subject }} · {{ cur.teacher }}</div>
               <div style="font-size:13px;color:#5B6472">{{ cur.tutor }} · {{ cur.priceText }}</div>
@@ -241,8 +248,7 @@
 
         <!-- ===== DEALS ===== -->
         <sc-if value="{{ isDeals }}" hint-placeholder-val="{{ false }}">
-          <div style="flex:0 0 auto;padding:6px 18px 12px"><h3 style="font-size:26px;font-weight:700;letter-spacing:-.02em">Сделки</h3></div>
-          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:2px 18px 18px">
+          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:16px 18px 18px">
             <div class="reveal" style="background:#15171D;border:1px solid #21252E;border-radius:16px;padding:18px;margin-bottom:16px">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:7px">
                 <div style="font-size:18px;font-weight:600;line-height:1.1">Мат. анализ<br>Иванов И.И.</div>
@@ -266,7 +272,7 @@
 
         <!-- ===== PROFILE ===== -->
         <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
-          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:14px 18px 18px">
+          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:16px 18px 18px">
             <div class="reveal" style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
               <span style="width:60px;height:60px;border-radius:17px;background:#7C8CFF;color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700">МК</span>
               <div><div style="font-size:21px;font-weight:700;letter-spacing:-.01em">Максим Котов</div><div style="font-size:13px;color:#5B6472;margin-top:2px">@maksim_k · Группа 4-301</div></div>
@@ -291,18 +297,18 @@
         </sc-if>
 
         <!-- ===== TAB BAR ===== -->
-        <div style="flex:0 0 auto;display:flex;background:#15171D;border-top:1px solid #21252E;padding:9px 6px 13px">
-          <div onClick="{{ setTab }}" data-id="market" class="press" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ colMarket }};transition:color .2s">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-            <span style="font-size:10px;font-weight:600">Маркет</span>
+        <div style="flex:0 0 auto;display:flex;gap:6px;background:#15171D;border-top:1px solid #21252E;padding:10px 12px 26px">
+          <div onClick="{{ setTab }}" data-id="market" class="press" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;border-radius:14px;cursor:pointer;color:{{ colMarket }};background:{{ bgMarket }};transition:color .2s,background .2s">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            <span style="font-size:11px;font-weight:600;letter-spacing:.01em">Маркет</span>
           </div>
-          <div onClick="{{ setTab }}" data-id="deals" class="press" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ colDeals }};transition:color .2s">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2 5-5"/><path d="M3 9l4-4 5 3 5-3 4 4-4 5-5-2-5 2-4-5Z"/></svg>
-            <span style="font-size:10px;font-weight:600">Сделки</span>
+          <div onClick="{{ setTab }}" data-id="deals" class="press" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;border-radius:14px;cursor:pointer;color:{{ colDeals }};background:{{ bgDeals }};transition:color .2s,background .2s">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2 5-5"/><path d="M3 9l4-4 5 3 5-3 4 4-4 5-5-2-5 2-4-5Z"/></svg>
+            <span style="font-size:11px;font-weight:600;letter-spacing:.01em">Сделки</span>
           </div>
-          <div onClick="{{ setTab }}" data-id="profile" class="press" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ colProfile }};transition:color .2s">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-            <span style="font-size:10px;font-weight:600">Профиль</span>
+          <div onClick="{{ setTab }}" data-id="profile" class="press" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;border-radius:14px;cursor:pointer;color:{{ colProfile }};background:{{ bgProfile }};transition:color .2s,background .2s">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <span style="font-size:11px;font-weight:600;letter-spacing:.01em">Профиль</span>
           </div>
         </div>
 
@@ -382,8 +388,19 @@ class Component extends DCLogic {
     });
     const advLabel={PENDING:'Подтвердить',ACCEPTED:'Перевести в работу',IN_PROGRESS:'Завершить сделку',COMPLETED:'✓ Сделка завершена'}[this.state.dealStatus];
     const completed=this.state.dealStatus==='COMPLETED';
-    const tcol=(t)=> this.state.tab===t ? '#7C8CFF' : '#4B5159';
+    const tcol=(t)=> this.state.tab===t ? '#7C8CFF' : '#5B6472';
+    const tbg=(t)=> this.state.tab===t ? 'rgba(124,140,255,.14)' : 'transparent';
     const profileReviews=this.reviewsPool.slice(0,2).map((r,k)=>({ ...r, delay:(0.1+k*0.07)+'s' }));
+
+    // ---- единый хедер ----
+    const headerMap = {
+      market:  { title:'Маркет',     sub:'Найдите репетитора',  back:false, reload:true  },
+      deals:   { title:'Сделки',     sub:'Ваши активные занятия', back:false, reload:false },
+      profile: { title:'Профиль',    sub:'',                    back:false, reload:false },
+      detail:  { title:'Репетитор',  sub:cur.subject,           back:true,  reload:false },
+      respond: { title:'Ваш отклик', sub:cur.tutor,             back:true,  reload:false },
+    };
+    const H = headerMap[sc] || headerMap.market;
 
     return {
       services:svc, cur, requests:reqs,
@@ -401,6 +418,9 @@ class Component extends DCLogic {
       advLabel, advBg: completed?'#15171D':'#7C8CFF', advColor: completed?'#3FB5A8':'#0E0F13',
       profileReviews,
       colMarket:tcol('market'), colDeals:tcol('deals'), colProfile:tcol('profile'),
+      bgMarket:tbg('market'), bgDeals:tbg('deals'), bgProfile:tbg('profile'),
+      headerTitle:H.title, headerSub:H.sub, hasHeaderSub:!!H.sub,
+      headerBack:H.back, headerLogo:!H.back, headerReload:H.reload,
       reload:()=>this.reload(), open:(e)=>this.open(e), setTab:(e)=>this.setTab(e), setSegment:(e)=>this.setSegment(e),
       goRespond:()=>this.goRespond(), back:()=>this.back(), submitResponse:()=>this.submitResponse(), advanceDeal:()=>this.advanceDeal(),
       setScroller:(el)=>{ this.scroller=el; },

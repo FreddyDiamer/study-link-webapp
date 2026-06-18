@@ -1,155 +1,95 @@
 <script setup lang="ts">
-// Vue
-import type { Component } from 'vue'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
-// Store
-import { useAppStore } from '@/stores/app'
 import { useTelegramStore } from '@/stores/telegram'
-
-// Constants
 import { PATHS } from '@/router/paths'
-import { HomeIcon, ServiceIcon, OrderIcon, ProfileIcon } from '@components/icons'
 
-// Composables
 const route = useRoute()
 const router = useRouter()
-
-// Stores
-const appStore = useAppStore()
 const telegramStore = useTelegramStore()
 
-// Types
-interface NavItem {
-  path: string
-  label: string
-  icon: Component
-  activeIcon?: string
-  badge?: number
-}
+type Tab = 'market' | 'deals' | 'profile'
 
-// Data
-const studentNavItems: NavItem[] = [
-  {
-    path: PATHS.STUDENT_MAIN,
-    label: 'Главная',
-    icon: HomeIcon,
-  },
-  {
-    path: PATHS.STUDENT_SERVICES,
-    label: 'Услуги',
-    icon: ServiceIcon,
-  },
-  {
-    path: PATHS.STUDENT_ORDERS,
-    label: 'Мои заказы',
-    icon: OrderIcon,
-    badge: 2,
-  },
-  {
-    path: PATHS.STUDENT_PROFILE,
-    label: 'Профиль',
-    icon: ProfileIcon,
-  },
+const tabs: { id: Tab; label: string; path: string }[] = [
+  { id: 'market', label: 'Маркет', path: PATHS.MARKET },
+  { id: 'deals', label: 'Сделки', path: PATHS.DEALS },
+  { id: 'profile', label: 'Профиль', path: PATHS.PROFILE },
 ]
 
-const tutorNavItems: NavItem[] = [
-  {
-    path: PATHS.TUTOR_MAIN,
-    label: 'Главная',
-    icon: HomeIcon,
-  },
-  {
-    path: PATHS.TUTOR_ORDERS,
-    label: 'Заказы',
-    icon: OrderIcon,
-  },
-  {
-    path: PATHS.TUTOR_SERVICES,
-    label: 'Мои услуги',
-    icon: ServiceIcon,
-  },
-  {
-    path: PATHS.TUTOR_PROFILE,
-    label: 'Профиль',
-    icon: ProfileIcon,
-  },
-]
+// иммерсивные под-экраны (деталь/отклик) без таб-бара, как в дизайне
+const showNav = computed(
+  () => route.name === 'market' || route.name === 'deals' || route.name === 'profile',
+)
 
-// Computed
-const currentNavItems = computed(() => {
-  if (appStore.isStudentFlow) return studentNavItems
-  if (appStore.isTutorFlow) return tutorNavItems
-  return []
+const activeTab = computed<Tab>(() => {
+  if (route.path.startsWith(PATHS.DEALS)) return 'deals'
+  if (route.path.startsWith(PATHS.PROFILE)) return 'profile'
+  return 'market'
 })
 
-// Methods
 const navigateTo = (path: string) => {
   telegramStore.hapticFeedback('light')
   router.push(path)
-}
-
-const isActiveRoute = (path: string) => {
-  return route.path === path
 }
 </script>
 
 <template>
   <nav
-    v-if="appStore.currentFlow && currentNavItems.length > 0"
-    class="fixed bottom-0 left-0 right-0 bg-d-panel border-t border-d-border z-40"
+    v-if="showNav"
+    class="shrink-0 z-40 flex gap-1.5 bg-d-panel border-t border-d-border px-3 pt-2.5 pb-[max(26px,env(safe-area-inset-bottom))]"
   >
-    <div class="flex items-center justify-around px-2 py-2 safe-area-inset-bottom">
-      <button
-        v-for="item in currentNavItems"
-        :key="item.path"
-        @click="navigateTo(item.path)"
-        class="flex flex-col items-center justify-center py-2 px-3 min-w-0 flex-1 transition-all duration-200"
-        :class="{
-          'text-d-accent': isActiveRoute(item.path),
-          'text-d-text-mute': !isActiveRoute(item.path),
-        }"
+    <button
+      v-for="tab in tabs"
+      :key="tab.id"
+      class="press flex-1 flex flex-col items-center gap-1.5 py-2 rounded-[14px] transition-colors"
+      :class="
+        activeTab === tab.id ? 'text-d-accent bg-d-accent/[0.14]' : 'text-d-text-hint bg-transparent'
+      "
+      @click="navigateTo(tab.path)"
+    >
+      <svg
+        v-if="tab.id === 'market'"
+        width="26"
+        height="26"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.9"
       >
-        <!-- Icon -->
-        <div class="w-6 h-6 mb-1 transition-transform duration-200 relative">
-          <component
-            :is="item.icon"
-            class="w-full h-full"
-            :stroke-width="isActiveRoute(item.path) ? '2.5' : '2'"
-          />
-
-          <!-- Badge -->
-          <div
-            v-if="item.badge && item.badge > 0"
-            class="absolute -top-2 -right-2 w-4 h-4 bg-d-coral rounded-full flex items-center justify-center text-d-ink text-[10px] font-bold min-w-4"
-          >
-            {{ item.badge > 9 ? '9+' : item.badge }}
-          </div>
-        </div>
-
-        <!-- Label -->
-        <span
-          class="text-[10px] font-medium leading-none transition-all duration-200 whitespace-nowrap"
-          :class="{
-            'font-semibold': isActiveRoute(item.path),
-          }"
-        >
-          {{ item.label }}
-        </span>
-      </button>
-    </div>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </svg>
+      <svg
+        v-else-if="tab.id === 'deals'"
+        width="26"
+        height="26"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.9"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m11 17 2 2 5-5" />
+        <path d="M3 9l4-4 5 3 5-3 4 4-4 5-5-2-5 2-4-5Z" />
+      </svg>
+      <svg
+        v-else
+        width="26"
+        height="26"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.9"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
+      </svg>
+      <span class="text-[11px] font-semibold tracking-[0.01em]">{{ tab.label }}</span>
+    </button>
   </nav>
-
-  <!-- Bottom padding for content when navbar is visible -->
-  <div
-    v-if="appStore.currentFlow && currentNavItems.length > 0"
-    class="h-20 safe-area-inset-bottom"
-  ></div>
 </template>
-
-<style scoped>
-.safe-area-inset-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-</style>
