@@ -1,6 +1,11 @@
-# kai-repetitor
+# Study Link
 
-This template should help get you started developing with Vue 3 in Vite.
+Telegram Mini App — a tutoring marketplace connecting students and tutors. Built with Vue 3 + TypeScript + Vite.
+
+## Documentation
+
+- [CLAUDE.md](CLAUDE.md) — project conventions and rules (hub for AI agents and humans alike)
+- [docs/INDEX.md](docs/INDEX.md) — documentation index: what to read for which task
 
 ## Recommended IDE Setup
 
