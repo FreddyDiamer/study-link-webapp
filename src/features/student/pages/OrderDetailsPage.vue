@@ -13,13 +13,7 @@ const route = useRoute()
 const router = useRouter()
 const telegramStore = useTelegramStore()
 const { getRequest, getRequestResponses } = useOrder()
-const {
-  activeSubjects,
-  isLoading: educationLoading,
-  error: educationError,
-  isInitialized,
-  initialize,
-} = useEducation()
+const { isInitialized, initialize } = useEducation()
 
 // Данные заказа
 const order = ref<Request | null>(null)
@@ -79,12 +73,6 @@ const handleBack = () => {
   router.back()
 }
 
-const handleEditOrder = () => {
-  if (order.value) {
-    router.push(`/student/orders/${order.value.id}/edit`)
-  }
-}
-
 const handleResponseAction = async (responseId: string, action: 'accept' | 'reject') => {
   try {
     if (action === 'accept') {
@@ -124,11 +112,6 @@ onMounted(async () => {
         </Button>
 
         <h1 class="text-lg font-semibold text-telegram-text">Детали заказа</h1>
-
-        <!-- TODO: Добавить редактирование заявки -->
-        <!-- <Button v-if="order" variant="ghost" @click="handleEditOrder" class="!p-2">
-          Редактировать
-        </Button> -->
       </div>
     </div>
 

@@ -21,9 +21,4 @@ export const usersApi = {
   getUser(id: string): Promise<User> {
     return apiClient.get(`/users/${id}`)
   },
-
-  // Получить статистику пользователя
-  getUserStats(id: string): Promise<any> {
-    return apiClient.get(`/users/${id}/stats`)
-  },
 }

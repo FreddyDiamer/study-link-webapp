@@ -9,8 +9,7 @@ export class UserService {
 
   async getProfile(): Promise<User> {
     try {
-      const user = await usersApi.getProfile()
-      return this.convertUserToRubles(user)
+      return await usersApi.getProfile()
     } catch (error) {
       this.handleError(error, 'Ошибка при получении профиля')
       throw error
@@ -27,7 +26,7 @@ export class UserService {
 
       this.telegramStore.showAlert('Профиль обновлен!')
 
-      return this.convertUserToRubles(user)
+      return user
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении профиля')
       throw error
@@ -36,8 +35,7 @@ export class UserService {
 
   async getUser(id: string): Promise<User> {
     try {
-      const user = await usersApi.getUser(id)
-      return this.convertUserToRubles(user)
+      return await usersApi.getUser(id)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении пользователя')
       throw error
@@ -53,13 +51,6 @@ export class UserService {
     }
     if (data.description && data.description.length > 500) {
       throw new Error('Описание не должно превышать 500 символов')
-    }
-  }
-
-  private convertUserToRubles(user: User): User {
-    return {
-      ...user,
-      balance: user.balance, // конвертируем из копеек в рубли
     }
   }
 

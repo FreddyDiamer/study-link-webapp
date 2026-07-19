@@ -34,46 +34,6 @@ export class TutorService {
   }
 
   /**
-   * Получение репетитора по ID
-   */
-  async getTutorById(id: string) {
-    if (!id) {
-      throw new Error('ID репетитора обязателен')
-    }
-
-    try {
-      return await tutorsApi.getById(id)
-    } catch (error: any) {
-      console.error('Ошибка получения репетитора:', error)
-      throw new Error(this.getErrorMessage(error))
-    }
-  }
-
-  /**
-   * Добавление в избранное с оптимистичным обновлением
-   */
-  async addToFavorites(tutorId: string) {
-    if (!tutorId) {
-      throw new Error('ID репетитора обязателен')
-    }
-
-    try {
-      // Тактильная обратная связь
-      this.telegramStore.hapticFeedback('light')
-
-      await tutorsApi.addToFavorites(tutorId)
-
-      // Показываем уведомление
-      this.showNotification('Репетитор добавлен в избранное')
-
-      return true
-    } catch (error: any) {
-      console.error('Ошибка добавления в избранное:', error)
-      throw new Error(this.getErrorMessage(error))
-    }
-  }
-
-  /**
    * Удаление из избранного
    */
   async removeFromFavorites(tutorId: string) {
@@ -103,30 +63,6 @@ export class TutorService {
       return await tutorsApi.getFavorites()
     } catch (error: any) {
       console.error('Ошибка получения избранных:', error)
-      throw new Error(this.getErrorMessage(error))
-    }
-  }
-
-  /**
-   * Получение популярных репетиторов
-   */
-  async getPopular(limit = 6) {
-    try {
-      return await tutorsApi.getPopular(limit)
-    } catch (error: any) {
-      console.error('Ошибка получения популярных репетиторов:', error)
-      throw new Error(this.getErrorMessage(error))
-    }
-  }
-
-  /**
-   * Получение доступных предметов
-   */
-  async getSubjects() {
-    try {
-      return await tutorsApi.getSubjects()
-    } catch (error: any) {
-      console.error('Ошибка получения предметов:', error)
       throw new Error(this.getErrorMessage(error))
     }
   }

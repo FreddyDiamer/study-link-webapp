@@ -10,20 +10,12 @@ export const educationApi = {
     return apiClient.get('/education/subjects')
   },
 
-  getSubject(id: string): Promise<Subject> {
-    return apiClient.get(`/education/subjects/${id}`)
-  },
-
   // =============================================================================
   // TEACHERS
   // =============================================================================
 
   getTeachers(): Promise<Teacher[]> {
     return apiClient.get('/education/teachers')
-  },
-
-  getTeacher(id: string): Promise<Teacher> {
-    return apiClient.get(`/education/teachers/${id}`)
   },
 
   // =============================================================================
@@ -34,24 +26,12 @@ export const educationApi = {
     return apiClient.get('/education/teacher-subjects')
   },
 
-  getTeacherSubjectsByTeacher(teacherId: string): Promise<TeacherSubject[]> {
-    return apiClient.get(`/education/teacher-subjects/teacher/${teacherId}`)
-  },
-
-  getTeacherSubjectsBySubject(subjectId: string): Promise<TeacherSubject[]> {
-    return apiClient.get(`/education/teacher-subjects/subject/${subjectId}`)
-  },
-
   // =============================================================================
   // GROUPS
   // =============================================================================
 
   getGroups(): Promise<Group[]> {
     return apiClient.get('/education/groups')
-  },
-
-  getGroup(id: string): Promise<Group> {
-    return apiClient.get(`/education/groups/${id}`)
   },
 
   createGroup(data: { number: string }): Promise<Group> {

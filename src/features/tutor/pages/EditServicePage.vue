@@ -109,7 +109,7 @@ const updateServiceData = async () => {
 
   try {
     const updateData: UpdateServiceDto = {
-      price: parseInt(form.price), // Конвертируем в копейки
+      price: parseInt(form.price),
       description: form.description,
       deadline: getDeadlineDate(),
     }

@@ -14,24 +14,11 @@ export const tutorsApi = {
   search: (params: TutorSearchParams) =>
     apiClient.get<PaginatedResponse<Tutor>>('/tutors/search', params),
 
-  // Получить репетитора по ID
-  getById: (id: string) => apiClient.get<Tutor>(`/tutors/${id}`),
-
-  // Добавить в избранное
-  addToFavorites: (tutorId: string) => apiClient.post(`/tutors/${tutorId}/favorites`),
-
   // Удалить из избранного
   removeFromFavorites: (tutorId: string) => apiClient.delete(`/tutors/${tutorId}/favorites`),
 
   // Получить избранных репетиторов
   getFavorites: () => apiClient.get<PaginatedResponse<Tutor>>('/tutors/favorites'),
-
-  // Получить популярных репетиторов
-  getPopular: (limit?: number) =>
-    apiClient.get<PaginatedResponse<Tutor>>('/tutors/popular', { limit }),
-
-  // Получить предметы
-  getSubjects: () => apiClient.get('/education/subjects'),
 
   // Получить статистику репетитора
   getTutorStats: () =>
@@ -58,21 +45,8 @@ export const tutorsApi = {
   // Получить мои услуги
   getMyServices: () => apiClient.get<PaginatedResponse<Service>>('/marketplace/services/my'),
 
-  // Получить услуги конкретного репетитора
-  getServicesByTutor: (tutorId: string) =>
-    apiClient.get<PaginatedResponse<Service>>(`/marketplace/services/by-tutor/${tutorId}`),
-
-  // Получить услуги по предмету и преподавателю
-  getServicesBySubjectAndTeacher: (subjectId: string, teacherId: string) =>
-    apiClient.get<PaginatedResponse<Service>>(
-      `/marketplace/services/by-subject-teacher/${subjectId}/${teacherId}`,
-    ),
-
   // Получить услугу по ID
   getService: (id: string) => apiClient.get<Service>(`/marketplace/services/${id}`),
-
-  // Получить статистику услуги
-  getServiceStats: (id: string) => apiClient.get(`/marketplace/services/${id}/stats`),
 
   // Создать услугу
   createService: (data: CreateServiceDto) => apiClient.post<Service>('/marketplace/services', data),

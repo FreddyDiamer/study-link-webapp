@@ -15,15 +15,7 @@ export class ServiceService {
 
   async getServices(filters?: ServiceFilterDto): Promise<PaginatedResponse<Service>> {
     try {
-      // Конвертируем цены в копейки для фильтров
-      const apiFilters = this.convertFiltersToKopeks(filters)
-
-      const response = await tutorsApi.getServices(apiFilters)
-
-      // Конвертируем цены обратно в рубли для отображения
-      const servicesWithRubles = this.convertServicesToRubles(response)
-
-      return servicesWithRubles
+      return await tutorsApi.getServices(filters)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении услуг')
       throw error
@@ -32,8 +24,7 @@ export class ServiceService {
 
   async getActiveServices(): Promise<PaginatedResponse<Service>> {
     try {
-      const response = await tutorsApi.getActiveServices()
-      return this.convertServicesToRubles(response)
+      return await tutorsApi.getActiveServices()
     } catch (error) {
       this.handleError(error, 'Ошибка при получении активных услуг')
       throw error
@@ -42,8 +33,7 @@ export class ServiceService {
 
   async getPopularServices(limit?: number): Promise<PaginatedResponse<Service>> {
     try {
-      const response = await tutorsApi.getPopularServices(limit)
-      return this.convertServicesToRubles(response)
+      return await tutorsApi.getPopularServices(limit)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении популярных услуг')
       throw error
@@ -52,8 +42,7 @@ export class ServiceService {
 
   async getMyServices(): Promise<PaginatedResponse<Service>> {
     try {
-      const response = await tutorsApi.getMyServices()
-      return this.convertServicesToRubles(response)
+      return await tutorsApi.getMyServices()
     } catch (error) {
       this.handleError(error, 'Ошибка при получении ваших услуг')
       throw error
@@ -62,57 +51,41 @@ export class ServiceService {
 
   async getService(id: string): Promise<Service> {
     try {
-      const service = await tutorsApi.getService(id)
-      return this.convertServiceToRubles(service)
+      return await tutorsApi.getService(id)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении услуги')
       throw error
     }
   }
 
-  async createService(data: Omit<CreateServiceDto, 'price'> & { price: number }): Promise<Service> {
+  async createService(data: CreateServiceDto): Promise<Service> {
     try {
       this.validateServiceData(data)
 
-      // Конвертируем цену в копейки
-      const serviceData: CreateServiceDto = {
-        ...data,
-        price: data.price,
-      }
-
       this.telegramStore.hapticFeedback('light')
 
-      const service = await tutorsApi.createService(serviceData)
+      const service = await tutorsApi.createService(data)
 
       this.telegramStore.showAlert('Услуга успешно создана!')
 
-      return this.convertServiceToRubles(service)
+      return service
     } catch (error) {
       this.handleError(error, 'Ошибка при создании услуги')
       throw error
     }
   }
 
-  async updateService(
-    id: string,
-    data: Omit<UpdateServiceDto, 'price'> & { price?: number },
-  ): Promise<Service> {
+  async updateService(id: string, data: UpdateServiceDto): Promise<Service> {
     try {
       this.validateUpdateData(data)
 
-      // Конвертируем цену в копейки если она есть
-      const updateData: UpdateServiceDto = {
-        ...data,
-        price: data.price,
-      }
-
       this.telegramStore.hapticFeedback('light')
 
-      const service = await tutorsApi.updateService(id, updateData)
+      const service = await tutorsApi.updateService(id, data)
 
       this.telegramStore.showAlert('Услуга обновлена!')
 
-      return this.convertServiceToRubles(service)
+      return service
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении услуги')
       throw error
@@ -127,7 +100,7 @@ export class ServiceService {
 
       this.telegramStore.showAlert('Услуга активирована!')
 
-      return this.convertServiceToRubles(service)
+      return service
     } catch (error) {
       this.handleError(error, 'Ошибка при активации услуги')
       throw error
@@ -142,7 +115,7 @@ export class ServiceService {
 
       this.telegramStore.showAlert('Услуга деактивирована!')
 
-      return this.convertServiceToRubles(service)
+      return service
     } catch (error) {
       this.handleError(error, 'Ошибка при деактивации услуги')
       throw error
@@ -185,32 +158,6 @@ export class ServiceService {
     }
     if (data.description && data.description.length > 500) {
       throw new Error('Описание не должно превышать 500 символов')
-    }
-  }
-
-  private convertFiltersToKopeks(filters?: ServiceFilterDto): ServiceFilterDto | undefined {
-    if (!filters) return filters
-
-    return {
-      ...filters,
-      minPrice: filters.minPrice,
-      maxPrice: filters.maxPrice,
-    }
-  }
-
-  private convertServiceToRubles(service: Service): Service {
-    return {
-      ...service,
-      price: service.price,
-    }
-  }
-
-  private convertServicesToRubles(
-    response: PaginatedResponse<Service>,
-  ): PaginatedResponse<Service> {
-    return {
-      ...response,
-      items: response.items.map((service) => this.convertServiceToRubles(service)),
     }
   }
 

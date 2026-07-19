@@ -67,7 +67,6 @@ const urgencyOptions = [
 const isSubmitting = ref(false)
 const isLoading = ref(true)
 const showDeleteModal = ref(false)
-const orderStatus = ref<'OPEN' | 'MATCHED' | 'CLOSED' | 'CANCELLED'>('OPEN')
 
 // Mock orders data - в реальном приложении загружать из API
 const mockOrders = [
@@ -122,7 +121,6 @@ const loadOrder = async () => {
     form.deadline = order.deadline
     form.customDate = order.customDate
     form.urgency = order.urgency
-    orderStatus.value = order.status as 'OPEN' | 'MATCHED' | 'CLOSED' | 'CANCELLED'
   }
 
   isLoading.value = false
@@ -146,18 +144,6 @@ const submitOrder = async () => {
   isSubmitting.value = false
 }
 
-const toggleStatus = async () => {
-  const newStatus = orderStatus.value === 'OPEN' ? 'CLOSED' : 'OPEN'
-  orderStatus.value = newStatus
-
-  telegramStore.hapticFeedback('medium')
-
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 500))
-
-  telegramStore.hapticFeedback('light')
-}
-
 const deleteOrder = async () => {
   showDeleteModal.value = false
   isSubmitting.value = true
@@ -175,21 +161,6 @@ const validateForm = () => {
   const hasSubject = form.subject && (form.subject !== 'other' || form.customSubject)
   const hasDeadline = form.deadline && (form.deadline !== 'custom' || form.customDate)
   return hasSubject && form.description && form.budget && hasDeadline
-}
-
-const getStatusInfo = (status: string) => {
-  switch (status) {
-    case 'OPEN':
-      return { color: 'bg-green-100 text-green-700', text: 'Открыта' }
-    case 'MATCHED':
-      return { color: 'bg-blue-100 text-blue-700', text: 'Найден репетитор' }
-    case 'CLOSED':
-      return { color: 'bg-gray-100 text-gray-700', text: 'Закрыта' }
-    case 'CANCELLED':
-      return { color: 'bg-red-100 text-red-700', text: 'Отменена' }
-    default:
-      return { color: 'bg-gray-100 text-gray-700', text: 'Неизвестно' }
-  }
 }
 
 const goBack = () => {

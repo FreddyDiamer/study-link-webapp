@@ -76,7 +76,7 @@ const submitService = async () => {
       subjectId: form.subject.value,
       teacherId: form.teacher.value,
       description: form.description,
-      price: parseInt(form.price), // Конвертируем в копейки
+      price: parseInt(form.price),
       deadline: getDeadlineDate(),
     }
 

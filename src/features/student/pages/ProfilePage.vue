@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { userService } from '@/services/business'
 import Card from '@/shared/components/ui/Card.vue'
-import Button from '@/shared/components/ui/Button.vue'
-import { PATHS } from '@/router/paths'
 import type { User } from '@/shared/types'
 
-const router = useRouter()
 const telegramStore = useTelegramStore()
 
 const user = ref<User | null>(null)
@@ -23,10 +19,6 @@ const loadProfile = async () => {
   } finally {
     isLoading.value = false
   }
-}
-
-const editProfile = () => {
-  router.push(PATHS.STUDENT_EDIT_PROFILE)
 }
 
 const openFeedback = () => {
@@ -84,9 +76,6 @@ onMounted(() => {
           </div>
         </div>
       </div>
-
-      <!-- TODO: Добавить редактирование профиля -->
-      <!-- <Button variant="ghost" class="w-full" @click="editProfile"> Редактировать профиль </Button> -->
     </Card>
 
     <!-- Блок обратной связи -->

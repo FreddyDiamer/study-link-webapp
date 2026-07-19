@@ -191,7 +191,7 @@ const mapApiToViewModel = (api: ApiService): Service => {
     id: api.id,
     title: api.subject?.name || 'Услуга',
     description: api.description || '',
-    price: api.price, // уже в рублях благодаря serviceService
+    price: api.price, // в рублях
     priceType: 'hour',
     subject: api.subject?.name || 'Предмет',
     teacher: {
@@ -254,33 +254,6 @@ const toggleFilters = () => {
 const goBack = () => {
   telegramStore.hapticFeedback('light')
   router.back()
-}
-
-const formatPrice = (price: number, type: string) => {
-  return `${price.toLocaleString('ru-RU')} ₽/${type === 'hour' ? 'час' : type === 'lesson' ? 'урок' : 'мес'}`
-}
-
-const formatAvailability = (availability: string) => {
-  const map = {
-    available: { text: 'Свободен', color: 'text-telegram-success' },
-    busy: { text: 'Занят', color: 'text-red-500' },
-    limited: { text: 'Ограниченно', color: 'text-yellow-500' },
-  }
-  return (
-    map[availability as keyof typeof map] || {
-      text: 'Неизвестно',
-      color: 'text-telegram-textSecondary',
-    }
-  )
-}
-
-const formatFormat = (format: string) => {
-  const map = {
-    online: '💻 Онлайн',
-    offline: '🏫 Очно',
-    both: '🔄 Любой формат',
-  }
-  return map[format as keyof typeof map] || format
 }
 
 const submitRequest = (service: Service) => {

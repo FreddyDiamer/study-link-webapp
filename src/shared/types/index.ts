@@ -12,7 +12,7 @@ export interface User {
   avatarUrl?: string
   groupId?: string
   group?: Group
-  balance: number // в копейках
+  balance: number // в рублях
   lastActivity: string
   createdAt: string
   updatedAt: string
@@ -93,12 +93,6 @@ export enum ServiceStatus {
   SUSPENDED = 'SUSPENDED',
 }
 
-export enum Urgency {
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-}
-
 export enum DealStatus {
   PENDING = 'PENDING',
   ACCEPTED = 'ACCEPTED',
@@ -119,7 +113,7 @@ export interface Service {
   tutorId: string
   subjectId: string
   teacherId: string
-  price: number // в копейках
+  price: number // в рублях
   description?: string
   status: ServiceStatus
   deadline?: string
@@ -137,7 +131,7 @@ export interface Request {
   subjectId: string
   teacherId: string
   description?: string
-  budget?: number // в копейках
+  budget?: number // в рублях
   deadline?: string
   createdAt: string
   updatedAt: string
@@ -153,7 +147,7 @@ export interface Deal {
   tutorId: string
   subjectId: string
   teacherId: string
-  price: number // в копейках
+  price: number // в рублях
   deadline?: string
   status: DealStatus
   serviceResponseId?: string
@@ -308,23 +302,3 @@ export interface CreateReviewDto {
   comment?: string
 }
 
-// =============================================================================
-// TELEGRAM TYPES
-// =============================================================================
-
-export interface TelegramAuthDto {
-  id: number
-  first_name: string
-  last_name?: string
-  username?: string
-  photo_url?: string
-  auth_date: number
-  hash: string
-}
-
-// =============================================================================
-// UTILITY TYPES
-// =============================================================================
-
-export type PriceInRubles = number
-export type PriceInKopeks = number

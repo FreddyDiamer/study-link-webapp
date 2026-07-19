@@ -30,9 +30,6 @@ const showFilters = ref(false)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const tutors = ref<Tutor[]>([])
-const totalTutors = ref(0)
-const currentPage = ref(1)
-const totalPages = ref(1)
 
 // Вычисляемые свойства для предметов
 const availableSubjects = computed(() => activeSubjects.value.map((subject) => subject.name))
@@ -58,15 +55,13 @@ const loadTutors = async () => {
       subject: selectedSubject.value || undefined,
       search: searchQuery.value.trim() || undefined,
       minRating: selectedSort.value === 'rating' ? 4 : undefined,
-      page: currentPage.value,
+      page: 1,
       limit: 10,
     }
 
     const response = await searchTutors(params)
 
     tutors.value = response.items
-    totalTutors.value = response.total
-    totalPages.value = response.totalPages
   } catch (err: any) {
     error.value = err.message
     console.error('Ошибка загрузки репетиторов:', err)
@@ -76,39 +71,9 @@ const loadTutors = async () => {
 }
 
 /**
- * Переключение страниц
- */
-const changePage = (page: number) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
-    loadTutors()
-  }
-}
-
-/**
- * Обработка поиска
- */
-const handleSearch = () => {
-  currentPage.value = 1
-  loadTutors()
-}
-
-/**
  * Обработка изменения фильтров
  */
 const handleFilterChange = () => {
-  currentPage.value = 1
-  loadTutors()
-}
-
-/**
- * Сброс фильтров
- */
-const resetFilters = () => {
-  searchQuery.value = ''
-  selectedSubject.value = null
-  selectedSort.value = 'rating'
-  currentPage.value = 1
   loadTutors()
 }
 
@@ -117,13 +82,6 @@ const resetFilters = () => {
  */
 const goToTutorProfile = (tutorId: string) => {
   router.push(`/tutors/${tutorId}`)
-}
-
-/**
- * Форматирование цены
- */
-const formatPrice = (price: number) => {
-  return `${price} ₽`
 }
 
 /**
@@ -162,35 +120,6 @@ const selectSubject = (subject: string | null) => {
   router.replace({ query })
 }
 
-const contactTutor = (tutor: any) => {
-  telegramStore.hapticFeedback('medium')
-  console.log('Связаться с репетитором:', tutor.name)
-  // TODO: Открыть чат или профиль репетитора
-}
-
-const viewTutorProfile = (tutor: any) => {
-  telegramStore.hapticFeedback('light')
-  console.log('Просмотр профиля:', tutor.name)
-  // TODO: Навигация к детальному профилю репетитора
-}
-
-const addToFavorites = (tutor: any) => {
-  telegramStore.hapticFeedback('light')
-  console.log('Добавить в избранное:', tutor.name)
-  // TODO: Добавить в избранное
-}
-
-const createOrderForTutor = (tutor: any) => {
-  telegramStore.hapticFeedback('medium')
-  console.log('Создать заявку для репетитора:', tutor.name)
-  router.push({
-    path: '/student/orders/create',
-    query: {
-      subject: selectedSubject.value || '',
-      tutorId: tutor.id,
-    },
-  })
-}
 </script>
 
 <template>
