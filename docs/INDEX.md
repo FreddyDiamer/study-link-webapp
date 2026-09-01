@@ -22,6 +22,7 @@ Router for all project documentation. Start here when you need to know *what to 
 | Bug hunt | Start at the layer boundaries: component → business service → `services/api/client.ts`; check ARCHITECTURE.md error-handling flow |
 | Working with subjects/teachers data | Education-store pattern in [conventions/ARCHITECTURE.md](conventions/ARCHITECTURE.md#global-reference-data-education) |
 | Design-system / UI redesign work | [UI_INVENTORY.md](UI_INVENTORY.md) — screen-by-screen inventory of what the app renders today |
+| Vue / Pinia / Router idiom questions, a11y of a component | Vendored agent skills in [../.claude/skills/](../.claude/skills/README.md) — Claude Code loads them automatically |
 
 ## All docs
 
@@ -32,6 +33,7 @@ Router for all project documentation. Start here when you need to know *what to 
 | [conventions/STYLES.md](conventions/STYLES.md) | `current` | Styling: Tailwind-only, `telegram-*` theme tokens, shared UI components |
 | [API_INTEGRATION.md](API_INTEGRATION.md) | `reference` | Backend (NestJS) integration: auth flow, response envelope, prices, env vars. Endpoints themselves live in `src/services/api/` |
 | [UI_INVENTORY.md](UI_INVENTORY.md) | `reference` | UI/functionality inventory of `main` (RU): screens, states, repeated patterns, current tokens, gaps — input for the design system |
+| [../.claude/skills/README.md](../.claude/skills/README.md) | `reference` | Vendored agent skills (Vue 3, Vue Router, Pinia, strict TS, WCAG 2.2) — upstream sources, what was rejected and why. General Vue guidance; this repo's docs override it |
 
 ## Principles
 

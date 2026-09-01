@@ -223,6 +223,17 @@ on `allowedHosts: true`. The previous architecture (two role flows) is preserved
 
 ---
 
+## Agent skills
+
+`.claude/skills/` holds vendored Vue/TypeScript/a11y reference material that Claude Code loads on
+demand: `vue-best-practices`, `vue-router-best-practices`, `vue-pinia-best-practices` (from
+[vuejs-ai/skills](https://github.com/vuejs-ai/skills)), `vue3-reference` and `web-accessibility`
+(from [github/awesome-copilot](https://github.com/github/awesome-copilot)), and `typescript-strict`.
+
+They describe Vue in general — **this file and `docs/` always win on conflict**. Provenance and the
+list of upstream rules deliberately rejected (and why) are in
+[.claude/skills/README.md](.claude/skills/README.md).
+
 ## Reference docs
 
 - `.agents/rules/frontend-writing-patterns.md` — **the** frontend coding rules (read first).
