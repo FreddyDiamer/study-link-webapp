@@ -166,18 +166,18 @@ const getDealStatusInfo = (status: string) => {
       }
     case 'COMPLETED':
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-telegram-text-secondary',
         text: 'Завершена',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-telegram-text-secondary',
         bg: 'bg-gray-100',
       }
     case 'CANCELLED':
       return { color: 'bg-red-500', text: 'Отменена', textColor: 'text-red-600', bg: 'bg-red-100' }
     default:
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-telegram-text-secondary',
         text: 'Неизвестно',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-telegram-text-secondary',
         bg: 'bg-gray-100',
       }
   }
@@ -412,7 +412,9 @@ onMounted(() => {
         </Button>
         <div>
           <h1 class="text-xl font-semibold text-telegram-text">{{ pageTitle }}</h1>
-          <p class="text-telegram-textSecondary text-sm">{{ resultStats.total }} заказов найдено</p>
+          <p class="text-telegram-text-secondary text-sm">
+            {{ resultStats.total }} заказов найдено
+          </p>
         </div>
       </div>
 
@@ -437,7 +439,7 @@ onMounted(() => {
       >
         <template #prepend>
           <svg
-            class="w-4 h-4 text-telegram-textSecondary"
+            class="w-4 h-4 text-telegram-text-secondary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -510,7 +512,7 @@ onMounted(() => {
       <div
         class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-accent"
       ></div>
-      <p class="text-telegram-textSecondary mt-2">Загрузка заказов...</p>
+      <p class="text-telegram-text-secondary mt-2">Загрузка заказов...</p>
     </div>
 
     <!-- Error -->
@@ -526,7 +528,7 @@ onMounted(() => {
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1">
             <h3 class="font-semibold text-telegram-text mb-1">{{ order.subject.name }}</h3>
-            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary mb-2">
+            <div class="flex items-center space-x-2 text-sm text-telegram-text-secondary mb-2">
               <span>{{ order.teacher.fullName }}</span>
             </div>
           </div>
@@ -549,7 +551,7 @@ onMounted(() => {
           </div>
           <div class="flex-1">
             <div class="font-medium text-telegram-text">{{ order.student.name }}</div>
-            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
+            <div class="flex items-center space-x-2 text-sm text-telegram-text-secondary">
               <!-- TODO вернуть -->
               <!-- <span>{{ 5 }} заказов</span>
               <span>•</span>
@@ -570,7 +572,7 @@ onMounted(() => {
         </p>
 
         <!-- Meta Info -->
-        <div class="flex items-center justify-between text-sm text-telegram-textSecondary mb-3">
+        <div class="flex items-center justify-between text-sm text-telegram-text-secondary mb-3">
           <span>Создан: {{ formatDate(order.createdAt) }}</span>
           <span v-if="order.deadline">Дедлайн: {{ formatDate(order.deadline) }}</span>
         </div>
@@ -590,7 +592,7 @@ onMounted(() => {
         class="w-16 h-16 bg-telegram-secondary rounded-full mx-auto mb-4 flex items-center justify-center"
       >
         <svg
-          class="w-8 h-8 text-telegram-textSecondary"
+          class="w-8 h-8 text-telegram-text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -604,7 +606,7 @@ onMounted(() => {
         </svg>
       </div>
       <h3 class="text-telegram-text font-semibold mb-2">Заказы не найдены</h3>
-      <p class="text-telegram-textSecondary mb-4">Попробуйте изменить параметры поиска</p>
+      <p class="text-telegram-text-secondary mb-4">Попробуйте изменить параметры поиска</p>
       <Button @click="resetFilters" variant="secondary">Сбросить фильтры</Button>
     </div>
 
@@ -643,7 +645,7 @@ onMounted(() => {
           <div class="grid grid-cols-2 gap-4 text-sm">
             <div class="flex items-center space-x-2">
               <div class="w-2 h-2 bg-telegram-accent rounded-full"></div>
-              <span class="text-telegram-textSecondary">
+              <span class="text-telegram-text-secondary">
                 Дедлайн:
                 <span class="text-telegram-text">{{
                   selectedRequest.deadline ? formatDate(selectedRequest.deadline) : 'Не установлен'
@@ -651,8 +653,8 @@ onMounted(() => {
               </span>
             </div>
             <div class="flex items-center space-x-2">
-              <div class="w-2 h-2 bg-telegram-textSecondary rounded-full"></div>
-              <span class="text-telegram-textSecondary">
+              <div class="w-2 h-2 bg-telegram-text-secondary rounded-full"></div>
+              <span class="text-telegram-text-secondary">
                 Создан:
                 <span class="text-telegram-text">{{ formatDate(selectedRequest.createdAt) }}</span>
               </span>
@@ -670,14 +672,16 @@ onMounted(() => {
               v-model="proposedDate"
               type="datetime-local"
               required
-              class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:outline-none focus:border-telegram-accent transition-colors"
+              class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text focus:outline-hidden focus:border-telegram-accent transition-colors"
             />
-            <p class="text-xs text-telegram-textSecondary mt-1">Когда вы готовы провести занятие</p>
+            <p class="text-xs text-telegram-text-secondary mt-1">
+              Когда вы готовы провести занятие
+            </p>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-telegram-text mb-2">
-              Ваша цена <span class="text-telegram-textSecondary">(необязательно)</span>
+              Ваша цена <span class="text-telegram-text-secondary">(необязательно)</span>
             </label>
             <div class="relative">
               <input
@@ -686,14 +690,14 @@ onMounted(() => {
                 min="0"
                 step="50"
                 placeholder="₽"
-                class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors"
+                class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-text-secondary focus:outline-hidden focus:border-telegram-accent transition-colors"
               />
               <span
-                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-telegram-textSecondary text-sm"
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-telegram-text-secondary text-sm"
                 >₽</span
               >
             </div>
-            <p class="text-xs text-telegram-textSecondary mt-1">
+            <p class="text-xs text-telegram-text-secondary mt-1">
               Оставьте пустым, если согласны с указанной ценой
             </p>
           </div>
@@ -702,15 +706,15 @@ onMounted(() => {
         <!-- Tutor Comment -->
         <div>
           <label class="block text-sm font-medium text-telegram-text mb-2">
-            Ваш комментарий <span class="text-telegram-textSecondary">(необязательно)</span>
+            Ваш комментарий <span class="text-telegram-text-secondary">(необязательно)</span>
           </label>
           <textarea
             v-model="tutorComment"
             rows="3"
             placeholder="Напишите ваши предложения, условия или дополнительную информацию..."
-            class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
+            class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-text-secondary focus:outline-hidden focus:border-telegram-accent transition-colors resize-none"
           />
-          <p class="text-xs text-telegram-textSecondary mt-1">
+          <p class="text-xs text-telegram-text-secondary mt-1">
             Студент увидит ваш комментарий вместе с откликом
           </p>
         </div>

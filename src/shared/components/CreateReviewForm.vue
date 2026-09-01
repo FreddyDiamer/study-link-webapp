@@ -53,7 +53,7 @@ const targetLabel = props.targetRole === 'TUTOR' ? 'репетитора' : 'с�
         <h3 class="text-lg font-semibold text-telegram-text mb-2">
           Оставить отзыв о {{ targetLabel }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">Поделитесь своим опытом работы</p>
+        <p class="text-sm text-telegram-text-secondary">Поделитесь своим опытом работы</p>
       </div>
 
       <!-- Rating -->
@@ -71,7 +71,7 @@ const targetLabel = props.targetRole === 'TUTOR' ? 'репетитора' : 'с�
           v-model="comment"
           rows="4"
           placeholder="Расскажите о своем опыте работы..."
-          class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
+          class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-text-secondary focus:outline-hidden focus:border-telegram-accent transition-colors resize-none"
         />
       </div>
 

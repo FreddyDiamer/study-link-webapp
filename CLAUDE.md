@@ -4,7 +4,7 @@
 Students post requests (orders) and browse tutor services; tutors publish services and respond to requests.
 The backend is a separate NestJS API (not in this repo) — see [docs/API_INTEGRATION.md](docs/API_INTEGRATION.md).
 
-Stack: **Vue 3** (Composition API, `<script setup lang="ts">`) · **TypeScript** (strict) · **Vite** · **Pinia** · **Vue Router** · **Tailwind CSS** · **axios** · `@telegram-apps/sdk-vue`.
+Stack: **Vue 3.5** (Composition API, `<script setup lang="ts">`) · **TypeScript 6** (strict) · **Vite 8** (Rolldown) · **Pinia 4** · **Vue Router 5** · **Tailwind CSS 4** (CSS-first theme, no config file) · **axios**. Telegram integration goes through the global `window.Telegram.WebApp` typed by `@types/telegram-web-app` — there is no Telegram SDK package.
 
 Before any non-trivial task, check **[docs/INDEX.md](docs/INDEX.md)** — it maps typical tasks to the docs you should read first.
 
@@ -20,6 +20,12 @@ Before any non-trivial task, check **[docs/INDEX.md](docs/INDEX.md)** — it map
 
 There is **no lint script and no test setup** in this project, so `pnpm type-check` is the only automated verification:
 run it **once after completing a coding task** to confirm the code compiles. Don't run it repeatedly mid-task, and don't run `pnpm build` unless explicitly asked.
+
+> **`pnpm type-check` does not pass on a clean tree.** There are **31 pre-existing errors** in 7 files
+> (`GroupsManager.vue`, `ServiceFilters.vue`, `EditOrderPage.vue`, student `OrdersPage.vue`,
+> `DealFilters.vue`, `services/business/education.ts`, `shared/composables/useAuth.ts`).
+> Compare your output against that baseline instead of expecting zero — and fix the ones in files
+> you touch. `pnpm build` therefore fails too; use `pnpm build-only` to check the bundler alone.
 
 ## Architecture
 
@@ -83,7 +89,8 @@ Defined in **both** `vite.config.ts` and `tsconfig.app.json` — keep them in sy
 `.claude/skills/` holds vendored Vue/TypeScript/a11y reference material that Claude Code loads on
 demand: `vue-best-practices`, `vue-router-best-practices`, `vue-pinia-best-practices` (from
 [vuejs-ai/skills](https://github.com/vuejs-ai/skills)), `vue3-reference` and `web-accessibility`
-(from [github/awesome-copilot](https://github.com/github/awesome-copilot)), and `typescript-strict`.
+(from [github/awesome-copilot](https://github.com/github/awesome-copilot)), plus `typescript-strict`
+and `tailwind-v4`.
 
 They describe Vue in general — **this file and `docs/` always win on conflict**. Provenance and the
 list of upstream rules deliberately rejected (and why) are in
@@ -104,4 +111,14 @@ Known gaps between the current code and the target patterns above. Don't treat t
 - `console.log` placeholders stand in for notifications/analytics in some business services.
 - Many feature components call the `telegram` store / `telegramService` directly instead of going through business services.
 - On 401 `services/api/client.ts` redirects to `/auth` — a route that does not exist in the router (dead redirect).
-- `allowedHosts: true` in `vite.config.ts` is marked `TODO: remove`.
+- `allowedHosts: true` + `host: true` in `vite.config.ts` is still marked `TODO: remove` — the dev
+  server accepts any Host on every interface, which matters because Mini App development usually
+  tunnels it publicly. Narrow it to the actual tunnel host.
+- 31 pre-existing `vue-tsc` errors (see the box under Commands) — no test suite exists to catch
+  the behaviour they hide.
+- `pnpm.overrides` in `package.json` pins `postcss` / `nanoid` / `browserslist` / `picomatch`
+  forward. They exist only to clear dev-only advisories in transitive deps of
+  `vite-plugin-vue-devtools` and `npm-run-all2`; drop each one once its parent ships a fixed range.
+- TypeScript is held at **6.0**: `vue-tsc` 3.3 cannot run on TypeScript 7 (it patches
+  `typescript/lib/tsc`, which the native Go compiler no longer ships). Retry TS 7 when vue-tsc
+  supports tsgo.

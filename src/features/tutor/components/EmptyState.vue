@@ -31,7 +31,7 @@ const handleAction = () => {
 
     <h2 class="text-xl font-semibold text-telegram-text mb-3">{{ title }}</h2>
 
-    <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+    <p class="text-telegram-text-secondary mb-8 max-w-sm mx-auto">
       {{ description }}
     </p>
 

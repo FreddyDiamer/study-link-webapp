@@ -86,7 +86,7 @@ const handleLeaveReview = () => {
         <h3 class="font-semibold text-telegram-text mb-1">
           {{ deal.subject?.name || 'Предмет не указан' }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-sm text-telegram-text-secondary">
           {{ deal.teacher?.fullName || 'Преподаватель не указан' }}
         </p>
       </div>
@@ -116,7 +116,7 @@ const handleLeaveReview = () => {
       </div>
       <div class="flex-1">
         <div class="font-medium text-telegram-text">{{ deal.tutor?.name || 'Репетитор' }}</div>
-        <div class="text-sm text-telegram-textSecondary">
+        <div class="text-sm text-telegram-text-secondary">
           @{{ deal.tutor?.telegramUsername || 'username' }}
         </div>
       </div>
@@ -125,17 +125,17 @@ const handleLeaveReview = () => {
     <!-- Deal details -->
     <div class="space-y-2 mb-4">
       <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Создано:</span>
+        <span class="text-telegram-text-secondary">Создано:</span>
         <span class="text-telegram-text">{{ formatDate(deal.createdAt) }}</span>
       </div>
 
       <div v-if="deal.deadline" class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Дедлайн:</span>
+        <span class="text-telegram-text-secondary">Дедлайн:</span>
         <span class="text-telegram-text">{{ formatDate(deal.deadline) }}</span>
       </div>
 
       <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Обновлено:</span>
+        <span class="text-telegram-text-secondary">Обновлено:</span>
         <span class="text-telegram-text">{{ formatDate(deal.updatedAt) }}</span>
       </div>
     </div>

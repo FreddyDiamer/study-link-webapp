@@ -67,7 +67,7 @@ onMounted(async () => {
     <!-- Header -->
     <div class="px-4 mb-6">
       <h1 class="text-2xl font-bold text-telegram-text mb-2">Мои дела</h1>
-      <p class="text-telegram-textSecondary">Заявки, отклики и активные уроки</p>
+      <p class="text-telegram-text-secondary">Заявки, отклики и активные уроки</p>
     </div>
 
     <!-- Tabs -->
@@ -80,8 +80,8 @@ onMounted(async () => {
           :class="[
             'flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200',
             currentTab === tab.id
-              ? 'bg-telegram-card text-telegram-text shadow-sm'
-              : 'text-telegram-textSecondary hover:text-telegram-text',
+              ? 'bg-telegram-card text-telegram-text shadow-xs'
+              : 'text-telegram-text-secondary hover:text-telegram-text',
           ]"
         >
           <span class="text-base">{{ tab.icon }}</span>

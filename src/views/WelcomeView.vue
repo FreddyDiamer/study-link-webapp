@@ -33,10 +33,10 @@ const selectRole = (flow: UserFlow) => {
   <div class="min-h-screen bg-telegram-bg">
     <!-- Header с градиентом -->
     <div
-      class="bg-gradient-to-br from-telegram-accent to-telegram-button px-4 pt-8 pb-12 text-center"
+      class="bg-linear-to-br from-telegram-accent to-telegram-button px-4 pt-8 pb-12 text-center"
     >
       <div
-        class="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-2xl mx-auto mb-6 flex items-center justify-center transition-all duration-700"
+        class="w-24 h-24 bg-white/20 backdrop-blur-xs rounded-2xl mx-auto mb-6 flex items-center justify-center transition-all duration-700"
         :class="{ 'animate-bounce-subtle': isLoaded }"
       >
         <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +77,7 @@ const selectRole = (flow: UserFlow) => {
         >
           <div class="flex items-center space-x-4">
             <div
-              class="w-14 h-14 bg-gradient-to-br from-telegram-button to-telegram-buttonHover rounded-xl flex items-center justify-center shadow-lg"
+              class="w-14 h-14 bg-linear-to-br from-telegram-button to-telegram-button-hover rounded-xl flex items-center justify-center shadow-lg"
             >
               <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -91,7 +91,7 @@ const selectRole = (flow: UserFlow) => {
 
             <div class="flex-1">
               <h3 class="text-xl font-semibold text-telegram-text mb-1">Я студент</h3>
-              <p class="text-telegram-textSecondary text-sm leading-relaxed">
+              <p class="text-telegram-text-secondary text-sm leading-relaxed">
                 Ищу репетитора для подготовки к экзаменам и изучения предметов
               </p>
             </div>
@@ -122,7 +122,7 @@ const selectRole = (flow: UserFlow) => {
         >
           <div class="flex items-center space-x-4">
             <div
-              class="w-14 h-14 bg-gradient-to-br from-telegram-success to-green-600 rounded-xl flex items-center justify-center shadow-lg"
+              class="w-14 h-14 bg-linear-to-br from-telegram-success to-green-600 rounded-xl flex items-center justify-center shadow-lg"
             >
               <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -136,7 +136,7 @@ const selectRole = (flow: UserFlow) => {
 
             <div class="flex-1">
               <h3 class="text-xl font-semibold text-telegram-text mb-1">Я репетитор</h3>
-              <p class="text-telegram-textSecondary text-sm leading-relaxed">
+              <p class="text-telegram-text-secondary text-sm leading-relaxed">
                 Предлагаю помощь в изучении предметов и подготовке к экзаменам
               </p>
             </div>
@@ -174,7 +174,7 @@ const selectRole = (flow: UserFlow) => {
         <div class="space-y-4">
           <div class="flex items-start space-x-3">
             <div
-              class="w-6 h-6 bg-telegram-success rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+              class="w-6 h-6 bg-telegram-success rounded-full flex items-center justify-center shrink-0 mt-0.5"
             >
               <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -186,7 +186,7 @@ const selectRole = (flow: UserFlow) => {
             </div>
             <div>
               <p class="text-telegram-text font-medium text-sm">Знание требований преподавателей</p>
-              <p class="text-telegram-textSecondary text-xs mt-1">
+              <p class="text-telegram-text-secondary text-xs mt-1">
                 Репетиторы знают специфику конкретных преподавателей
               </p>
             </div>
@@ -194,7 +194,7 @@ const selectRole = (flow: UserFlow) => {
 
           <div class="flex items-start space-x-3">
             <div
-              class="w-6 h-6 bg-telegram-success rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+              class="w-6 h-6 bg-telegram-success rounded-full flex items-center justify-center shrink-0 mt-0.5"
             >
               <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -206,7 +206,7 @@ const selectRole = (flow: UserFlow) => {
             </div>
             <div>
               <p class="text-telegram-text font-medium text-sm">Быстрый поиск</p>
-              <p class="text-telegram-textSecondary text-xs mt-1">
+              <p class="text-telegram-text-secondary text-xs mt-1">
                 Найди репетитора по предмету и преподавателю за минуты
               </p>
             </div>
@@ -214,7 +214,7 @@ const selectRole = (flow: UserFlow) => {
 
           <div class="flex items-start space-x-3">
             <div
-              class="w-6 h-6 bg-telegram-success rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+              class="w-6 h-6 bg-telegram-success rounded-full flex items-center justify-center shrink-0 mt-0.5"
             >
               <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -226,7 +226,7 @@ const selectRole = (flow: UserFlow) => {
             </div>
             <div>
               <p class="text-telegram-text font-medium text-sm">Безопасные платежи</p>
-              <p class="text-telegram-textSecondary text-xs mt-1">
+              <p class="text-telegram-text-secondary text-xs mt-1">
                 Все транзакции проходят через защищенную систему Telegram
               </p>
             </div>

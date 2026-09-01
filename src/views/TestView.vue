@@ -589,29 +589,29 @@
         <h3 class="text-lg font-semibold text-telegram-text mb-4">
           💡 Мои обновленные рекомендации:
         </h3>
-        <div class="space-y-3 text-sm text-telegram-textSecondary">
-          <div class="p-3 bg-telegram-secondary rounded">
+        <div class="space-y-3 text-sm text-telegram-text-secondary">
+          <div class="p-3 bg-telegram-secondary rounded-sm">
             <div class="font-medium text-telegram-text">📋 Заказы — ТОП-3:</div>
             <div>1. <strong>Clipboard</strong> ✨ — четко показывает список задач</div>
             <div>2. <strong>File Text</strong> 💙 — понятно для документов</div>
             <div>3. <strong>Check</strong> — простой и знакомый символ</div>
           </div>
 
-          <div class="p-3 bg-telegram-secondary rounded">
+          <div class="p-3 bg-telegram-secondary rounded-sm">
             <div class="font-medium text-telegram-text">🛠️ Услуги — ТОП-3:</div>
             <div>1. <strong>Briefcase</strong> ✨ — профессиональные услуги</div>
             <div>2. <strong>Service</strong> 💜 — прямо по назначению</div>
             <div>3. <strong>Grid</strong> — каталог услуг</div>
           </div>
 
-          <div class="p-3 bg-telegram-secondary rounded">
+          <div class="p-3 bg-telegram-secondary rounded-sm">
             <div class="font-medium text-telegram-text">👨‍🏫 Репетитор — ТОП-3:</div>
             <div>1. <strong>Chalkboard</strong> 🔥 — классический символ обучения</div>
             <div>2. <strong>Presentation</strong> ✨ — современное преподавание</div>
             <div>3. <strong>Book</strong> 🔶 — простой и понятный</div>
           </div>
 
-          <div class="text-xs text-telegram-textSecondary mt-4">
+          <div class="text-xs text-telegram-text-secondary mt-4">
             <strong>Принципы выбора:</strong> простота, узнаваемость, интуитивность для
             пользователей любого возраста
           </div>

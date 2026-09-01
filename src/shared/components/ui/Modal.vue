@@ -76,7 +76,7 @@ const maxWidthClasses = {
                 class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-telegram-secondary transition-colors"
               >
                 <svg
-                  class="w-5 h-5 text-telegram-textSecondary"
+                  class="w-5 h-5 text-telegram-text-secondary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

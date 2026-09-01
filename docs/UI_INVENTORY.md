@@ -45,7 +45,7 @@ CSS-переменную `--custom-primary` (её использует `.btn-pri
 
 ## 2. Дизайн-токены, которые сейчас в коде
 
-Источники: `tailwind.config.js`, `src/assets/base.css`, `src/assets/main.css`.
+Источники: блок `@theme` в `src/assets/main.css`, `src/assets/base.css`. (Tailwind v4 — CSS-first, `tailwind.config.js` больше нет.)
 
 ### Цвета (`telegram-*`, тёмная тема, единственная)
 
@@ -57,9 +57,9 @@ CSS-переменную `--custom-primary` (её использует `.btn-pri
 | `input` | `#1A252F` | фон полей ввода (класс `.input`) |
 | `border` | `#2C3E50` | все границы |
 | `text` | `#FFFFFF` | основной текст |
-| `textSecondary` | `#8E9297` | вторичный текст, плейсхолдеры, неактивные иконки |
+| `text-secondary` | `#8E9297` | вторичный текст, плейсхолдеры, неактивные иконки |
 | `accent` | `#64B5F6` | акцент студента, ссылки, активная навигация |
-| `button` / `buttonHover` | `#2AABEE` / `#229ED9` | градиенты, часть спиннеров |
+| `button` / `button-hover` | `#2AABEE` / `#229ED9` | градиенты, часть спиннеров |
 | `success` | `#48BB78` | акцент репетитора, «успешные» статусы, цены |
 | `warning` | `#ED8936` | почти не используется |
 | `destructive` | `#E53E3E` | ошибки, удаление |
@@ -78,7 +78,7 @@ CSS-переменную `--custom-primary` (её использует `.btn-pri
 - Шкала стандартная Tailwind (`xs` 12 → `3xl` 30), задана явно в конфиге.
 - Фактическое применение: заголовок страницы — то `text-2xl font-bold`, то `text-xl font-semibold`;
   заголовок секции — `text-lg font-semibold`; заголовок карточки — `font-semibold` / `text-lg` /
-  `text-xl`; подписи — `text-sm text-telegram-textSecondary`, микроподписи — `text-xs`.
+  `text-xl`; подписи — `text-sm text-telegram-text-secondary`, микроподписи — `text-xs`.
   Единой семантической шкалы (title/subtitle/body/caption/price) нет.
 
 ### Форма и глубина

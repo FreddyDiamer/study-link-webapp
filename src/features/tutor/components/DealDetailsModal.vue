@@ -105,7 +105,7 @@ const handleComplete = () => {
           <h3 class="text-lg font-semibold text-telegram-text">
             {{ deal.student?.name || 'Студент' }}
           </h3>
-          <p class="text-sm text-telegram-textSecondary">
+          <p class="text-sm text-telegram-text-secondary">
             @{{ deal.student?.telegramUsername || 'username' }}
           </p>
         </div>
@@ -119,21 +119,21 @@ const handleComplete = () => {
       <!-- Deal details -->
       <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Предмет:</span>
+          <span class="text-sm text-telegram-text-secondary">Предмет:</span>
           <span class="font-medium text-telegram-text">
             {{ deal.subject?.name || 'Не указан' }}
           </span>
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Преподаватель:</span>
+          <span class="text-sm text-telegram-text-secondary">Преподаватель:</span>
           <span class="font-medium text-telegram-text">
             {{ deal.teacher?.fullName || 'Не указан' }}
           </span>
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Статус:</span>
+          <span class="text-sm text-telegram-text-secondary">Статус:</span>
           <span
             v-if="statusConfig"
             :class="[
@@ -147,12 +147,12 @@ const handleComplete = () => {
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Создан:</span>
+          <span class="text-sm text-telegram-text-secondary">Создан:</span>
           <span class="text-telegram-text">{{ formatDate(deal.createdAt) }}</span>
         </div>
 
         <div v-if="deal.deadline" class="flex items-center justify-between">
-          <span class="text-sm text-telegram-textSecondary">Дедлайн:</span>
+          <span class="text-sm text-telegram-text-secondary">Дедлайн:</span>
           <span class="text-telegram-text">{{ formatDate(deal.deadline) }}</span>
         </div>
       </div>
@@ -160,7 +160,7 @@ const handleComplete = () => {
       <!-- Description -->
       <div v-if="deal.serviceResponse?.message || deal.requestResponse?.message">
         <h4 class="font-medium text-telegram-text mb-2">Описание:</h4>
-        <p class="text-sm text-telegram-textSecondary bg-telegram-secondary p-3 rounded-lg">
+        <p class="text-sm text-telegram-text-secondary bg-telegram-secondary p-3 rounded-lg">
           {{ deal.serviceResponse?.message || deal.requestResponse?.message }}
         </p>
       </div>

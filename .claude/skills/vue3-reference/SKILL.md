@@ -22,7 +22,7 @@ The upstream document targets a generic Vue 3 app. Where it disagrees with this 
   `pnpm type-check` is the only automated verification.
 - **Styling is Tailwind, not `<style scoped>`.** Ignore the styling section's CSS Modules /
   `v-bind()` in `<style>` advice — see [docs/conventions/STYLES.md](../../../docs/conventions/STYLES.md).
-  Tailwind here is **v3**, so v4-only syntax does not apply.
+  Tailwind here is **v4** with a CSS-first `@theme` (no `tailwind.config.js`).
 - **Forms**: the doc's "schema library + form library" advice matches the project target —
   **vee-validate + yup**, both already installed. Do not hand-roll `validateForm()`.
 - **Layering.** The doc lets components fetch data. This repo does not: components and pages go

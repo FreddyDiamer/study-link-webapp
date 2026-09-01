@@ -29,17 +29,17 @@ const getDealStatusInfo = (status: string) => {
       }
     case 'COMPLETED':
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-telegram-text-secondary',
         text: 'Завершена',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-telegram-text-secondary',
       }
     case 'CANCELLED':
       return { color: 'bg-red-500', text: 'Отменена', textColor: 'text-red-600' }
     default:
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-telegram-text-secondary',
         text: 'Неизвестно',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-telegram-text-secondary',
       }
   }
 }
@@ -100,7 +100,7 @@ const startLesson = (deal: any) => {
         class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
       >
         <svg
-          class="w-10 h-10 text-telegram-textSecondary"
+          class="w-10 h-10 text-telegram-text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -114,7 +114,7 @@ const startLesson = (deal: any) => {
         </svg>
       </div>
       <h2 class="text-xl font-semibold text-telegram-text mb-3">У вас пока нет активных уроков</h2>
-      <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+      <p class="text-telegram-text-secondary mb-8 max-w-sm mx-auto">
         Найдите репетитора и начните обучение
       </p>
       <Button @click="findTutors" class="mx-auto">Найти репетитора</Button>
@@ -136,7 +136,7 @@ const startLesson = (deal: any) => {
               {{ deal.teacher?.fullName || 'Преподаватель' }}
             </h3>
             <div class="flex items-center space-x-2 mb-2">
-              <span class="text-telegram-textSecondary text-sm">{{
+              <span class="text-telegram-text-secondary text-sm">{{
                 deal.tutor?.name || 'Репетитор'
               }}</span>
               <div class="flex items-center space-x-1">
@@ -145,7 +145,7 @@ const startLesson = (deal: any) => {
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                   />
                 </svg>
-                <span class="text-telegram-textSecondary text-sm">{{
+                <span class="text-telegram-text-secondary text-sm">{{
                   deal.tutor?.rating ?? '—'
                 }}</span>
               </div>
@@ -170,7 +170,7 @@ const startLesson = (deal: any) => {
         <!-- Source Info -->
         <div class="mb-4">
           <div class="flex items-center space-x-2 text-sm">
-            <span class="text-telegram-textSecondary">Источник:</span>
+            <span class="text-telegram-text-secondary">Источник:</span>
             <span class="text-telegram-text">
               {{ deal.serviceResponseId ? 'Отклик на услугу' : 'Отклик на заявку' }}
             </span>
@@ -180,7 +180,7 @@ const startLesson = (deal: any) => {
         <!-- Deadline / Action -->
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-telegram-textSecondary text-xs mb-1">
+            <p class="text-telegram-text-secondary text-xs mb-1">
               {{ deal.deadline ? 'Дедлайн' : 'Создана' }}
             </p>
             <p class="text-telegram-text text-sm">

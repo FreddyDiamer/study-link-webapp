@@ -209,7 +209,7 @@ const createOrderForTutor = (tutor: any) => {
       </Button>
       <div>
         <h1 class="text-2xl font-bold text-telegram-text">{{ pageTitle }}</h1>
-        <p class="text-telegram-textSecondary">{{ filteredTutors.length }} репетиторов найдено</p>
+        <p class="text-telegram-text-secondary">{{ filteredTutors.length }} репетиторов найдено</p>
       </div>
     </div>
 
@@ -246,7 +246,7 @@ const createOrderForTutor = (tutor: any) => {
         >
           <template #prepend>
             <svg
-              class="w-4 h-4 text-telegram-textSecondary"
+              class="w-4 h-4 text-telegram-text-secondary"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -265,10 +265,10 @@ const createOrderForTutor = (tutor: any) => {
         <div class="flex items-center space-x-2 overflow-x-auto pb-2">
           <button
             @click="selectSubject(null)"
-            class="flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+            class="shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
             :class="{
               'bg-telegram-accent text-white': selectedSubject === null,
-              'bg-telegram-secondary text-telegram-textSecondary': selectedSubject !== null,
+              'bg-telegram-secondary text-telegram-text-secondary': selectedSubject !== null,
             }"
           >
             Все
@@ -277,10 +277,10 @@ const createOrderForTutor = (tutor: any) => {
             v-for="subject in availableSubjects"
             :key="subject"
             @click="selectSubject(subject)"
-            class="flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+            class="shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
             :class="{
               'bg-telegram-accent text-white': selectedSubject === subject,
-              'bg-telegram-secondary text-telegram-textSecondary': selectedSubject !== subject,
+              'bg-telegram-secondary text-telegram-text-secondary': selectedSubject !== subject,
             }"
           >
             {{ subject }}
@@ -289,10 +289,10 @@ const createOrderForTutor = (tutor: any) => {
 
         <!-- Sort -->
         <div class="flex items-center justify-between">
-          <span class="text-telegram-textSecondary text-sm">Сортировка:</span>
+          <span class="text-telegram-text-secondary text-sm">Сортировка:</span>
           <select
             v-model="selectedSort"
-            class="bg-telegram-secondary text-telegram-text border-none rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-telegram-accent"
+            class="bg-telegram-secondary text-telegram-text border-none rounded-lg px-3 py-1 text-sm focus:outline-hidden focus:ring-2 focus:ring-telegram-accent"
           >
             <option value="rating">По рейтингу</option>
             <option value="price-low">Сначала дешевле</option>
@@ -309,7 +309,7 @@ const createOrderForTutor = (tutor: any) => {
           class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
         >
           <svg
-            class="w-10 h-10 text-telegram-textSecondary"
+            class="w-10 h-10 text-telegram-text-secondary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -323,7 +323,7 @@ const createOrderForTutor = (tutor: any) => {
           </svg>
         </div>
         <h2 class="text-xl font-semibold text-telegram-text mb-3">Репетиторы не найдены</h2>
-        <p class="text-telegram-textSecondary mb-6">
+        <p class="text-telegram-text-secondary mb-6">
           Попробуйте изменить критерии поиска или выберите другой предмет
         </p>
         <Button @click="selectSubject(null)" variant="secondary">
@@ -352,7 +352,7 @@ const createOrderForTutor = (tutor: any) => {
                 <div class="flex items-center space-x-2 mb-1">
                   <h3 class="text-telegram-text font-semibold text-lg">{{ tutor.name }}</h3>
                 </div>
-                <p class="text-telegram-textSecondary text-sm mb-2">
+                <p class="text-telegram-text-secondary text-sm mb-2">
                   {{ tutor.description || 'Репетитор' }}
                 </p>
                 <div class="flex items-center space-x-4">
@@ -365,7 +365,7 @@ const createOrderForTutor = (tutor: any) => {
                     <span class="text-telegram-text font-semibold">{{
                       formatRating(tutor.rating)
                     }}</span>
-                    <span class="text-telegram-textSecondary text-sm"
+                    <span class="text-telegram-text-secondary text-sm"
                       >({{ tutor.reviewsCount }})</span
                     >
                   </div>

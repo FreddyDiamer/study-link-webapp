@@ -70,7 +70,7 @@ const handleReject = () => {
         <h3 class="font-semibold text-telegram-text mb-1">
           {{ response.request?.subject?.name || 'Предмет не указан' }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-sm text-telegram-text-secondary">
           {{ response.request?.teacher?.fullName || 'Преподаватель не указан' }}
         </p>
       </div>
@@ -97,7 +97,7 @@ const handleReject = () => {
         <div class="font-medium text-telegram-text">
           {{ response.request?.student?.name || 'Студент' }}
         </div>
-        <div class="text-sm text-telegram-textSecondary">
+        <div class="text-sm text-telegram-text-secondary">
           @{{ response.request?.student?.telegramUsername || 'username' }}
         </div>
       </div>
@@ -105,7 +105,7 @@ const handleReject = () => {
         <div v-if="response.price" class="font-bold text-telegram-accent">
           {{ formatPrice(response.price) }}
         </div>
-        <div class="text-xs text-telegram-textSecondary">
+        <div class="text-xs text-telegram-text-secondary">
           {{ formatDate(response.createdAt) }}
         </div>
       </div>
@@ -121,12 +121,12 @@ const handleReject = () => {
     <!-- Details -->
     <div class="space-y-2 mb-4">
       <div v-if="response.proposedDeadline" class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Предложенный дедлайн:</span>
+        <span class="text-telegram-text-secondary">Предложенный дедлайн:</span>
         <span class="text-telegram-text">{{ formatDate(response.proposedDeadline) }}</span>
       </div>
 
       <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Отклик отправлен:</span>
+        <span class="text-telegram-text-secondary">Отклик отправлен:</span>
         <span class="text-telegram-text">{{ formatDate(response.createdAt) }}</span>
       </div>
     </div>

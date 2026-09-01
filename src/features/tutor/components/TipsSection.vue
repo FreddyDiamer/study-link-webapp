@@ -6,7 +6,7 @@ import { Card } from '@components/ui'
   <Card class="p-6 bg-telegram-success/5 border-telegram-success/20">
     <div class="flex items-start space-x-3">
       <div
-        class="w-8 h-8 bg-telegram-success rounded-full flex items-center justify-center flex-shrink-0"
+        class="w-8 h-8 bg-telegram-success rounded-full flex items-center justify-center shrink-0"
       >
         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

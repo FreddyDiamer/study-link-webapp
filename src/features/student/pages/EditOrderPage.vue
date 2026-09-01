@@ -244,7 +244,7 @@ const goBack = () => {
         <!-- Teacher -->
         <Card class="p-6">
           <h2 class="text-lg font-semibold text-telegram-text mb-2">Тип подготовки</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">Укажите, к чему нужна подготовка</p>
+          <p class="text-telegram-text-secondary text-sm mb-4">Укажите, к чему нужна подготовка</p>
 
           <Select
             v-model="form.teacher"
@@ -257,7 +257,7 @@ const goBack = () => {
         <!-- Description -->
         <Card class="p-6">
           <h2 class="text-lg font-semibold text-telegram-text mb-2">Описание задач</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">
+          <p class="text-telegram-text-secondary text-sm mb-4">
             Расскажите, что именно нужно изучить или подготовить
           </p>
 
@@ -271,7 +271,7 @@ const goBack = () => {
         <!-- Deadline Selection -->
         <Card class="p-6">
           <h2 class="text-lg font-semibold text-telegram-text mb-2">Срок выполнения</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">
+          <p class="text-telegram-text-secondary text-sm mb-4">
             Укажите, когда нужно выполнить задание
           </p>
 
@@ -289,7 +289,7 @@ const goBack = () => {
         <!-- Urgency -->
         <Card class="p-6">
           <h2 class="text-lg font-semibold text-telegram-text mb-2">Срочность</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">Насколько срочно нужен репетитор</p>
+          <p class="text-telegram-text-secondary text-sm mb-4">Насколько срочно нужен репетитор</p>
 
           <Select
             v-model="form.urgency"
@@ -302,13 +302,13 @@ const goBack = () => {
         <!-- Budget -->
         <Card class="p-6">
           <h2 class="text-lg font-semibold text-telegram-text mb-2">Бюджет за занятие</h2>
-          <p class="text-telegram-textSecondary text-sm mb-4">
+          <p class="text-telegram-text-secondary text-sm mb-4">
             Укажите комфортную для вас стоимость
           </p>
 
           <div class="flex items-center space-x-3">
             <Input v-model="form.budget" placeholder="1500" type="number" class="flex-1" />
-            <span class="text-telegram-textSecondary font-medium">₽</span>
+            <span class="text-telegram-text-secondary font-medium">₽</span>
           </div>
         </Card>
 
@@ -352,7 +352,7 @@ const goBack = () => {
         </div>
 
         <h3 class="text-lg font-semibold text-telegram-text mb-2">Удалить заявку?</h3>
-        <p class="text-telegram-textSecondary text-sm mb-6">
+        <p class="text-telegram-text-secondary text-sm mb-6">
           Это действие нельзя отменить. Заявка будет удалена навсегда.
         </p>
 

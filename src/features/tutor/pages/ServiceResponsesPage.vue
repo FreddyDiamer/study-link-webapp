@@ -152,7 +152,7 @@ const getUrgencyClass = (urgency: string): string => {
     case 'В течение месяца':
       return 'bg-green-500/20 text-green-600'
     default:
-      return 'bg-telegram-secondary text-telegram-textSecondary'
+      return 'bg-telegram-secondary text-telegram-text-secondary'
   }
 }
 
@@ -176,15 +176,15 @@ const getResponseStatusInfo = (status: string) => {
       return { color: 'bg-red-500', text: 'Отклонен', textColor: 'text-red-600' }
     case 'EXPIRED':
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-telegram-text-secondary',
         text: 'Истек',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-telegram-text-secondary',
       }
     default:
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-telegram-text-secondary',
         text: 'Неизвестно',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-telegram-text-secondary',
       }
   }
 }
@@ -275,7 +275,7 @@ onMounted(() => {
         <h1 class="text-xl font-bold text-telegram-text mb-1">
           {{ service.subject.name }} • {{ service.teacher.fullName }}
         </h1>
-        <p class="text-telegram-textSecondary text-sm">
+        <p class="text-telegram-text-secondary text-sm">
           {{ service.description }} • {{ service.price }}₽
         </p>
       </div>
@@ -288,8 +288,8 @@ onMounted(() => {
         :class="[
           'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all',
           activeTab === 'new'
-            ? 'bg-telegram-accent text-white shadow-sm'
-            : 'text-telegram-textSecondary hover:text-telegram-text',
+            ? 'bg-telegram-accent text-white shadow-xs'
+            : 'text-telegram-text-secondary hover:text-telegram-text',
         ]"
       >
         Новые отклики
@@ -306,8 +306,8 @@ onMounted(() => {
         :class="[
           'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all',
           activeTab === 'active'
-            ? 'bg-telegram-accent text-white shadow-sm'
-            : 'text-telegram-textSecondary hover:text-telegram-text',
+            ? 'bg-telegram-accent text-white shadow-xs'
+            : 'text-telegram-text-secondary hover:text-telegram-text',
         ]"
       >
         Активные
@@ -324,8 +324,8 @@ onMounted(() => {
         :class="[
           'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all',
           activeTab === 'completed'
-            ? 'bg-telegram-accent text-white shadow-sm'
-            : 'text-telegram-textSecondary hover:text-telegram-text',
+            ? 'bg-telegram-accent text-white shadow-xs'
+            : 'text-telegram-text-secondary hover:text-telegram-text',
         ]"
       >
         Завершенные
@@ -361,7 +361,7 @@ onMounted(() => {
             </div>
             <div>
               <h3 class="font-semibold text-telegram-text">{{ response.student.name }}</h3>
-              <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
+              <div class="flex items-center space-x-2 text-sm text-telegram-text-secondary">
                 <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
@@ -373,7 +373,7 @@ onMounted(() => {
           </div>
 
           <div class="flex flex-col items-end space-y-2">
-            <span class="text-xs text-telegram-textSecondary">{{
+            <span class="text-xs text-telegram-text-secondary">{{
               formatDate(response.createdAt)
             }}</span>
             <div
@@ -396,11 +396,11 @@ onMounted(() => {
         <!-- Price Details -->
         <div class="grid grid-cols-2 gap-4 mb-4 p-3 bg-telegram-secondary/50 rounded-lg">
           <div>
-            <span class="text-xs text-telegram-textSecondary">Предложенная цена:</span>
+            <span class="text-xs text-telegram-text-secondary">Предложенная цена:</span>
             <div class="text-sm font-medium text-telegram-success">{{ response.price }}₽</div>
           </div>
           <div>
-            <span class="text-xs text-telegram-textSecondary">Цена услуги:</span>
+            <span class="text-xs text-telegram-text-secondary">Цена услуги:</span>
             <div class="text-sm font-medium text-telegram-text">{{ response.service.price }}₽</div>
           </div>
         </div>
@@ -408,7 +408,7 @@ onMounted(() => {
         <!-- Deadline -->
         <div v-if="response.proposedDeadline" class="mb-4 p-3 bg-telegram-secondary/30 rounded-lg">
           <div class="flex items-center justify-between">
-            <span class="text-sm text-telegram-textSecondary">Предложенный дедлайн:</span>
+            <span class="text-sm text-telegram-text-secondary">Предложенный дедлайн:</span>
             <span class="text-sm font-medium text-telegram-text">
               {{ formatDeadline(response.proposedDeadline) }}
             </span>
@@ -493,7 +493,7 @@ onMounted(() => {
         class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
       >
         <svg
-          class="w-10 h-10 text-telegram-textSecondary"
+          class="w-10 h-10 text-telegram-text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -517,7 +517,7 @@ onMounted(() => {
         }}
       </h2>
 
-      <p class="text-telegram-textSecondary max-w-sm mx-auto">
+      <p class="text-telegram-text-secondary max-w-sm mx-auto">
         {{
           activeTab === 'new'
             ? 'Когда ученики начнут откликаться на вашу услугу, они появятся здесь'

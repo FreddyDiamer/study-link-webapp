@@ -44,7 +44,7 @@ const handleViewDetails = () => {
         <h3 class="font-semibold text-telegram-text mb-1">
           {{ request.subject?.name || 'Предмет не указан' }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-sm text-telegram-text-secondary">
           {{ request.teacher?.fullName || 'Преподаватель не указан' }}
         </p>
       </div>
@@ -53,7 +53,7 @@ const handleViewDetails = () => {
         <div v-if="request.budget" class="font-bold text-telegram-accent">
           {{ formatPrice(request.budget) }}
         </div>
-        <div class="text-xs text-telegram-textSecondary">
+        <div class="text-xs text-telegram-text-secondary">
           {{ formatDate(request.createdAt) }}
         </div>
       </div>
@@ -68,7 +68,7 @@ const handleViewDetails = () => {
       </div>
       <div class="flex-1">
         <div class="font-medium text-telegram-text">{{ request.student?.name || 'Студент' }}</div>
-        <div class="text-sm text-telegram-textSecondary">
+        <div class="text-sm text-telegram-text-secondary">
           @{{ request.student?.telegramUsername || 'username' }}
         </div>
       </div>
@@ -84,12 +84,12 @@ const handleViewDetails = () => {
     <!-- Details -->
     <div class="space-y-2 mb-4">
       <div v-if="request.deadline" class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Дедлайн:</span>
+        <span class="text-telegram-text-secondary">Дедлайн:</span>
         <span class="text-telegram-text">{{ formatDate(request.deadline) }}</span>
       </div>
 
       <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Заявка создана:</span>
+        <span class="text-telegram-text-secondary">Заявка создана:</span>
         <span class="text-telegram-text">{{ formatDate(request.createdAt) }}</span>
       </div>
     </div>

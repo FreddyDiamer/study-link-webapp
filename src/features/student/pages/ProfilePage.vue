@@ -43,7 +43,7 @@ onMounted(() => {
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-telegram-text mb-2">Профиль</h1>
-      <p class="text-telegram-textSecondary">Управляйте своим профилем и настройками</p>
+      <p class="text-telegram-text-secondary">Управляйте своим профилем и настройками</p>
     </div>
 
     <!-- Profile info -->
@@ -63,7 +63,7 @@ onMounted(() => {
           <h2 class="text-xl font-semibold text-telegram-text">
             {{ user.name || telegramStore.firstName || 'Пользователь' }}
           </h2>
-          <p class="text-telegram-textSecondary">
+          <p class="text-telegram-text-secondary">
             @{{ user.telegramUsername || telegramStore.username || 'username' }}
           </p>
           <div class="inline-flex items-center mt-2 px-2 py-1 bg-telegram-button/10 rounded-lg">
@@ -93,18 +93,18 @@ onMounted(() => {
     <div class="relative mt-6 group cursor-pointer" @click="openFeedback">
       <!-- Градиентный фон с анимацией -->
       <div
-        class="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl opacity-75 group-hover:opacity-100 transition-all duration-300 blur-sm group-hover:blur-none"
+        class="absolute inset-0 bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl opacity-75 group-hover:opacity-100 transition-all duration-300 blur-xs group-hover:blur-none"
       ></div>
 
       <!-- Основная карточка -->
       <Card
-        class="relative p-6 backdrop-blur-sm bg-white/10 border border-white/20 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105"
+        class="relative p-6 backdrop-blur-xs bg-white/10 border border-white/20 shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <!-- Анимированная иконка -->
             <div
-              class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-300"
+              class="w-12 h-12 bg-white/20 backdrop-blur-xs rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-300"
             >
               <div class="text-xl">💡</div>
             </div>
@@ -116,7 +116,7 @@ onMounted(() => {
 
           <!-- Стрелка с анимацией -->
           <div
-            class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300"
+            class="w-8 h-8 bg-white/20 backdrop-blur-xs rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300"
           >
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path

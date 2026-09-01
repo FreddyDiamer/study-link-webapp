@@ -269,7 +269,7 @@ const formatAvailability = (availability: string) => {
   return (
     map[availability as keyof typeof map] || {
       text: 'Неизвестно',
-      color: 'text-telegram-textSecondary',
+      color: 'text-telegram-text-secondary',
     }
   )
 }
@@ -361,7 +361,7 @@ onMounted(async () => {
         </Button>
         <div>
           <h1 class="text-xl font-semibold text-telegram-text">{{ pageTitle }}</h1>
-          <p class="text-telegram-textSecondary text-sm">{{ resultStats.total }} услуг найдено</p>
+          <p class="text-telegram-text-secondary text-sm">{{ resultStats.total }} услуг найдено</p>
         </div>
       </div>
 
@@ -440,7 +440,7 @@ onMounted(async () => {
       <div
         class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-accent"
       ></div>
-      <p class="text-telegram-textSecondary mt-2">Загрузка услуг...</p>
+      <p class="text-telegram-text-secondary mt-2">Загрузка услуг...</p>
     </div>
 
     <!-- Error -->
@@ -461,7 +461,7 @@ onMounted(async () => {
         <div class="flex items-start justify-between mb-3">
           <div class="flex-1">
             <h3 class="font-semibold text-telegram-text mb-1">{{ service.subject }}</h3>
-            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
+            <div class="flex items-center space-x-2 text-sm text-telegram-text-secondary">
               <span>{{ service.teacher.name }}</span>
             </div>
           </div>
@@ -484,7 +484,7 @@ onMounted(async () => {
           </div>
           <div class="flex-1">
             <div class="font-medium text-telegram-text">{{ service.teacher.name }}</div>
-            <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
+            <div class="flex items-center space-x-2 text-sm text-telegram-text-secondary">
               <span>{{ service.teacher.experience }} услуг</span>
               <span>•</span>
               <div class="flex items-center space-x-1">
@@ -501,7 +501,7 @@ onMounted(async () => {
         </div>
 
         <!-- Description -->
-        <p class="text-telegram-textSecondary text-sm mb-3 line-clamp-5">
+        <p class="text-telegram-text-secondary text-sm mb-3 line-clamp-5">
           {{ service.description }}
         </p>
 
@@ -520,7 +520,7 @@ onMounted(async () => {
         class="w-16 h-16 bg-telegram-secondary rounded-full mx-auto mb-4 flex items-center justify-center"
       >
         <svg
-          class="w-8 h-8 text-telegram-textSecondary"
+          class="w-8 h-8 text-telegram-text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -534,7 +534,7 @@ onMounted(async () => {
         </svg>
       </div>
       <h3 class="text-telegram-text font-semibold mb-2">Услуги не найдены</h3>
-      <p class="text-telegram-textSecondary mb-4">Попробуйте изменить параметры поиска</p>
+      <p class="text-telegram-text-secondary mb-4">Попробуйте изменить параметры поиска</p>
       <Button @click="resetFilters" variant="secondary">Сбросить фильтры</Button>
     </div>
 

@@ -27,7 +27,7 @@ const colorClasses = {
   <div class="bg-telegram-card rounded-xl p-4 border border-telegram-border">
     <div class="flex items-center justify-between">
       <div class="flex-1">
-        <p class="text-sm text-telegram-textSecondary mb-1">{{ title }}</p>
+        <p class="text-sm text-telegram-text-secondary mb-1">{{ title }}</p>
         <p class="text-2xl font-bold text-telegram-text">{{ value }}</p>
 
         <div v-if="trend" class="flex items-center mt-2">

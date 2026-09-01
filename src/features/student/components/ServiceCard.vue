@@ -56,7 +56,7 @@ const handleAddToFavorites = () => {
         <h3 class="font-semibold text-telegram-text mb-1">
           {{ service.subject?.name || 'Предмет не указан' }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-sm text-telegram-text-secondary">
           {{ service.teacher?.fullName || 'Преподаватель не указан' }}
         </p>
       </div>
@@ -65,7 +65,7 @@ const handleAddToFavorites = () => {
         <div class="font-bold text-telegram-accent text-lg">
           {{ formatPrice(service.price) }}
         </div>
-        <div v-if="service.deadline" class="text-xs text-telegram-textSecondary">
+        <div v-if="service.deadline" class="text-xs text-telegram-text-secondary">
           До {{ formatDate(service.deadline) }}
         </div>
       </div>
@@ -80,7 +80,7 @@ const handleAddToFavorites = () => {
       </div>
       <div class="flex-1">
         <div class="font-medium text-telegram-text">{{ service.tutor?.name || 'Репетитор' }}</div>
-        <div class="flex items-center space-x-2 text-sm text-telegram-textSecondary">
+        <div class="flex items-center space-x-2 text-sm text-telegram-text-secondary">
           <span>⭐ {{ (service.tutor as any)?.rating || 5.0 }}</span>
           <span>•</span>
           <span>{{ (service.tutor as any)?.reviewsCount || 0 }} отзывов</span>

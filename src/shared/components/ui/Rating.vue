@@ -81,7 +81,7 @@ const handleStarClick = (starIndex: number) => {
       <span :class="[textSizeClasses[size], 'font-medium text-telegram-text']">
         {{ rating.toFixed(1) }}
       </span>
-      <span v-if="reviewsCount" :class="[textSizeClasses[size], 'text-telegram-textSecondary']">
+      <span v-if="reviewsCount" :class="[textSizeClasses[size], 'text-telegram-text-secondary']">
         ({{ reviewsCount }})
       </span>
     </div>

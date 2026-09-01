@@ -168,7 +168,7 @@ onMounted(async () => {
             class="w-16 h-16 bg-telegram-secondary rounded-full mx-auto mb-4 flex items-center justify-center"
           >
             <svg
-              class="w-8 h-8 text-telegram-textSecondary"
+              class="w-8 h-8 text-telegram-text-secondary"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -181,7 +181,7 @@ onMounted(async () => {
               />
             </svg>
           </div>
-          <p class="text-telegram-textSecondary mb-4">У вас пока нет предметов</p>
+          <p class="text-telegram-text-secondary mb-4">У вас пока нет предметов</p>
           <Button @click="createOrder">Добавить первый предмет</Button>
         </div>
 
@@ -204,12 +204,12 @@ onMounted(async () => {
                       class="w-2 h-2 bg-telegram-success rounded-full"
                     ></span>
                   </div>
-                  <p class="text-telegram-textSecondary text-sm">{{ subject.name }}</p>
+                  <p class="text-telegram-text-secondary text-sm">{{ subject.name }}</p>
                   <div class="flex items-center space-x-4 mt-1">
                     <span class="text-telegram-success text-xs font-medium">
                       {{ subject.tutorsCount }} репетиторов
                     </span>
-                    <span class="text-telegram-textSecondary text-xs">
+                    <span class="text-telegram-text-secondary text-xs">
                       {{ subject.servicesCount }} услуг
                     </span>
                     <span class="text-telegram-accent text-xs">
@@ -219,7 +219,7 @@ onMounted(async () => {
                 </div>
               </div>
               <div class="text-right">
-                <div class="text-telegram-textSecondary text-xs mb-1">Последняя активность</div>
+                <div class="text-telegram-text-secondary text-xs mb-1">Последняя активность</div>
                 <div class="text-telegram-text text-sm font-medium">
                   {{ formatDate(subject.lastActivity) }}
                 </div>

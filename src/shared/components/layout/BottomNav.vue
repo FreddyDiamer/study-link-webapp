@@ -109,7 +109,7 @@ const isActiveRoute = (path: string) => {
         :class="{
           'text-telegram-accent': isActiveRoute(item.path) && appStore.isStudentFlow,
           'text-telegram-success': isActiveRoute(item.path) && appStore.isTutorFlow,
-          'text-telegram-textSecondary hover:text-telegram-text': !isActiveRoute(item.path),
+          'text-telegram-text-secondary hover:text-telegram-text': !isActiveRoute(item.path),
         }"
       >
         <!-- Icon -->

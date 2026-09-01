@@ -1,7 +1,203 @@
-@import './base.css';
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import './base.css' layer(base);
+@import 'tailwindcss';
+
+@theme {
+  --color-telegram-bg: #17212b;
+  --color-telegram-secondary: #242f3d;
+  --color-telegram-accent: #64b5f6;
+  --color-telegram-text: #ffffff;
+  --color-telegram-text-secondary: #8e9297;
+  --color-telegram-button: #2aabee;
+  --color-telegram-button-hover: #229ed9;
+  --color-telegram-destructive: #e53e3e;
+  --color-telegram-success: #48bb78;
+  --color-telegram-warning: #ed8936;
+  --color-telegram-border: #2c3e50;
+  --color-telegram-input: #1a252f;
+  --color-telegram-card: #1e2832;
+
+  --color-gradient-from: #667eea;
+  --color-gradient-to: #764ba2;
+
+  --font-sans: Inter, 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --shadow-telegram: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --animate-fade-in: fadeIn 0.3s ease-in-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-bounce-subtle: bounceSubtle 0.6s ease-in-out;
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes slideUp {
+    0% {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes bounceSubtle {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+}
+
+/*
+  `inline` обязателен: значение подставляется прямо в утилиту
+  (`background-color: var(--custom-primary)`), а не резолвится один раз на :root.
+  Без него переключение флоу через .flow-student / .flow-tutor перестаёт работать,
+  потому что --custom-primary вычислился бы на :root ещё до применения класса.
+*/
+@theme inline {
+  --color-custom-primary: var(--custom-primary);
+  --color-custom-secondary: var(--custom-secondary);
+}
+
+/*
+  В Tailwind v4 цвет границы по умолчанию — currentcolor.
+  Шим сохраняет поведение v3; чтобы его убрать, нужно проставить явный
+  border-* всем элементам, которые полагаются на дефолт.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+/* Компоненты */
+@layer components {
+  /* App flow */
+  .flow-student {
+    --custom-primary: #64b5f6;
+    --custom-secondary: #242f3d;
+  }
+
+  .flow-tutor {
+    --custom-primary: #48bb78;
+    --custom-secondary: #242f3d;
+  }
+
+  /* Кнопки */
+  .btn {
+    @apply relative px-4 py-2 rounded-xl;
+    @apply flex items-center justify-center;
+    @apply transition-all duration-200 font-medium;
+    @apply focus:outline-hidden;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply bg-custom-primary text-white;
+    @apply hover:bg-custom-primary active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-telegram-secondary text-telegram-text border border-telegram-border;
+    @apply hover:bg-telegram-card active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply text-telegram-accent bg-transparent;
+    @apply hover:bg-telegram-secondary active:scale-95;
+  }
+
+  /* Карточки */
+  .card {
+    @apply bg-telegram-card rounded-2xl p-4 border border-telegram-border;
+    @apply shadow-card transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply hover:shadow-card-hover hover:-translate-y-1;
+  }
+
+  .card-gradient {
+    @apply bg-linear-to-br from-gradient-from to-gradient-to;
+    @apply text-white border-none;
+  }
+
+  /* Поля ввода */
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-telegram-border;
+    @apply bg-telegram-input text-telegram-text placeholder-telegram-text-secondary;
+    @apply focus:outline-hidden;
+    @apply transition-all duration-200;
+  }
+
+  /* Навигация */
+  .nav-item {
+    @apply flex items-center px-4 py-3 rounded-xl text-telegram-text-secondary;
+    @apply hover:bg-telegram-secondary hover:text-telegram-text;
+    @apply transition-all duration-200;
+  }
+
+  .nav-item.active {
+    @apply bg-telegram-accent text-white;
+  }
+
+  /* Бейджи */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-telegram-success text-white;
+  }
+
+  .badge-warning {
+    @apply bg-telegram-warning text-white;
+  }
+
+  .badge-error {
+    @apply bg-telegram-destructive text-white;
+  }
+
+  /* Анимации */
+  .animate-enter {
+    @apply animate-fade-in;
+  }
+
+  .animate-slide {
+    @apply animate-slide-up;
+  }
+}
+
+/* Утилиты */
+@utility text-gradient {
+  @apply bg-linear-to-r from-telegram-accent to-telegram-button bg-clip-text text-transparent;
+}
+
+@utility absolute-center {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
+@utility safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
 /* Основные стили для темной темы */
 @layer base {
@@ -43,122 +239,5 @@
 
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-telegram-accent;
-  }
-}
-
-/* Компоненты */
-@layer components {
-  /* App flow */
-  .flow-student {
-    --custom-primary: #64b5f6;
-    --custom-secondary: #242f3d;
-  }
-
-  .flow-tutor {
-    --custom-primary: #48bb78;
-    --custom-secondary: #242f3d;
-  }
-
-  /* Кнопки */
-  .btn {
-    @apply relative px-4 py-2 rounded-xl;
-    @apply flex items-center justify-center;
-    @apply transition-all duration-200 font-medium;
-    @apply focus:outline-none;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
-  }
-
-  .btn-primary {
-    @apply bg-custom-primary text-white;
-    @apply hover:bg-custom-primary active:scale-95;
-  }
-
-  .btn-secondary {
-    @apply bg-telegram-secondary text-telegram-text border border-telegram-border;
-    @apply hover:bg-telegram-card active:scale-95;
-  }
-
-  .btn-ghost {
-    @apply text-telegram-accent bg-transparent;
-    @apply hover:bg-telegram-secondary active:scale-95;
-  }
-
-  /* Карточки */
-  .card {
-    @apply bg-telegram-card rounded-2xl p-4 border border-telegram-border;
-    @apply shadow-card transition-all duration-200;
-  }
-
-  .card-hover {
-    @apply hover:shadow-card-hover hover:-translate-y-1;
-  }
-
-  .card-gradient {
-    @apply bg-gradient-to-br from-gradient-from to-gradient-to;
-    @apply text-white border-none;
-  }
-
-  /* Поля ввода */
-  .input {
-    @apply w-full px-4 py-3 rounded-xl border border-telegram-border;
-    @apply bg-telegram-input text-telegram-text placeholder-telegram-textSecondary;
-    @apply focus:outline-none;
-    @apply transition-all duration-200;
-  }
-
-  /* Навигация */
-  .nav-item {
-    @apply flex items-center px-4 py-3 rounded-xl text-telegram-textSecondary;
-    @apply hover:bg-telegram-secondary hover:text-telegram-text;
-    @apply transition-all duration-200;
-  }
-
-  .nav-item.active {
-    @apply bg-telegram-accent text-white;
-  }
-
-  /* Бейджи */
-  .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
-  }
-
-  .badge-success {
-    @apply bg-telegram-success text-white;
-  }
-
-  .badge-warning {
-    @apply bg-telegram-warning text-white;
-  }
-
-  .badge-error {
-    @apply bg-telegram-destructive text-white;
-  }
-
-  /* Анимации */
-  .animate-enter {
-    @apply animate-fade-in;
-  }
-
-  .animate-slide {
-    @apply animate-slide-up;
-  }
-}
-
-/* Утилиты */
-@layer utilities {
-  .text-gradient {
-    @apply bg-gradient-to-r from-telegram-accent to-telegram-button bg-clip-text text-transparent;
-  }
-
-  .absolute-center {
-    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
-  }
-
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
   }
 }

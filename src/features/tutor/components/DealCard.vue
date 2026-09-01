@@ -95,7 +95,7 @@ const handleComplete = () => {
         <h3 class="font-semibold text-telegram-text mb-1">
           {{ props.deal.subject?.name || 'Предмет не указан' }}
         </h3>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-sm text-telegram-text-secondary">
           Студент: {{ props.deal.student?.name || 'Не указан' }}
         </p>
       </div>
@@ -114,21 +114,21 @@ const handleComplete = () => {
     <!-- Details -->
     <div class="space-y-2 mb-4">
       <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Цена:</span>
+        <span class="text-telegram-text-secondary">Цена:</span>
         <span class="font-medium text-telegram-text">
           {{ formatPrice(props.deal.price) }}
         </span>
       </div>
 
       <div class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Создан:</span>
+        <span class="text-telegram-text-secondary">Создан:</span>
         <span class="text-telegram-text">
           {{ formatDate(props.deal.createdAt) }}
         </span>
       </div>
 
       <div v-if="props.deal.deadline" class="flex justify-between text-sm">
-        <span class="text-telegram-textSecondary">Дедлайн:</span>
+        <span class="text-telegram-text-secondary">Дедлайн:</span>
         <span class="text-telegram-text">
           {{ formatDate(props.deal.deadline) }}
         </span>

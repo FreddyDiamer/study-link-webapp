@@ -84,13 +84,13 @@ const hideGroupCard = () => {
     <div class="flex items-start justify-between mb-4">
       <div class="flex items-center space-x-3">
         <div
-          class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
+          class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center shrink-0"
         >
           <ServiceIcon class="w-5 h-5 text-telegram-accent" />
         </div>
         <div>
           <h3 class="text-lg font-semibold text-telegram-text">Укажите вашу группу</h3>
-          <p class="text-sm text-telegram-textSecondary">
+          <p class="text-sm text-telegram-text-secondary">
             Мы подберем репетиторов по вашим предметам
           </p>
         </div>
@@ -100,8 +100,8 @@ const hideGroupCard = () => {
     <div class="space-y-4">
       <div class="bg-telegram-secondary/50 p-3 rounded-lg">
         <div class="flex items-start space-x-2">
-          <InfoIcon class="w-4 h-4 text-telegram-accent mt-0.5 flex-shrink-0" />
-          <p class="text-xs text-telegram-textSecondary leading-relaxed">
+          <InfoIcon class="w-4 h-4 text-telegram-accent mt-0.5 shrink-0" />
+          <p class="text-xs text-telegram-text-secondary leading-relaxed">
             Введите номер группы, и мы автоматически определим ваши предметы, чтобы предложить
             подходящие услуги и репетиторов
           </p>
@@ -122,7 +122,7 @@ const hideGroupCard = () => {
           class="w-full"
         >
           <template #prepend>
-            <GroupIcon class="w-4 h-4 text-telegram-textSecondary" />
+            <GroupIcon class="w-4 h-4 text-telegram-text-secondary" />
           </template>
         </Select>
 
@@ -147,7 +147,7 @@ const hideGroupCard = () => {
 
           <button
             @click="hideGroupCard"
-            class="text-xs text-telegram-textSecondary hover:text-telegram-text transition-colors mx-auto block"
+            class="text-xs text-telegram-text-secondary hover:text-telegram-text transition-colors mx-auto block"
           >
             Больше не показывать
           </button>

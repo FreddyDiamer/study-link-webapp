@@ -209,7 +209,7 @@ onMounted(async () => {
       <!-- Teacher (optional) -->
       <Card class="p-6">
         <h2 class="text-lg font-semibold text-telegram-text mb-2">Преподаватель</h2>
-        <p class="text-telegram-textSecondary text-sm mb-4">
+        <p class="text-telegram-text-secondary text-sm mb-4">
           Укажите, если нужна подготовка к конкретному преподавателю
         </p>
 
@@ -224,7 +224,7 @@ onMounted(async () => {
       <!-- Description -->
       <Card class="p-6">
         <h2 class="text-lg font-semibold text-telegram-text mb-2">Описание задач</h2>
-        <p class="text-telegram-textSecondary text-sm mb-4">
+        <p class="text-telegram-text-secondary text-sm mb-4">
           Расскажите, что именно нужно изучить или подготовить
         </p>
 
@@ -238,7 +238,7 @@ onMounted(async () => {
       <!-- Deadline Selection -->
       <Card class="p-6">
         <h2 class="text-lg font-semibold text-telegram-text mb-2">Срок выполнения</h2>
-        <p class="text-telegram-textSecondary text-sm mb-4">
+        <p class="text-telegram-text-secondary text-sm mb-4">
           Укажите, когда нужно выполнить задание
         </p>
 
@@ -256,11 +256,13 @@ onMounted(async () => {
       <!-- Budget -->
       <Card class="p-6">
         <h2 class="text-lg font-semibold text-telegram-text mb-2">Бюджет за занятие</h2>
-        <p class="text-telegram-textSecondary text-sm mb-4">Укажите комфортную для вас стоимость</p>
+        <p class="text-telegram-text-secondary text-sm mb-4">
+          Укажите комфортную для вас стоимость
+        </p>
 
         <div class="flex items-center space-x-3">
           <Input v-model="form.budget" placeholder="1500" type="number" class="flex-1" />
-          <span class="text-telegram-textSecondary font-medium">₽</span>
+          <span class="text-telegram-text-secondary font-medium">₽</span>
         </div>
       </Card>
 

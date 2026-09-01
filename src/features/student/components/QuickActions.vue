@@ -54,11 +54,11 @@ const handleAction = (path: string) => {
 
         <div class="flex-1">
           <h3 class="text-telegram-text font-medium">{{ action.title }}</h3>
-          <p class="text-telegram-textSecondary text-sm">{{ action.description }}</p>
+          <p class="text-telegram-text-secondary text-sm">{{ action.description }}</p>
         </div>
 
         <svg
-          class="w-5 h-5 text-telegram-textSecondary"
+          class="w-5 h-5 text-telegram-text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

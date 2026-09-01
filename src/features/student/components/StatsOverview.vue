@@ -47,7 +47,7 @@ const stats = [
     >
       <div class="flex items-center justify-between">
         <div class="flex-1">
-          <p class="text-sm text-telegram-textSecondary mb-1">{{ stat.label }}</p>
+          <p class="text-sm text-telegram-text-secondary mb-1">{{ stat.label }}</p>
           <p class="text-2xl font-bold text-telegram-text">{{ stat.value }}</p>
         </div>
 

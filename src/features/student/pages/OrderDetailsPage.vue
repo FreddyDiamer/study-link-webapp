@@ -119,14 +119,14 @@ onMounted(async () => {
     <!-- Header -->
     <div class="px-4 mb-6">
       <div class="flex items-center">
-        <Button variant="ghost" @click="handleBack" class="!p-2">
+        <Button variant="ghost" @click="handleBack" class="p-2!">
           <ArrowIcon class="w-5 h-5 rotate-90" />
         </Button>
 
         <h1 class="text-lg font-semibold text-telegram-text">Детали заказа</h1>
 
         <!-- TODO: Добавить редактирование заявки -->
-        <!-- <Button v-if="order" variant="ghost" @click="handleEditOrder" class="!p-2">
+        <!-- <Button v-if="order" variant="ghost" @click="handleEditOrder" class="p-2!">
           Редактировать
         </Button> -->
       </div>
@@ -156,25 +156,25 @@ onMounted(async () => {
               <div class="text-lg font-bold text-telegram-button">
                 {{ order.budget ? formatPrice(order.budget) : 'Бюджет не указан' }}
               </div>
-              <div class="text-sm text-telegram-textSecondary">бюджет</div>
+              <div class="text-sm text-telegram-text-secondary">бюджет</div>
             </div>
           </div>
 
           <div class="space-y-2">
             <div class="flex items-center space-x-2">
-              <span class="text-sm text-telegram-textSecondary">Преподаватель:</span>
+              <span class="text-sm text-telegram-text-secondary">Преподаватель:</span>
               <span class="text-sm font-medium text-telegram-text">{{ teacherName }}</span>
             </div>
 
             <div v-if="order.deadline" class="flex items-center space-x-2">
-              <span class="text-sm text-telegram-textSecondary">Срок:</span>
+              <span class="text-sm text-telegram-text-secondary">Срок:</span>
               <span class="text-sm font-medium text-telegram-text">
                 {{ formatDate(order.deadline) }}
               </span>
             </div>
 
             <div class="flex items-center space-x-2">
-              <span class="text-sm text-telegram-textSecondary">Создан:</span>
+              <span class="text-sm text-telegram-text-secondary">Создан:</span>
               <span class="text-sm font-medium text-telegram-text">
                 {{ formatDate(order.createdAt) }}
               </span>
@@ -183,7 +183,7 @@ onMounted(async () => {
 
           <div v-if="order.description" class="pt-4 border-t border-telegram-border">
             <h3 class="text-sm font-medium text-telegram-text mb-2">Описание</h3>
-            <p class="text-sm text-telegram-textSecondary">{{ order.description }}</p>
+            <p class="text-sm text-telegram-text-secondary">{{ order.description }}</p>
           </div>
         </div>
       </Card>
@@ -195,8 +195,8 @@ onMounted(async () => {
         </div>
 
         <div v-if="responses.length === 0" class="text-center py-8">
-          <div class="text-telegram-textSecondary mb-2">Пока нет откликов</div>
-          <p class="text-sm text-telegram-textSecondary">
+          <div class="text-telegram-text-secondary mb-2">Пока нет откликов</div>
+          <p class="text-sm text-telegram-text-secondary">
             Репетиторы увидят вашу заявку и смогут откликнуться
           </p>
         </div>

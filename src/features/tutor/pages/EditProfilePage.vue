@@ -73,7 +73,7 @@ onMounted(() => {
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
-      <Button variant="ghost" @click="handleBack" class="!p-2">
+      <Button variant="ghost" @click="handleBack" class="p-2!">
         <ArrowIcon class="w-5 h-5 rotate-180" />
       </Button>
 
@@ -98,7 +98,7 @@ onMounted(() => {
           </div>
           <div>
             <h3 class="text-lg font-medium text-telegram-text">Фото профиля</h3>
-            <p class="text-sm text-telegram-textSecondary">
+            <p class="text-sm text-telegram-text-secondary">
               Аватар генерируется автоматически на основе имени
             </p>
           </div>
@@ -114,9 +114,9 @@ onMounted(() => {
               v-model="form.description"
               rows="4"
               placeholder="Расскажите о себе, своем опыте преподавания, достижениях..."
-              class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
+              class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-text-secondary focus:outline-hidden focus:border-telegram-accent transition-colors resize-none"
             />
-            <p class="text-xs text-telegram-textSecondary">
+            <p class="text-xs text-telegram-text-secondary">
               Это описание поможет студентам лучше узнать вас
             </p>
           </div>

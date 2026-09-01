@@ -228,7 +228,7 @@ onUnmounted(() => {
           :class="{
             'bg-telegram-accent/10 text-telegram-accent':
               selectedOption?.value === option.value && option.value !== '',
-            'text-telegram-textSecondary italic': option.value === '',
+            'text-telegram-text-secondary italic': option.value === '',
             'text-telegram-text': selectedOption?.value !== option.value && option.value !== '',
             'bg-telegram-secondary': highlightedIndex === index,
           }"
@@ -258,7 +258,7 @@ onUnmounted(() => {
       v-if="isOpen && filteredOptions.length === 0 && inputValue"
       class="absolute z-50 mt-2 w-full bg-telegram-card border border-telegram-border rounded-xl shadow-lg"
     >
-      <div class="px-4 py-6 text-center text-telegram-textSecondary">
+      <div class="px-4 py-6 text-center text-telegram-text-secondary">
         <LoupeIcon class="w-8 h-8 mx-auto mb-2 opacity-50" />
         <p class="text-sm">Ничего не найдено</p>
         <p class="text-xs mt-1">Попробуйте изменить запрос</p>

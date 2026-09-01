@@ -351,7 +351,7 @@ const getUrgencyClass = (urgency?: RequestResponse['urgency']): string => {
     case 'low':
       return 'text-green-600'
     default:
-      return 'text-telegram-textSecondary'
+      return 'text-telegram-text-secondary'
   }
 }
 
@@ -444,7 +444,7 @@ const activeDealsCount = ref(
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold text-telegram-text mb-2">Управление услугами</h1>
-        <p class="text-telegram-textSecondary">Услуги, отклики и активные занятия</p>
+        <p class="text-telegram-text-secondary">Услуги, отклики и активные занятия</p>
       </div>
     </div>
 
@@ -457,8 +457,8 @@ const activeDealsCount = ref(
         :class="[
           'flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200',
           activeTab === tab.id
-            ? 'bg-telegram-card text-telegram-text shadow-sm'
-            : 'text-telegram-textSecondary hover:text-telegram-text',
+            ? 'bg-telegram-card text-telegram-text shadow-xs'
+            : 'text-telegram-text-secondary hover:text-telegram-text',
         ]"
       >
         <span class="text-base">{{ tab.icon }}</span>
@@ -471,7 +471,7 @@ const activeDealsCount = ref(
       <!-- Empty State when no services -->
       <div v-if="activeServices.length === 0" class="text-center py-16">
         <div
-          class="w-24 h-24 bg-gradient-to-br from-telegram-accent/20 to-telegram-accent/10 rounded-full mx-auto mb-6 flex items-center justify-center"
+          class="w-24 h-24 bg-linear-to-br from-telegram-accent/20 to-telegram-accent/10 rounded-full mx-auto mb-6 flex items-center justify-center"
         >
           <svg
             class="w-12 h-12 text-telegram-accent"
@@ -490,7 +490,7 @@ const activeDealsCount = ref(
 
         <h2 class="text-2xl font-bold text-telegram-text mb-3">Создайте свои услуги</h2>
 
-        <p class="text-telegram-textSecondary mb-12 max-w-md mx-auto leading-relaxed">
+        <p class="text-telegram-text-secondary mb-12 max-w-md mx-auto leading-relaxed">
           Добавьте описания ваших услуг репетиторства с указанием предметов, стоимости и условий.
           Студенты смогут найти и выбрать подходящие занятия.
         </p>
@@ -498,7 +498,7 @@ const activeDealsCount = ref(
         <div class="flex justify-center">
           <Button
             @click="createService"
-            class="bg-gradient-to-r from-telegram-accent to-telegram-accent/80 hover:from-telegram-accent/90 hover:to-telegram-accent/70 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-white/20"
+            class="bg-linear-to-r from-telegram-accent to-telegram-accent/80 hover:from-telegram-accent/90 hover:to-telegram-accent/70 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-white/20"
           >
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -522,7 +522,7 @@ const activeDealsCount = ref(
         >
           <div class="flex items-center space-x-4">
             <div
-              class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
+              class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center shrink-0"
             >
               <svg
                 class="w-5 h-5 text-telegram-accent"
@@ -540,7 +540,9 @@ const activeDealsCount = ref(
             </div>
             <div>
               <h3 class="text-base font-semibold text-telegram-accent">Добавить услугу</h3>
-              <p class="text-telegram-textSecondary text-sm">Создайте новую услугу для студентов</p>
+              <p class="text-telegram-text-secondary text-sm">
+                Создайте новую услугу для студентов
+              </p>
             </div>
           </div>
         </Card>
@@ -561,7 +563,7 @@ const activeDealsCount = ref(
                   <h3 class="text-xl font-semibold text-telegram-text">{{ service.title }}</h3>
                   <button
                     @click.stop="editService(service)"
-                    class="-mr-5 flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-telegram-secondary transition-colors text-telegram-textSecondary text-sm"
+                    class="-mr-5 flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-telegram-secondary transition-colors text-telegram-text-secondary text-sm"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -575,7 +577,7 @@ const activeDealsCount = ref(
                   </button>
                 </div>
 
-                <p class="text-telegram-textSecondary text-sm mb-3">
+                <p class="text-telegram-text-secondary text-sm mb-3">
                   {{ service.teacher }}
                 </p>
 
@@ -613,22 +615,22 @@ const activeDealsCount = ref(
                   <div class="text-lg font-semibold text-telegram-text">
                     {{ service.responsesCount }}
                   </div>
-                  <div class="text-xs text-telegram-textSecondary">Всего откликов</div>
+                  <div class="text-xs text-telegram-text-secondary">Всего откликов</div>
                 </div>
                 <div class="text-center">
                   <div class="text-lg font-semibold text-telegram-accent">
                     {{ service.activeResponsesCount }}
                   </div>
-                  <div class="text-xs text-telegram-textSecondary">Активных</div>
+                  <div class="text-xs text-telegram-text-secondary">Активных</div>
                 </div>
                 <div class="text-center">
                   <div class="text-lg font-semibold text-telegram-success">
                     {{ service.newResponsesCount }}
                   </div>
-                  <div class="text-xs text-telegram-textSecondary">Новых</div>
+                  <div class="text-xs text-telegram-text-secondary">Новых</div>
                 </div>
                 <svg
-                  class="w-5 h-5 text-telegram-textSecondary"
+                  class="w-5 h-5 text-telegram-text-secondary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -657,7 +659,7 @@ const activeDealsCount = ref(
               <h3 class="text-lg font-semibold text-telegram-text mb-1">
                 {{ response.requestTitle }}
               </h3>
-              <p class="text-telegram-textSecondary text-sm mb-2">{{ response.studentName }}</p>
+              <p class="text-telegram-text-secondary text-sm mb-2">{{ response.studentName }}</p>
             </div>
             <div class="flex items-center space-x-2">
               <span
@@ -683,15 +685,15 @@ const activeDealsCount = ref(
             <div class="flex items-center space-x-4">
               <div v-if="response.price" class="text-center">
                 <div class="text-telegram-success font-semibold">{{ response.price }}₽</div>
-                <div class="text-xs text-telegram-textSecondary">Моя цена</div>
+                <div class="text-xs text-telegram-text-secondary">Моя цена</div>
               </div>
               <div v-if="response.budget" class="text-center">
                 <div class="text-telegram-text font-semibold">{{ response.budget }}₽</div>
-                <div class="text-xs text-telegram-textSecondary">Бюджет</div>
+                <div class="text-xs text-telegram-text-secondary">Бюджет</div>
               </div>
             </div>
             <div class="text-right">
-              <div class="text-telegram-textSecondary text-xs">
+              <div class="text-telegram-text-secondary text-xs">
                 отправлен {{ response.createdAt.toLocaleDateString('ru-RU') }}
               </div>
             </div>
@@ -723,7 +725,7 @@ const activeDealsCount = ref(
           class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
         >
           <svg
-            class="w-10 h-10 text-telegram-textSecondary"
+            class="w-10 h-10 text-telegram-text-secondary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -739,7 +741,7 @@ const activeDealsCount = ref(
 
         <h2 class="text-xl font-semibold text-telegram-text mb-3">Нет откликов на заявки</h2>
 
-        <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+        <p class="text-telegram-text-secondary mb-8 max-w-sm mx-auto">
           Вы еще не откликались на заявки студентов. Ищите подходящие заказы в разделе "Заявки"
         </p>
       </div>
@@ -782,7 +784,7 @@ const activeDealsCount = ref(
               <h4 class="text-lg font-semibold text-telegram-accent">
                 {{ deal.subject }}
               </h4>
-              <p class="text-telegram-textSecondary text-sm">
+              <p class="text-telegram-text-secondary text-sm">
                 {{ deal.teacher }}
               </p>
             </div>
@@ -804,7 +806,7 @@ const activeDealsCount = ref(
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                 />
               </svg>
-              <span class="text-telegram-textSecondary text-xs font-medium uppercase tracking-wide"
+              <span class="text-telegram-text-secondary text-xs font-medium uppercase tracking-wide"
                 >Задача студента</span
               >
             </div>
@@ -829,7 +831,7 @@ const activeDealsCount = ref(
                   d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                 />
               </svg>
-              <span class="text-telegram-textSecondary text-xs font-medium uppercase tracking-wide"
+              <span class="text-telegram-text-secondary text-xs font-medium uppercase tracking-wide"
                 >Мой комментарий</span
               >
             </div>
@@ -853,14 +855,14 @@ const activeDealsCount = ref(
               <div class="text-telegram-text font-medium">
                 {{ deal.deadline.toLocaleDateString('ru-RU') }}
               </div>
-              <div class="text-telegram-textSecondary text-xs">крайний срок</div>
+              <div class="text-telegram-text-secondary text-xs">крайний срок</div>
             </div>
             <div v-if="deal.deadline" class="w-px h-8 bg-telegram-secondary"></div>
             <div class="text-center">
               <div class="text-telegram-text font-medium">
                 {{ deal.createdAt.toLocaleDateString('ru-RU') }}
               </div>
-              <div class="text-telegram-textSecondary text-xs">начато</div>
+              <div class="text-telegram-text-secondary text-xs">начато</div>
             </div>
           </div>
 
@@ -878,7 +880,7 @@ const activeDealsCount = ref(
           class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
         >
           <svg
-            class="w-10 h-10 text-telegram-textSecondary"
+            class="w-10 h-10 text-telegram-text-secondary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -894,7 +896,7 @@ const activeDealsCount = ref(
 
         <h2 class="text-xl font-semibold text-telegram-text mb-3">Нет активных занятий</h2>
 
-        <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+        <p class="text-telegram-text-secondary mb-8 max-w-sm mx-auto">
           У вас пока нет активных занятий. Принимайте отклики студентов, чтобы начать заниматься
         </p>
       </div>

@@ -29,15 +29,15 @@ const getStatusInfo = (status: string) => {
       return { color: 'bg-telegram-success', text: 'В работе', textColor: 'text-telegram-success' }
     case 'declined':
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-telegram-text-secondary',
         text: 'Отклонен',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-telegram-text-secondary',
       }
     default:
       return {
-        color: 'bg-telegram-textSecondary',
+        color: 'bg-telegram-text-secondary',
         text: 'Неизвестно',
-        textColor: 'text-telegram-textSecondary',
+        textColor: 'text-telegram-text-secondary',
       }
   }
 }
@@ -102,7 +102,7 @@ const declineService = (response: any) => {
         </div>
         <div>
           <h3 class="font-semibold text-telegram-text">{{ response.tutor.name }}</h3>
-          <div class="flex items-center space-x-3 text-sm text-telegram-textSecondary">
+          <div class="flex items-center space-x-3 text-sm text-telegram-text-secondary">
             <div class="flex items-center space-x-1">
               <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -137,7 +137,7 @@ const declineService = (response: any) => {
 
     <!-- Response Time -->
     <div class="flex items-center justify-between mb-4">
-      <span class="text-telegram-textSecondary text-xs">
+      <span class="text-telegram-text-secondary text-xs">
         Отклик отправлен {{ formatDate(response.createdAt) }}
       </span>
       <div class="w-2 h-2 bg-telegram-accent rounded-full"></div>
@@ -192,7 +192,7 @@ const declineService = (response: any) => {
           <Button
             @click="declineService(response)"
             variant="ghost"
-            class="w-full mt-3 text-sm text-telegram-textSecondary"
+            class="w-full mt-3 text-sm text-telegram-text-secondary"
           >
             Не подошел
           </Button>
@@ -219,7 +219,7 @@ const declineService = (response: any) => {
 
       <!-- Declined Response -->
       <template v-else-if="response.status === ResponseStatus.REJECTED">
-        <div class="flex-1 text-center py-2 text-telegram-textSecondary text-sm">
+        <div class="flex-1 text-center py-2 text-telegram-text-secondary text-sm">
           Отклик отклонен
         </div>
       </template>

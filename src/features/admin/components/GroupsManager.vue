@@ -89,7 +89,7 @@ onMounted(() => {
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-2xl font-bold text-telegram-text">Управление группами</h2>
-        <p class="text-telegram-textSecondary">Создание и удаление групп студентов</p>
+        <p class="text-telegram-text-secondary">Создание и удаление групп студентов</p>
       </div>
 
       <Button @click="showCreateModal = true" size="sm">
@@ -103,13 +103,13 @@ onMounted(() => {
       <Card v-if="loading" class="p-6">
         <div class="flex items-center justify-center">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-telegram-accent"></div>
-          <span class="ml-3 text-telegram-textSecondary">Загрузка групп...</span>
+          <span class="ml-3 text-telegram-text-secondary">Загрузка групп...</span>
         </div>
       </Card>
 
       <Card v-else-if="groups.length === 0" class="p-6">
-        <div class="text-center text-telegram-textSecondary">
-          <GroupIcon class="w-12 h-12 mx-auto mb-4 text-telegram-textSecondary/50" />
+        <div class="text-center text-telegram-text-secondary">
+          <GroupIcon class="w-12 h-12 mx-auto mb-4 text-telegram-text-secondary/50" />
           <p>Группы не найдены</p>
           <p class="text-sm">Создайте первую группу</p>
         </div>
@@ -125,7 +125,7 @@ onMounted(() => {
             </div>
             <div>
               <h3 class="font-semibold text-telegram-text">{{ group.number }}</h3>
-              <p class="text-sm text-telegram-textSecondary">
+              <p class="text-sm text-telegram-text-secondary">
                 Создана {{ new Date(group.createdAt).toLocaleDateString() }}
               </p>
             </div>

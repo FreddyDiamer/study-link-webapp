@@ -49,7 +49,7 @@ const handleBack = () => {
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
-      <Button variant="ghost" @click="handleBack" class="!p-2">
+      <Button variant="ghost" @click="handleBack" class="p-2!">
         <ArrowIcon class="w-5 h-5 rotate-180" />
       </Button>
 
@@ -70,7 +70,7 @@ const handleBack = () => {
           </div>
           <div>
             <h3 class="text-lg font-medium text-telegram-text">Фото профиля</h3>
-            <p class="text-sm text-telegram-textSecondary">
+            <p class="text-sm text-telegram-text-secondary">
               Аватар генерируется автоматически на основе имени
             </p>
           </div>

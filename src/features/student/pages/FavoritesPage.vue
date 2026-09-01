@@ -49,7 +49,7 @@ onMounted(() => {
   <div class="min-h-screen bg-telegram-bg p-4 pt-6">
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-telegram-text mb-2">Избранное</h1>
-      <p class="text-telegram-textSecondary">Репетиторы, которых вы добавили в избранное</p>
+      <p class="text-telegram-text-secondary">Репетиторы, которых вы добавили в избранное</p>
     </div>
 
     <!-- Loading state -->
@@ -69,7 +69,7 @@ onMounted(() => {
             </div>
             <div>
               <h3 class="font-semibold text-telegram-text">{{ tutor.name || 'Репетитор' }}</h3>
-              <p class="text-sm text-telegram-textSecondary">
+              <p class="text-sm text-telegram-text-secondary">
                 {{ tutor.description || 'Описание не указано' }}
               </p>
             </div>
@@ -92,7 +92,7 @@ onMounted(() => {
         class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
       >
         <svg
-          class="w-10 h-10 text-telegram-textSecondary"
+          class="w-10 h-10 text-telegram-text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -108,7 +108,7 @@ onMounted(() => {
 
       <h2 class="text-xl font-semibold text-telegram-text mb-3">Пока пусто</h2>
 
-      <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+      <p class="text-telegram-text-secondary mb-8 max-w-sm mx-auto">
         Найдите репетиторов и добавьте понравившихся в избранное для быстрого доступа
       </p>
 

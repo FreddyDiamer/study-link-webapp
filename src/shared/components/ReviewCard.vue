@@ -35,7 +35,7 @@ const formatDate = (dateString: string) => {
           <div class="font-medium text-telegram-text">
             {{ review.author?.name || 'Пользователь' }}
           </div>
-          <div class="text-sm text-telegram-textSecondary">
+          <div class="text-sm text-telegram-text-secondary">
             {{ formatDate(review.createdAt) }}
           </div>
         </div>
@@ -52,7 +52,7 @@ const formatDate = (dateString: string) => {
     </div>
 
     <!-- Deal info -->
-    <div class="text-xs text-telegram-textSecondary">
+    <div class="text-xs text-telegram-text-secondary">
       По сделке: {{ review.deal?.subject?.name || 'Не указано' }}
     </div>
   </Card>

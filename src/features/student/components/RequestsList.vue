@@ -22,11 +22,11 @@ const getRequestStatusInfo = (status: string) => {
     case 'MATCHED':
       return { color: 'bg-blue-500', text: 'Найден репетитор' }
     case 'CLOSED':
-      return { color: 'bg-telegram-textSecondary', text: 'Закрыта' }
+      return { color: 'bg-telegram-text-secondary', text: 'Закрыта' }
     case 'CANCELLED':
       return { color: 'bg-red-500', text: 'Отменена' }
     default:
-      return { color: 'bg-telegram-textSecondary', text: 'Неизвестно' }
+      return { color: 'bg-telegram-text-secondary', text: 'Неизвестно' }
   }
 }
 
@@ -85,7 +85,7 @@ const editRequest = (request: any, event: Event) => {
         class="w-20 h-20 bg-telegram-secondary rounded-full mx-auto mb-6 flex items-center justify-center"
       >
         <svg
-          class="w-10 h-10 text-telegram-textSecondary"
+          class="w-10 h-10 text-telegram-text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -99,7 +99,7 @@ const editRequest = (request: any, event: Event) => {
         </svg>
       </div>
       <h2 class="text-xl font-semibold text-telegram-text mb-3">У вас пока нет заявок</h2>
-      <p class="text-telegram-textSecondary mb-8 max-w-sm mx-auto">
+      <p class="text-telegram-text-secondary mb-8 max-w-sm mx-auto">
         Создайте первую заявку на поиск репетитора и получайте отклики
       </p>
       <Button @click="createRequest" class="mx-auto">Создать заявку</Button>
@@ -114,7 +114,7 @@ const editRequest = (request: any, event: Event) => {
       >
         <div class="flex items-center space-x-4">
           <div
-            class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center flex-shrink-0"
+            class="w-10 h-10 bg-telegram-accent/10 rounded-full flex items-center justify-center shrink-0"
           >
             <svg
               class="w-5 h-5 text-telegram-accent"
@@ -132,7 +132,7 @@ const editRequest = (request: any, event: Event) => {
           </div>
           <div>
             <h3 class="text-base font-semibold text-telegram-accent">Создать заявку</h3>
-            <p class="text-telegram-textSecondary text-sm">Найдите репетитора для ваших задач</p>
+            <p class="text-telegram-text-secondary text-sm">Найдите репетитора для ваших задач</p>
           </div>
         </div>
       </Card>
@@ -160,7 +160,7 @@ const editRequest = (request: any, event: Event) => {
           <!-- TODO: Добавить редактирование заявки -->
           <!-- <button
             @click="editRequest(request, $event)"
-            class="p-2 text-telegram-textSecondary hover:text-telegram-text hover:bg-telegram-secondary/50 rounded-lg transition-colors flex-shrink-0"
+            class="p-2 text-telegram-text-secondary hover:text-telegram-text hover:bg-telegram-secondary/50 rounded-lg transition-colors shrink-0"
             title="Редактировать заявку"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,11 +180,11 @@ const editRequest = (request: any, event: Event) => {
         <!-- Details -->
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-telegram-textSecondary text-xs mb-1">Создана</p>
+            <p class="text-telegram-text-secondary text-xs mb-1">Создана</p>
             <p class="text-telegram-text text-sm">{{ formatDate(request.createdAt) }}</p>
           </div>
           <div class="text-right">
-            <p class="text-telegram-textSecondary text-xs mb-1">Откликов</p>
+            <p class="text-telegram-text-secondary text-xs mb-1">Откликов</p>
             <div class="flex items-center justify-end space-x-2">
               <span class="text-telegram-text text-lg font-bold">{{
                 (request as any)?._count?.responses ?? 0

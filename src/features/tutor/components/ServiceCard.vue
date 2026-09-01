@@ -85,7 +85,7 @@ const handleToggleStatus = () => {
             {{ getStatusConfig(service.status).label }}
           </span>
         </div>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-sm text-telegram-text-secondary">
           {{ service.teacher?.fullName || 'Преподаватель не указан' }}
         </p>
       </div>
@@ -94,7 +94,7 @@ const handleToggleStatus = () => {
         <div class="font-bold text-telegram-accent text-lg">
           {{ formatPrice(service.price) }}
         </div>
-        <div v-if="service.deadline" class="text-xs text-telegram-textSecondary">
+        <div v-if="service.deadline" class="text-xs text-telegram-text-secondary">
           До {{ formatDate(service.deadline) }}
         </div>
       </div>
@@ -108,7 +108,7 @@ const handleToggleStatus = () => {
     </div>
 
     <!-- Stats -->
-    <div class="flex items-center justify-between mb-4 text-sm text-telegram-textSecondary">
+    <div class="flex items-center justify-between mb-4 text-sm text-telegram-text-secondary">
       <span>Создано: {{ formatDate(service.createdAt) }}</span>
       <span v-if="service.responses?.length"> {{ service.responses.length }} откликов </span>
     </div>

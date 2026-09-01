@@ -83,7 +83,7 @@ const handleLogoClick = () => {
 
 <template>
   <header
-    class="bg-telegram-card border-b border-telegram-border fixed top-0 left-0 right-0 z-50 backdrop-blur-sm"
+    class="bg-telegram-card border-b border-telegram-border fixed top-0 left-0 right-0 z-50 backdrop-blur-xs"
   >
     <div class="flex items-center justify-between px-4 h-14">
       <!-- Logo/Title -->
@@ -151,7 +151,7 @@ const handleLogoClick = () => {
               </div>
               <div>
                 <div class="text-telegram-text font-medium text-sm">Студент</div>
-                <div class="text-telegram-textSecondary text-xs">Ищу репетитора</div>
+                <div class="text-telegram-text-secondary text-xs">Ищу репетитора</div>
               </div>
             </button>
 
@@ -165,7 +165,7 @@ const handleLogoClick = () => {
               </div>
               <div>
                 <div class="text-telegram-text font-medium text-sm">Репетитор</div>
-                <div class="text-telegram-textSecondary text-xs">Предлагаю услуги</div>
+                <div class="text-telegram-text-secondary text-xs">Предлагаю услуги</div>
               </div>
             </button>
           </div>
@@ -190,7 +190,10 @@ const handleLogoClick = () => {
   </header>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
+/* В Tailwind v4 блок <style> не видит тему сам по себе — @apply требует @reference */
+@reference '../../../assets/main.css';
+
 .icon-wrapper {
   @apply w-8 h-8 rounded-lg text-white;
   @apply flex items-center justify-center;

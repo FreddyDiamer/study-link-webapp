@@ -41,8 +41,8 @@ const handleViewResponses = (serviceId: string) => {
     <div v-if="isLoading" class="space-y-4">
       <Card v-for="i in 3" :key="i" class="p-4">
         <div class="animate-pulse">
-          <div class="h-4 bg-telegram-secondary rounded mb-2"></div>
-          <div class="h-3 bg-telegram-secondary rounded w-2/3"></div>
+          <div class="h-4 bg-telegram-secondary rounded-sm mb-2"></div>
+          <div class="h-3 bg-telegram-secondary rounded-sm w-2/3"></div>
         </div>
       </Card>
     </div>
@@ -65,20 +65,20 @@ const handleViewResponses = (serviceId: string) => {
                 Активно
               </span>
             </div>
-            <p class="text-sm text-telegram-textSecondary mt-1">
+            <p class="text-sm text-telegram-text-secondary mt-1">
               {{ service.teacher.fullName }}
             </p>
             <div class="flex items-center space-x-4 mt-2">
               <span class="text-sm font-medium text-telegram-text">{{
                 formatPrice(service.price)
               }}</span>
-              <span class="text-xs text-telegram-textSecondary">
+              <span class="text-xs text-telegram-text-secondary">
                 {{ service.responses?.length ?? 0 }} откликов
               </span>
             </div>
           </div>
           <svg
-            class="w-5 h-5 text-telegram-textSecondary"
+            class="w-5 h-5 text-telegram-text-secondary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -100,7 +100,7 @@ const handleViewResponses = (serviceId: string) => {
         class="w-16 h-16 bg-telegram-secondary rounded-full mx-auto mb-4 flex items-center justify-center"
       >
         <svg
-          class="w-8 h-8 text-telegram-textSecondary"
+          class="w-8 h-8 text-telegram-text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -115,7 +115,7 @@ const handleViewResponses = (serviceId: string) => {
       </div>
 
       <h4 class="text-lg font-medium text-telegram-text mb-2">Нет активных услуг</h4>
-      <p class="text-telegram-textSecondary mb-4">
+      <p class="text-telegram-text-secondary mb-4">
         Создайте свою первую услугу, чтобы начать получать заявки
       </p>
     </div>

@@ -165,7 +165,7 @@ watch(
       <!-- Service Info -->
       <div class="p-4 bg-telegram-secondary/30 rounded-lg">
         <h4 class="font-medium text-telegram-text mb-1">{{ service.title }}</h4>
-        <p class="text-sm text-telegram-textSecondary">
+        <p class="text-sm text-telegram-text-secondary">
           Репетитор: {{ service.teacher.name }} • {{ service.price }}₽/час
         </p>
       </div>
@@ -181,9 +181,9 @@ watch(
             v-model="form.message"
             rows="3"
             placeholder="Здравствуйте! Интересует помощь с ..."
-            class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-textSecondary focus:outline-none focus:border-telegram-accent transition-colors resize-none"
+            class="w-full px-4 py-3 bg-telegram-secondary border border-telegram-border rounded-xl text-telegram-text placeholder-telegram-text-secondary focus:outline-hidden focus:border-telegram-accent transition-colors resize-none"
           />
-          <p class="text-xs text-telegram-textSecondary mt-1">
+          <p class="text-xs text-telegram-text-secondary mt-1">
             Опишите задачу, уровень сложности, ваши цели
           </p>
         </div>
@@ -221,7 +221,7 @@ watch(
 
       <!-- Help text -->
       <div class="text-center">
-        <p class="text-xs text-telegram-textSecondary">
+        <p class="text-xs text-telegram-text-secondary">
           Репетитор увидит вашу заявку и сможет принять её или предложить свои условия
         </p>
       </div>
