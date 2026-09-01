@@ -30,7 +30,6 @@ export default defineConfig({
         manualChunks(id: string) {
           if (!id.includes('node_modules')) return
           if (/node_modules[\\/](@vue[\\/]|vue[\\/]|vue-router[\\/]|pinia[\\/])/.test(id)) return 'vendor'
-          if (/node_modules[\\/]@telegram-apps[\\/]/.test(id)) return 'telegram'
           if (/node_modules[\\/](@vueuse[\\/]|axios[\\/])/.test(id)) return 'utils'
         },
       },
