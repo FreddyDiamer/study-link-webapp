@@ -26,10 +26,12 @@ export default defineConfig({
     minify: 'terser',
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['vue', 'vue-router', 'pinia'],
-          telegram: ['@telegram-apps/sdk-vue'],
-          utils: ['@vueuse/core', 'axios'],
+        // Rolldown (Vite 8) принимает только функциональную форму manualChunks
+        manualChunks(id: string) {
+          if (!id.includes('node_modules')) return
+          if (/node_modules[\\/](@vue[\\/]|vue[\\/]|vue-router[\\/]|pinia[\\/])/.test(id)) return 'vendor'
+          if (/node_modules[\\/]@telegram-apps[\\/]/.test(id)) return 'telegram'
+          if (/node_modules[\\/](@vueuse[\\/]|axios[\\/])/.test(id)) return 'utils'
         },
       },
     },
