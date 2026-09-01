@@ -78,6 +78,17 @@ These are the standards to follow for new and modified code, even where existing
 
 Defined in **both** `vite.config.ts` and `tsconfig.app.json` — keep them in sync when adding aliases.
 
+## Agent skills
+
+`.claude/skills/` holds vendored Vue/TypeScript/a11y reference material that Claude Code loads on
+demand: `vue-best-practices`, `vue-router-best-practices`, `vue-pinia-best-practices` (from
+[vuejs-ai/skills](https://github.com/vuejs-ai/skills)), `vue3-reference` and `web-accessibility`
+(from [github/awesome-copilot](https://github.com/github/awesome-copilot)), and `typescript-strict`.
+
+They describe Vue in general — **this file and `docs/` always win on conflict**. Provenance and the
+list of upstream rules deliberately rejected (and why) are in
+[.claude/skills/README.md](.claude/skills/README.md).
+
 ## Git commits
 
 - Prefix with type: `feat:`, `fix:`, `refactor:`, `chore:`, …
