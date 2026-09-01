@@ -21,6 +21,7 @@ Router for all project documentation. Start here when you need to know *what to 
 | Anything with prices | "Domain rules" in [CLAUDE.md](../CLAUDE.md) — rubles everywhere, no kopeks |
 | Bug hunt | Start at the layer boundaries: component → business service → `services/api/client.ts`; check ARCHITECTURE.md error-handling flow |
 | Working with subjects/teachers data | Education-store pattern in [conventions/ARCHITECTURE.md](conventions/ARCHITECTURE.md#global-reference-data-education) |
+| Design-system / UI redesign work | [UI_INVENTORY.md](UI_INVENTORY.md) — screen-by-screen inventory of what the app renders today |
 
 ## All docs
 
@@ -30,6 +31,7 @@ Router for all project documentation. Start here when you need to know *what to 
 | [conventions/ARCHITECTURE.md](conventions/ARCHITECTURE.md) | `current` | Layered architecture: dependency rules, per-layer code patterns, new-feature checklist |
 | [conventions/STYLES.md](conventions/STYLES.md) | `current` | Styling: Tailwind-only, `telegram-*` theme tokens, shared UI components |
 | [API_INTEGRATION.md](API_INTEGRATION.md) | `reference` | Backend (NestJS) integration: auth flow, response envelope, prices, env vars. Endpoints themselves live in `src/services/api/` |
+| [UI_INVENTORY.md](UI_INVENTORY.md) | `reference` | UI/functionality inventory of `main` (RU): screens, states, repeated patterns, current tokens, gaps — input for the design system |
 
 ## Principles
 
