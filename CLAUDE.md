@@ -17,15 +17,15 @@ Before any non-trivial task, check **[docs/INDEX.md](docs/INDEX.md)** — it map
 | `pnpm type-check` | `vue-tsc --build` only |
 | `pnpm preview` | Preview the production build |
 | `pnpm format` | Prettier over `src/` (no semi, single quotes, width 100) |
+| `pnpm prepare` | Installs the husky pre-commit hook (runs automatically on `pnpm install`) |
 
 There is **no lint script and no test setup** in this project, so `pnpm type-check` is the only automated verification:
 run it **once after completing a coding task** to confirm the code compiles. Don't run it repeatedly mid-task, and don't run `pnpm build` unless explicitly asked.
 
-> **`pnpm type-check` does not pass on a clean tree.** There are **31 pre-existing errors** in 7 files
-> (`GroupsManager.vue`, `ServiceFilters.vue`, `EditOrderPage.vue`, student `OrdersPage.vue`,
-> `DealFilters.vue`, `services/business/education.ts`, `shared/composables/useAuth.ts`).
-> Compare your output against that baseline instead of expecting zero — and fix the ones in files
-> you touch. `pnpm build` therefore fails too; use `pnpm build-only` to check the bundler alone.
+> **`pnpm type-check` must report zero errors.** A **husky pre-commit hook** (`.husky/pre-commit`)
+> runs it on every commit and rejects the commit if it fails, so never leave a type error behind.
+> The hook installs itself via the `prepare` script on `pnpm install`.
+> `git commit --no-verify` skips it — for genuine emergencies only, not to defer a fix.
 
 ## Architecture
 
@@ -63,7 +63,7 @@ Setup stores (`app`, `auth`, `telegram`, `education`); expose state as `readonly
 
 These are the standards to follow for new and modified code, even where existing code doesn't comply yet (see Migration status below):
 
-- **Auth**: the canonical mechanism is [stores/auth.ts](src/stores/auth.ts) + `services/business/auth`. `shared/composables/useAuth.ts` is **deprecated** (mock, module-level state) — do not extend it; migrate call sites to the store when touching them.
+- **Auth**: the only mechanism is [stores/auth.ts](src/stores/auth.ts) + `services/business/auth`. The deprecated mock `shared/composables/useAuth.ts` has been deleted — do not reintroduce a composable-based auth path.
 - **Forms**: validate with **vee-validate + yup** (both installed). Do not add new hand-rolled `validateForm()` implementations.
 
 ## Domain rules
@@ -105,17 +105,16 @@ list of upstream rules deliberately rejected (and why) are in
 
 Known gaps between the current code and the target patterns above. Don't treat these as examples to copy; fix them opportunistically when touching the code:
 
-- Two auth mechanisms coexist: real `stores/auth.ts` vs deprecated mock `shared/composables/useAuth.ts` (its `login` has a TODO and fake data).
 - Forms use manual `reactive()` + `validateForm()` instead of vee-validate/yup.
 - Leftover no-op price converters in `services/business/service.ts` (`convertServiceToRubles`, `convertFiltersToKopeks`) — dead weight from the removed kopeks convention; safe to delete when touching the file.
 - `console.log` placeholders stand in for notifications/analytics in some business services.
 - Many feature components call the `telegram` store / `telegramService` directly instead of going through business services.
 - On 401 `services/api/client.ts` redirects to `/auth` — a route that does not exist in the router (dead redirect).
+- `ordersApi.getMyStudentDeals()` calls `GET /marketplace/deals/my-student`, added by symmetry
+  with `/my-tutor`. **Not verified against the backend** — confirm the route exists.
 - `allowedHosts: true` + `host: true` in `vite.config.ts` is still marked `TODO: remove` — the dev
   server accepts any Host on every interface, which matters because Mini App development usually
   tunnels it publicly. Narrow it to the actual tunnel host.
-- 31 pre-existing `vue-tsc` errors (see the box under Commands) — no test suite exists to catch
-  the behaviour they hide.
 - `pnpm.overrides` in `package.json` pins `postcss` / `nanoid` / `browserslist` / `picomatch`
   forward. They exist only to clear dev-only advisories in transitive deps of
   `vite-plugin-vue-devtools` and `npm-run-all2`; drop each one once its parent ships a fixed range.

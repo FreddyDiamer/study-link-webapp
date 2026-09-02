@@ -114,6 +114,16 @@ export const useOrder = () => {
     }
   }
 
+  const getMyStudentDeals = async () => {
+    isLoading.value = true
+    try {
+      deals.value = await orderService.getMyStudentDeals()
+      return deals.value
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const getDeal = async (id: string) => {
     isLoading.value = true
     try {
@@ -311,6 +321,7 @@ export const useOrder = () => {
     // Deals
     getDeals,
     getMyTutorDeals,
+    getMyStudentDeals,
     getDeal,
     acceptDeal,
     rejectDeal,

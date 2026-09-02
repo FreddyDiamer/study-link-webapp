@@ -138,6 +138,16 @@ export class OrderService {
     }
   }
 
+  async getMyStudentDeals(): Promise<PaginatedResponse<Deal>> {
+    try {
+      const response = await ordersApi.getMyStudentDeals()
+      return this.convertDealsToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении ваших сделок как студента')
+      throw error
+    }
+  }
+
   async getDeal(id: string): Promise<Deal> {
     try {
       const deal = await ordersApi.getDeal(id)

@@ -90,15 +90,15 @@ const clearFilters = () => {
       <!-- Filters Row 1 -->
       <div class="grid grid-cols-2 gap-3">
         <Select
-          :model-value="filters.subject"
-          @update:model-value="(value) => updateFilters({ subject: value })"
+          :value="filters.subject"
+          @update:value="(value) => updateFilters({ subject: value })"
           :options="subjects"
           placeholder="Предмет"
         />
 
         <Select
-          :model-value="filters.status"
-          @update:model-value="(value) => updateFilters({ status: value as DealFilters['status'] })"
+          :value="filters.status"
+          @update:value="(value) => updateFilters({ status: value as DealFilters['status'] })"
           :options="statusOptions"
           placeholder="Статус"
         />
@@ -108,15 +108,15 @@ const clearFilters = () => {
       <div class="grid grid-cols-2 gap-3">
         <Select
           v-if="teachers"
-          :model-value="filters.teacher"
-          @update:model-value="(value) => updateFilters({ teacher: value })"
+          :value="filters.teacher"
+          @update:value="(value) => updateFilters({ teacher: value })"
           :options="teachers"
           placeholder="Преподаватель"
         />
 
         <Select
-          :model-value="filters.source"
-          @update:model-value="(value) => updateFilters({ source: value as DealFilters['source'] })"
+          :value="filters.source"
+          @update:value="(value) => updateFilters({ source: value as DealFilters['source'] })"
           :options="sourceOptions"
           placeholder="Источник"
         />
@@ -125,15 +125,15 @@ const clearFilters = () => {
       <!-- Filters Row 2 -->
       <div class="grid grid-cols-2 gap-3">
         <Select
-          :model-value="filters.source"
-          @update:model-value="(value) => updateFilters({ source: value as DealFilters['source'] })"
+          :value="filters.source"
+          @update:value="(value) => updateFilters({ source: value as DealFilters['source'] })"
           :options="sourceOptions"
           placeholder="Источник"
         />
 
         <Select
-          :model-value="filters.sortBy"
-          @update:model-value="(value) => updateFilters({ sortBy: value as DealFilters['sortBy'] })"
+          :value="filters.sortBy"
+          @update:value="(value) => updateFilters({ sortBy: value as DealFilters['sortBy'] })"
           :options="sortOptions"
           placeholder="Сортировка"
         />
@@ -142,10 +142,8 @@ const clearFilters = () => {
       <!-- Sort Order -->
       <div class="flex items-center justify-between">
         <Select
-          :model-value="filters.sortOrder"
-          @update:model-value="
-            (value) => updateFilters({ sortOrder: value as DealFilters['sortOrder'] })
-          "
+          :value="filters.sortOrder"
+          @update:value="(value) => updateFilters({ sortOrder: value as DealFilters['sortOrder'] })"
           :options="sortOrderOptions"
           placeholder="Порядок"
           class="w-32"

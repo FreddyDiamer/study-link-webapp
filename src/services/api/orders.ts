@@ -46,6 +46,9 @@ export const ordersApi = {
   // Получить мои сделки как репетитор
   getMyTutorDeals: () => apiClient.get<PaginatedResponse<Deal>>('/marketplace/deals/my-tutor'),
 
+  // Получить мои сделки как студент
+  getMyStudentDeals: () => apiClient.get<PaginatedResponse<Deal>>('/marketplace/deals/my-student'),
+
   // Получить сделку по ID
   getDeal: (id: string) => apiClient.get<Deal>(`/marketplace/deals/${id}`),
 

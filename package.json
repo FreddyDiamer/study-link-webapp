@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "prepare": "husky"
   },
   "dependencies": {
     "@vue/devtools-api": "^8.2.1",
@@ -28,6 +29,7 @@
     "@types/telegram-web-app": "^7.10.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/tsconfig": "^0.9.1",
+    "husky": "^9.1.7",
     "npm-run-all2": "^9.0.3",
     "prettier": "3.9.6",
     "tailwindcss": "^4.3.3",

@@ -22,7 +22,8 @@ export class EducationService {
 
   async getActiveSubjects(): Promise<Subject[]> {
     try {
-      return await educationApi.getActiveSubjects()
+      const subjects = await educationApi.getSubjects()
+      return subjects.filter((subject) => subject.isActive)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении активных предметов')
       throw error

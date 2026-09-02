@@ -73,15 +73,15 @@ const clearFilters = () => {
       <!-- Subject and Teacher filters -->
       <div class="grid grid-cols-2 gap-3">
         <Select
-          :model-value="filters.subject"
-          @update:model-value="(value) => updateFilters({ subject: value })"
+          :value="filters.subject"
+          @update:value="(value) => updateFilters({ subject: value })"
           :options="subjects"
           placeholder="Предмет"
         />
 
         <Select
-          :model-value="filters.teacher"
-          @update:model-value="(value) => updateFilters({ teacher: value })"
+          :value="filters.teacher"
+          @update:value="(value) => updateFilters({ teacher: value })"
           :options="teachers"
           placeholder="Преподаватель"
         />
@@ -111,17 +111,15 @@ const clearFilters = () => {
       <!-- Sort options -->
       <div class="grid grid-cols-2 gap-3">
         <Select
-          :model-value="filters.sortBy"
-          @update:model-value="
-            (value) => updateFilters({ sortBy: value as ServiceFilters['sortBy'] })
-          "
+          :value="filters.sortBy"
+          @update:value="(value) => updateFilters({ sortBy: value as ServiceFilters['sortBy'] })"
           :options="sortOptions"
           placeholder="Сортировка"
         />
 
         <Select
-          :model-value="filters.sortOrder"
-          @update:model-value="
+          :value="filters.sortOrder"
+          @update:value="
             (value) => updateFilters({ sortOrder: value as ServiceFilters['sortOrder'] })
           "
           :options="sortOrderOptions"

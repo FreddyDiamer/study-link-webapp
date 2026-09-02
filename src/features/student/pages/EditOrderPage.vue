@@ -227,7 +227,7 @@ const goBack = () => {
           <h2 class="text-lg font-semibold text-telegram-text mb-4">Предмет</h2>
 
           <Select
-            v-model="form.subject"
+            v-model:value="form.subject"
             :options="subjects"
             placeholder="Выберите предмет"
             required
@@ -247,7 +247,7 @@ const goBack = () => {
           <p class="text-telegram-text-secondary text-sm mb-4">Укажите, к чему нужна подготовка</p>
 
           <Select
-            v-model="form.teacher"
+            v-model:value="form.teacher"
             :options="teachers"
             placeholder="Выберите тип подготовки"
             required
@@ -276,7 +276,7 @@ const goBack = () => {
           </p>
 
           <Select
-            v-model="form.deadline"
+            v-model:value="form.deadline"
             :options="deadlines"
             placeholder="Выберите срок"
             required
@@ -292,7 +292,7 @@ const goBack = () => {
           <p class="text-telegram-text-secondary text-sm mb-4">Насколько срочно нужен репетитор</p>
 
           <Select
-            v-model="form.urgency"
+            v-model:value="form.urgency"
             :options="urgencyOptions"
             placeholder="Выберите уровень срочности"
             required

@@ -131,7 +131,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <Button @click="confirmDelete(group)" variant="danger" size="sm">
+          <Button @click="confirmDelete(group)" variant="destructive" size="sm">
             <TrashIcon class="w-4 h-4" />
           </Button>
         </div>
