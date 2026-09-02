@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
 import BottomNav from '@/shared/components/layout/BottomNav.vue'
 import DevLogin from '@/features/auth/DevLogin.vue'
+import { AppToast } from '@/shared/components/ui'
 import { useAuthStore, useEducationStore } from '@/stores'
 import { MOCK_INIT_DATA } from './shared/constants'
 
@@ -45,7 +46,9 @@ onMounted(initializeApp)
 
 <template>
   <div class="h-screen bg-d-ink text-d-text font-sl flex flex-col overflow-hidden">
-    <main class="flex-1 min-h-0">
+    <main class="relative flex-1 min-h-0">
+      <AppToast />
+
       <!-- загрузка -->
       <div v-if="!ready" class="flex items-center justify-center h-full">
         <span

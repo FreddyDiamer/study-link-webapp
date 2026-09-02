@@ -85,6 +85,14 @@ export const ordersApi = {
   updateServiceResponse: (id: string, data: Partial<CreateServiceResponseDto>) =>
     apiClient.patch<ServiceResponse>(`/marketplace/service-responses/${id}`, data),
 
+  // Принять отклик на услугу (создаёт сделку)
+  acceptServiceResponse: (id: string) =>
+    apiClient.patch<ServiceResponse>(`/marketplace/service-responses/${id}/accept`),
+
+  // Отклонить отклик на услугу
+  rejectServiceResponse: (id: string) =>
+    apiClient.patch<ServiceResponse>(`/marketplace/service-responses/${id}/reject`),
+
   // Удалить отклик на услугу
   deleteServiceResponse: (id: string) => apiClient.delete(`/marketplace/service-responses/${id}`),
 
@@ -107,6 +115,14 @@ export const ordersApi = {
   // Обновить отклик на заявку
   updateRequestResponse: (id: string, data: Partial<CreateRequestResponseDto>) =>
     apiClient.patch<RequestResponse>(`/marketplace/request-responses/${id}`, data),
+
+  // Принять отклик на заявку (создаёт сделку)
+  acceptRequestResponse: (id: string) =>
+    apiClient.patch<RequestResponse>(`/marketplace/request-responses/${id}/accept`),
+
+  // Отклонить отклик на заявку
+  rejectRequestResponse: (id: string) =>
+    apiClient.patch<RequestResponse>(`/marketplace/request-responses/${id}/reject`),
 
   // Удалить отклик на заявку
   deleteRequestResponse: (id: string) => apiClient.delete(`/marketplace/request-responses/${id}`),

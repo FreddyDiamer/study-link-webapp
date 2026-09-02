@@ -17,6 +17,8 @@ export interface User {
   createdAt: string
   updatedAt: string
   rating: number
+  /** число отзывов; приходит вместе с рейтингом там, где бэкенд его отдаёт */
+  reviewsCount?: number
 }
 
 export interface Tutor extends User {

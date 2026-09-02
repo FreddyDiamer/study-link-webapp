@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { educationService } from '@/services/business'
-import type { Subject, Teacher, TeacherSubject } from '@/shared/types'
+import type { Group, Subject, Teacher, TeacherSubject } from '@/shared/types'
 
 export const useEducationStore = defineStore('education', () => {
   // State
   const subjects = ref<Subject[]>([])
   const teachers = ref<Teacher[]>([])
   const teacherSubjects = ref<TeacherSubject[]>([])
+  const groups = ref<Group[]>([])
 
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -64,7 +65,7 @@ export const useEducationStore = defineStore('education', () => {
     error.value = null
 
     try {
-      await Promise.all([loadSubjects(), loadTeachers(), loadTeacherSubjects()])
+      await Promise.all([loadSubjects(), loadTeachers(), loadTeacherSubjects(), loadGroups()])
 
       isInitialized.value = true
     } catch (err: any) {
@@ -102,6 +103,15 @@ export const useEducationStore = defineStore('education', () => {
     }
   }
 
+  const loadGroups = async () => {
+    try {
+      groups.value = await educationService.getGroups()
+    } catch (err: any) {
+      console.error('Ошибка загрузки групп:', err)
+      throw err
+    }
+  }
+
   const refresh = async () => {
     isInitialized.value = false
     await initialize()
@@ -111,6 +121,7 @@ export const useEducationStore = defineStore('education', () => {
     subjects.value = []
     teachers.value = []
     teacherSubjects.value = []
+    groups.value = []
     isLoading.value = false
     error.value = null
     isInitialized.value = false
@@ -121,6 +132,7 @@ export const useEducationStore = defineStore('education', () => {
     subjects,
     teachers,
     teacherSubjects,
+    groups,
     isLoading,
     error,
     isInitialized,
@@ -139,6 +151,7 @@ export const useEducationStore = defineStore('education', () => {
     loadSubjects,
     loadTeachers,
     loadTeacherSubjects,
+    loadGroups,
     refresh,
     clear,
   }

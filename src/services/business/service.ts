@@ -8,6 +8,9 @@ import type {
   PaginatedResponse,
 } from '@/shared/types'
 
+/** Минимальная цена услуги в копейках (100 ₽). */
+const MIN_PRICE_KOPEKS = 10_000
+
 export class ServiceService {
   private get telegramStore() {
     return useTelegramStore()
@@ -169,8 +172,8 @@ export class ServiceService {
     if (!data.teacherId) {
       throw new Error('Выберите преподавателя')
     }
-    if (!data.price || data.price < 100) {
-      throw new Error('Цена должна быть не менее 100 рублей')
+    if (!data.price || data.price < MIN_PRICE_KOPEKS) {
+      throw new Error(`Цена должна быть не менее ${MIN_PRICE_KOPEKS / 100} рублей`)
     }
     if (data.description && data.description.length > 500) {
       throw new Error('Описание не должно превышать 500 символов')
@@ -178,10 +181,8 @@ export class ServiceService {
   }
 
   private validateUpdateData(data: any): void {
-    if (data.price !== undefined) {
-      if (data.price < 100) {
-        throw new Error('Цена должна быть не менее 100 рублей')
-      }
+    if (data.price !== undefined && data.price < MIN_PRICE_KOPEKS) {
+      throw new Error(`Цена должна быть не менее ${MIN_PRICE_KOPEKS / 100} рублей`)
     }
     if (data.description && data.description.length > 500) {
       throw new Error('Описание не должно превышать 500 символов')

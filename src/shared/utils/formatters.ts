@@ -56,3 +56,40 @@ export const truncateText = (text: string, maxLength: number): string => {
   if (text.length <= maxLength) return text
   return text.slice(0, maxLength) + '...'
 }
+
+/**
+ * Цена из копеек бэкенда в рублёвую строку: 150000 → «1 500 ₽».
+ * Единая точка форматирования денег в UI (см. money-правило в .agents/rules).
+ */
+export const formatKopeks = (kopeks?: number | null): string => {
+  if (kopeks == null) return '—'
+  const rubles = Math.round(kopeks / 100)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  return `${rubles} ₽`
+}
+
+/** Русское склонение по числу: pluralize(3, 'отклик', 'отклика', 'откликов') → «отклика». */
+export const pluralize = (n: number, one: string, few: string, many: string): string => {
+  const mod10 = n % 10
+  const mod100 = n % 100
+  if (mod100 >= 11 && mod100 <= 14) return many
+  if (mod10 === 1) return one
+  if (mod10 >= 2 && mod10 <= 4) return few
+  return many
+}
+
+/** «3 отклика» — число со склонённым словом. */
+export const countWithWord = (n: number, one: string, few: string, many: string): string =>
+  `${n} ${pluralize(n, one, few, many)}`
+
+/** Дедлайн в стиле дизайна: «до 28 июня». Без года, месяц в родительном падеже. */
+export const formatDeadline = (date?: string | Date | null, prefix = 'до'): string => {
+  if (!date) return 'Срок не указан'
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  if (Number.isNaN(dateObj.getTime())) return 'Срок не указан'
+  const formatted = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' }).format(
+    dateObj,
+  )
+  return prefix ? `${prefix} ${formatted}` : formatted
+}

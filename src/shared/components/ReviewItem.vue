@@ -8,6 +8,8 @@ interface Props {
   text?: string
   // компактный вид для профиля (разделён хайрлайном, без карточки)
   bare?: boolean
+  // «исполнитель» / «заказчик» — за какую роль оставлен отзыв
+  role?: 'tutor' | 'student'
 }
 
 const props = withDefaults(defineProps<Props>(), { bare: false })
@@ -29,6 +31,14 @@ const stars = computed(() => {
     <div class="flex items-center gap-2 mb-1.5">
       <AvatarChip :name="author" size="sm" />
       <span class="text-caption font-semibold">{{ author }}</span>
+      <span
+        v-if="role"
+        class="text-[9px] font-bold px-[7px] py-0.5 rounded-[5px]"
+        :class="
+          role === 'tutor' ? 'bg-d-accent/[0.16] text-d-accent' : 'bg-d-teal/[0.16] text-d-teal'
+        "
+        >{{ role === 'tutor' ? 'исполнитель' : 'заказчик' }}</span
+      >
       <span class="ml-auto text-d-rating text-[12px] tracking-[1px]">{{ stars }}</span>
     </div>
     <p v-if="text" class="text-review" :class="bare ? 'text-d-text-second' : 'text-d-text-bright'">

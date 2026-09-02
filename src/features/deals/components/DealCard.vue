@@ -1,82 +1,88 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { StatusBadge } from '@/shared/components/ui'
-import { useAuthStore } from '@/stores'
+import { formatKopeks } from '@/shared/utils'
 import { DealStatus, type Deal } from '@/shared/types'
+
+export type DealRole = 'customer' | 'worker'
 
 interface Props {
   deal: Deal
+  /** роль текущего пользователя в этой сделке */
+  role: DealRole
+  busy?: boolean
 }
-const props = defineProps<Props>()
-const emit = defineEmits<{ advance: [deal: Deal] }>()
 
-const auth = useAuthStore()
+const props = withDefaults(defineProps<Props>(), { busy: false })
+const emit = defineEmits<{ complete: [deal: Deal]; cancel: [deal: Deal] }>()
 
-const formatPrice = (kopeks: number) =>
-  `${Math.round(kopeks / 100)
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} ₽`
+const isCustomer = computed(() => props.role === 'customer')
 
-const counterparty = computed(() => {
-  const isStudent = props.deal.student?.id === auth.user?.id
-  return (isStudent ? props.deal.tutor?.name : props.deal.student?.name) || '—'
+// три статуса вместо пяти: PENDING и ACCEPTED неотличимы для человека
+const isCancelled = computed(() => props.deal.status === DealStatus.CANCELLED)
+const isDone = computed(() => props.deal.status === DealStatus.COMPLETED)
+const isActive = computed(() => !isCancelled.value && !isDone.value)
+
+const statusLabel = computed(() => {
+  if (isCancelled.value) return 'Отменена'
+  return isDone.value ? 'Завершена' : 'В работе'
+})
+const statusClass = computed(() => {
+  if (isCancelled.value) return 'bg-d-coral/[0.16] text-d-coral'
+  return isDone.value ? 'bg-d-teal/[0.16] text-d-teal' : 'bg-d-accent/[0.16] text-d-accent'
 })
 
-const ORDER = [
-  DealStatus.PENDING,
-  DealStatus.ACCEPTED,
-  DealStatus.IN_PROGRESS,
-  DealStatus.COMPLETED,
-]
-
-const isCancelled = computed(() => props.deal.status === DealStatus.CANCELLED)
-const currentIndex = computed(() => ORDER.indexOf(props.deal.status))
-const completed = computed(() => props.deal.status === DealStatus.COMPLETED)
-
-const steps = computed(() =>
-  ORDER.map((_, i) => {
-    const done = i < currentIndex.value
-    const active = i === currentIndex.value
-    const last = i === ORDER.length - 1
-    return {
-      key: i,
-      done,
-      active,
-      notLast: !last,
-      icon: done ? '✓' : String(i + 1),
-      fill: i < currentIndex.value ? 1 : 0,
-    }
-  }),
+const roleTag = computed(() => (isCustomer.value ? 'Вы заказчик' : 'Вы исполнитель'))
+const roleTagClass = computed(() =>
+  isCustomer.value ? 'bg-d-rating/[0.14] text-d-rating' : 'bg-d-accent/[0.16] text-d-accent',
 )
 
-const advLabel = computed(
-  () =>
-    ({
-      [DealStatus.PENDING]: 'Подтвердить',
-      [DealStatus.ACCEPTED]: 'Перевести в работу',
-      [DealStatus.IN_PROGRESS]: 'Завершить сделку',
-      [DealStatus.COMPLETED]: '✓ Сделка завершена',
-      [DealStatus.CANCELLED]: 'Отменена',
-    })[props.deal.status],
+const counterparty = computed(() =>
+  isCustomer.value
+    ? `Репетитор: ${props.deal.tutor?.name || '—'}`
+    : `Студент: ${props.deal.student?.name || '—'}`,
 )
+
+const moneyLabel = computed(() => (isCustomer.value ? 'Вы платите' : 'Вы получите'))
+const moneyClass = computed(() => (isCustomer.value ? 'text-d-coral' : 'text-d-teal'))
+
+const completeLabel = computed(() => (isCustomer.value ? 'Подтвердить выполнение' : 'Сдать работу'))
+
+const steps = computed(() => [
+  { key: 0, notLast: true, icon: isDone.value ? '✓' : '1', fill: isDone.value ? 1 : 0 },
+  { key: 1, notLast: false, icon: isDone.value ? '✓' : '2', fill: 0 },
+])
 </script>
 
 <template>
-  <div class="reveal bg-d-panel border border-d-border rounded-sheet p-[18px] mb-4">
-    <div class="flex items-start justify-between mb-2">
-      <div class="text-[18px] font-semibold leading-tight">
-        {{ deal.subject?.name }}<br />{{ deal.teacher?.fullName }}
-      </div>
-      <StatusBadge :deal="deal.status" />
-    </div>
-    <div class="text-subhead text-d-text-hint mb-5">
-      с {{ counterparty }} ·
-      <span class="text-d-text font-semibold tnum">{{ formatPrice(deal.price) }}</span>
+  <div class="reveal bg-d-panel border border-d-border rounded-sheet p-[18px] mb-3.5">
+    <div class="flex items-center gap-[7px] mb-3">
+      <span
+        class="text-micro uppercase px-2.5 py-[3px] rounded-md transition-colors duration-300"
+        :class="roleTagClass"
+        >{{ roleTag }}</span
+      >
+      <span
+        class="ml-auto text-[12px] font-bold px-[11px] py-1 rounded-full whitespace-nowrap transition-colors duration-300"
+        :class="statusClass"
+        >{{ statusLabel }}</span
+      >
     </div>
 
-    <!-- animated stepper (happy path only) -->
+    <div class="text-[18px] font-semibold leading-tight mb-1.5">
+      {{ deal.subject?.name }} · {{ deal.teacher?.fullName }}
+    </div>
+    <div class="text-subhead text-d-text-hint mb-3.5">{{ counterparty }}</div>
+
+    <div class="flex items-baseline gap-2 mb-5">
+      <span class="text-caption text-d-text-hint">{{ moneyLabel }}</span>
+      <span class="text-[20px] font-bold tnum" :class="moneyClass">
+        {{ formatKopeks(deal.price) }}
+      </span>
+    </div>
+
+    <!-- степпер: В работе → Завершена -->
     <template v-if="!isCancelled">
-      <div class="flex items-center mb-2">
+      <div class="flex items-center mb-2.5">
         <div
           v-for="st in steps"
           :key="st.key"
@@ -86,9 +92,9 @@ const advLabel = computed(
           <span
             class="shrink-0 w-[30px] h-[30px] rounded-chip flex items-center justify-center text-[13px] font-bold transition-all duration-300"
             :class="
-              st.done
+              isDone
                 ? 'bg-d-accent text-d-ink'
-                : st.active
+                : st.key === 0
                   ? 'bg-d-accent/[0.18] text-d-accent border-[1.5px] border-d-accent'
                   : 'text-d-text-hint border-[1.5px] border-d-border-soft'
             "
@@ -107,18 +113,25 @@ const advLabel = computed(
         </div>
       </div>
       <div class="flex justify-between text-micro uppercase text-d-text-hint">
-        <span>Создана</span><span>Завершена</span>
+        <span>В работе</span><span>Завершена</span>
       </div>
     </template>
   </div>
 
-  <button
-    v-if="!isCancelled"
-    class="press w-full h-[50px] rounded-[13px] text-[15px] font-bold mb-4 disabled:cursor-default"
-    :class="completed ? 'bg-d-panel text-d-teal' : 'bg-d-accent text-d-ink'"
-    :disabled="completed"
-    @click="emit('advance', deal)"
-  >
-    {{ advLabel }}
-  </button>
+  <template v-if="isActive">
+    <button
+      class="press w-full h-[50px] rounded-[13px] bg-d-accent text-d-ink text-[15px] font-bold mb-2.5 disabled:opacity-40"
+      :disabled="busy"
+      @click="emit('complete', deal)"
+    >
+      {{ completeLabel }}
+    </button>
+    <button
+      class="press w-full text-center text-subhead font-semibold text-d-coral py-2 mb-4 disabled:opacity-40"
+      :disabled="busy"
+      @click="emit('cancel', deal)"
+    >
+      Отменить сделку
+    </button>
+  </template>
 </template>

@@ -25,9 +25,24 @@ const router = createRouter({
       component: () => import('../features/market/pages/ServiceDetailPage.vue'),
     },
     {
-      path: PATHS.SERVICE_RESPOND,
-      name: 'service-respond',
-      component: () => import('../features/market/pages/RespondPage.vue'),
+      path: PATHS.REQUEST_CREATE,
+      name: 'request-create',
+      component: () => import('../features/market/pages/CreateRequestPage.vue'),
+    },
+    {
+      path: PATHS.REQUEST_DETAIL,
+      name: 'request-detail',
+      component: () => import('../features/market/pages/RequestDetailPage.vue'),
+    },
+    {
+      path: PATHS.REQUEST_EDIT,
+      name: 'request-edit',
+      component: () => import('../features/market/pages/CreateRequestPage.vue'),
+    },
+    {
+      path: PATHS.REQUEST_RESPOND,
+      name: 'request-respond',
+      component: () => import('../features/market/pages/RequestRespondPage.vue'),
     },
     {
       path: PATHS.DEALS,

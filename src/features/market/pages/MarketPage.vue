@@ -1,45 +1,119 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useService } from '@/shared/composables'
-import { orderService } from '@/services/business'
+import { useOrder, useService } from '@/shared/composables'
+import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
-import { serviceDetailPath, PATHS } from '@/router/paths'
+import { PATHS, requestDetailPath, serviceDetailPath } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
-import MarketSegment, { type MarketSeg } from '../components/MarketSegment.vue'
+import { SegmentControl } from '@/shared/components/ui'
+import SearchField from '../components/SearchField.vue'
+import SubjectChips from '../components/SubjectChips.vue'
 import ServiceCard from '../components/ServiceCard.vue'
 import RequestCard from '../components/RequestCard.vue'
 import CardSkeleton from '../components/CardSkeleton.vue'
-import type { Service, Request } from '@/shared/types'
+import EmptyFeed from '../components/EmptyFeed.vue'
+import CreateIntentSheet from '../components/CreateIntentSheet.vue'
+import type { Request, Service } from '@/shared/types'
+
+type MarketSeg = 'requests' | 'services'
+
+// порядок как в макете: сначала «Заявки», потом «Услуги»
+const SEGMENTS = [
+  { id: 'requests', label: 'Заявки' },
+  { id: 'services', label: 'Услуги' },
+] as const
 
 const router = useRouter()
+const auth = useAuthStore()
 const telegramStore = useTelegramStore()
 const { getActiveServices } = useService()
+const { getRequests } = useOrder()
 
-const segment = ref<MarketSeg>('services')
+// в макете лента открывается на «Заявках»: роль задаётся тем, что листаешь
+const segment = ref<MarketSeg>('requests')
+const subjectId = ref('')
+const query = ref('')
 const loading = ref(true)
+const intentSheet = ref(false)
 const services = ref<Service[]>([])
 const requests = ref<Request[]>([])
+
+const isRequests = computed(() => segment.value === 'requests')
+
+const matches = (haystack: (string | undefined)[]) => {
+  const q = query.value.trim().toLowerCase()
+  if (!q) return true
+  return haystack.some((value) => value?.toLowerCase().includes(q))
+}
+
+const visibleRequests = computed(() =>
+  requests.value.filter(
+    (r) =>
+      (!subjectId.value || r.subjectId === subjectId.value) &&
+      matches([r.subject?.name, r.teacher?.fullName, r.student?.name, r.description]),
+  ),
+)
+
+const visibleServices = computed(() =>
+  services.value.filter(
+    (s) =>
+      (!subjectId.value || s.subjectId === subjectId.value) &&
+      matches([s.subject?.name, s.teacher?.fullName, s.tutor?.name, s.description]),
+  ),
+)
+
+const isEmpty = computed(() =>
+  isRequests.value ? !visibleRequests.value.length : !visibleServices.value.length,
+)
+const isFiltered = computed(() => !!subjectId.value || !!query.value.trim())
+
+const headerSub = computed(() => (isRequests.value ? 'Кому нужна помощь' : 'Кто предлагает помощь'))
+const feedHint = computed(() =>
+  isRequests.value
+    ? 'Кому нужна помощь — здесь вы исполнитель'
+    : 'Кто предлагает помощь — здесь вы заказчик',
+)
+const searchHint = computed(() => (isRequests.value ? 'Поиск по заявкам' : 'Поиск по услугам'))
+const emptyTitle = computed(() =>
+  isFiltered.value
+    ? isRequests.value
+      ? 'Заявок по этому предмету нет'
+      : 'Услуг по этому предмету нет'
+    : isRequests.value
+      ? 'Заявок пока нет'
+      : 'Услуг пока нет',
+)
 
 const load = async () => {
   loading.value = true
   try {
-    const [svc, req] = await Promise.all([getActiveServices(), orderService.getRequests()])
+    const [svc, req] = await Promise.all([getActiveServices(), getRequests()])
     services.value = svc?.items ?? []
     requests.value = req?.items ?? []
   } catch (e) {
-    console.error('Не удалось загрузить маркет:', e)
+    console.error('Не удалось загрузить ленту:', e)
   } finally {
     loading.value = false
   }
 }
+
+const isMine = (request: Request) => request.studentId === auth.user?.id
 
 const openService = (id: string) => {
   telegramStore.hapticFeedback('light')
   router.push(serviceDetailPath(id))
 }
 
-const goCreate = () => router.push(PATHS.SERVICE_CREATE)
+const openRequest = (id: string) => {
+  telegramStore.hapticFeedback('light')
+  router.push(requestDetailPath(id))
+}
+
+const resetFilter = () => {
+  subjectId.value = ''
+  query.value = ''
+}
 
 const delay = (i: number) => `${i * 0.07}s`
 
@@ -48,35 +122,62 @@ onMounted(load)
 
 <template>
   <div class="flex flex-col h-full">
-    <AppHeader title="Маркет" sub="Найдите репетитора" add reload @add="goCreate" @reload="load" />
-    <div class="shrink-0 px-[18px] pt-3.5 pb-3">
-      <MarketSegment v-model="segment" />
+    <AppHeader title="Лента" :sub="headerSub" add @add="intentSheet = true" />
+
+    <div class="shrink-0 px-[18px] pt-3.5 pb-2.5">
+      <SegmentControl v-model="segment" :items="SEGMENTS" class="mb-3" />
+
+      <!-- подсказка роли: она меняется вместе с сегментом -->
+      <div class="flex items-center gap-[7px] mb-2.5">
+        <span
+          class="shrink-0 w-1.5 h-1.5 rounded-full transition-colors duration-300"
+          :class="isRequests ? 'bg-d-accent' : 'bg-d-rating'"
+        />
+        <span class="text-[11px] text-d-text-hint">{{ feedHint }}</span>
+      </div>
+
+      <SearchField v-model="query" :placeholder="searchHint" class="mb-3" />
+      <SubjectChips v-model="subjectId" />
     </div>
 
-    <div class="flex-1 overflow-y-auto px-[18px] pb-[18px] flex flex-col gap-3">
+    <div class="flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px] flex flex-col gap-3">
       <template v-if="loading">
         <CardSkeleton v-for="n in 4" :key="n" />
       </template>
 
-      <template v-else-if="segment === 'services'">
+      <EmptyFeed
+        v-else-if="isEmpty"
+        :title="emptyTitle"
+        :filtered="isFiltered"
+        @reset="resetFilter"
+      />
+
+      <template v-else-if="isRequests">
+        <RequestCard
+          v-for="(q, i) in visibleRequests"
+          :key="q.id"
+          :request="q"
+          :mine="isMine(q)"
+          :delay="delay(i)"
+          @click="openRequest(q.id)"
+        />
+      </template>
+
+      <template v-else>
         <ServiceCard
-          v-for="(s, i) in services"
+          v-for="(s, i) in visibleServices"
           :key="s.id"
           :service="s"
           :delay="delay(i)"
           @click="openService(s.id)"
         />
-        <p v-if="!services.length" class="text-center text-d-text-hint text-subhead py-10">
-          Пока нет услуг
-        </p>
-      </template>
-
-      <template v-else>
-        <RequestCard v-for="(q, i) in requests" :key="q.id" :request="q" :delay="delay(i)" />
-        <p v-if="!requests.length" class="text-center text-d-text-hint text-subhead py-10">
-          Пока нет заявок
-        </p>
       </template>
     </div>
+
+    <CreateIntentSheet
+      v-model="intentSheet"
+      @request="router.push(PATHS.REQUEST_CREATE)"
+      @service="router.push(PATHS.SERVICE_CREATE)"
+    />
   </div>
 </template>

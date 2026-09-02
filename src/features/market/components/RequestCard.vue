@@ -1,36 +1,29 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
+import { countWithWord, formatDeadline, formatKopeks } from '@/shared/utils'
 import type { Request } from '@/shared/types'
 
 interface Props {
   request: Request
+  /** заявка принадлежит текущему пользователю — в макете помечена плашкой «Моя» */
+  mine?: boolean
   delay?: string
 }
 
-const props = defineProps<Props>()
-
-const formatPrice = (kopeks: number) =>
-  `${Math.round(kopeks / 100)
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} ₽`
+const props = withDefaults(defineProps<Props>(), { mine: false })
 
 const budgetText = computed(() =>
   props.request.budget && props.request.budget > 0
-    ? `до ${formatPrice(props.request.budget)}`
+    ? `до ${formatKopeks(props.request.budget)}`
     : 'Бюджет не указан',
 )
 
-const responsesCount = computed(() => props.request.responses?.length ?? 0)
-const responsesLabel = computed(() => {
-  const n = responsesCount.value
-  const mod10 = n % 10
-  const mod100 = n % 100
-  let word = 'откликов'
-  if (mod10 === 1 && mod100 !== 11) word = 'отклик'
-  else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) word = 'отклика'
-  return `${n} ${word}`
-})
+const responsesLabel = computed(() =>
+  countWithWord(props.request.responses?.length ?? 0, 'отклик', 'отклика', 'откликов'),
+)
+
+const deadlineText = computed(() => formatDeadline(props.request.deadline))
 </script>
 
 <template>
@@ -41,6 +34,12 @@ const responsesLabel = computed(() => {
     <div class="flex items-center gap-2.5 mb-3">
       <AvatarChip :name="request.student?.name" size="md" />
       <span class="text-caption font-semibold">{{ request.student?.name || 'Студент' }}</span>
+      <span
+        v-if="mine"
+        class="text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-accent/[0.16] text-d-accent"
+        >Моя</span
+      >
+      <span class="ml-auto text-[12px] text-d-text-hint">{{ responsesLabel }}</span>
     </div>
 
     <h3 class="text-title-m mb-1.5">
@@ -52,7 +51,7 @@ const responsesLabel = computed(() => {
 
     <div class="flex items-center justify-between">
       <span class="text-price tnum">{{ budgetText }}</span>
-      <span class="text-caption text-d-text-hint">{{ responsesLabel }}</span>
+      <span class="text-caption text-d-text-hint">{{ deadlineText }}</span>
     </div>
   </article>
 </template>

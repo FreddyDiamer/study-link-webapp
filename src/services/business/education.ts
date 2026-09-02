@@ -1,6 +1,6 @@
 import { educationApi } from '@/services/api'
 import { useTelegramStore } from '@/stores'
-import type { Subject, Teacher, TeacherSubject } from '@/shared/types'
+import type { Group, Subject, Teacher, TeacherSubject } from '@/shared/types'
 
 export class EducationService {
   private get telegramStore() {
@@ -78,6 +78,19 @@ export class EducationService {
       return await educationApi.getTeacherSubjectsBySubject(subjectId)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении преподавателей предмета')
+      throw error
+    }
+  }
+
+  // =============================================================================
+  // GROUPS
+  // =============================================================================
+
+  async getGroups(): Promise<Group[]> {
+    try {
+      return await educationApi.getGroups()
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении групп')
       throw error
     }
   }

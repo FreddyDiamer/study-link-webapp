@@ -86,6 +86,15 @@ export default {
           to: { opacity: '1', transform: 'translateY(0)' },
         },
         'd-ringspin': { to: { transform: 'rotate(360deg)' } },
+        'd-sheetup': {
+          from: { transform: 'translateY(100%)' },
+          to: { transform: 'translateY(0)' },
+        },
+        'd-pop': {
+          '0%': { transform: 'scale(.6)', opacity: '0' },
+          '60%': { transform: 'scale(1.15)' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
       },
       animation: {
         'd-shimmer': 'd-shimmer 1.3s infinite linear',
@@ -93,6 +102,8 @@ export default {
         'd-growx': 'd-growx 0.7s cubic-bezier(.3,.8,.3,1) both',
         'd-toastin': 'd-toastin 0.26s cubic-bezier(.2,.8,.2,1)',
         'd-spin': 'd-ringspin 0.7s linear infinite',
+        'd-sheetup': 'd-sheetup 0.3s cubic-bezier(.3,.8,.3,1)',
+        'd-pop': 'd-pop 0.3s cubic-bezier(.2,.8,.2,1)',
       },
     },
   },

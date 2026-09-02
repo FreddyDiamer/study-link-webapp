@@ -34,6 +34,19 @@ export class UserService {
     }
   }
 
+  async updateGroup(groupId: string): Promise<User> {
+    try {
+      this.telegramStore.hapticFeedback('light')
+
+      const user = await usersApi.updateGroup(groupId)
+
+      return this.convertUserToRubles(user)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при смене группы')
+      throw error
+    }
+  }
+
   async getUser(id: string): Promise<User> {
     try {
       const user = await usersApi.getUser(id)

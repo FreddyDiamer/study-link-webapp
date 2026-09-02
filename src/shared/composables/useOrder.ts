@@ -156,6 +156,16 @@ export const useOrder = () => {
     }
   }
 
+  const cancelDeal = async (dealId: string) => {
+    try {
+      const response = await orderService.cancelDeal(dealId)
+      return response
+    } catch (error) {
+      console.error('Ошибка отмены сделки:', error)
+      throw error
+    }
+  }
+
   const completeDeal = async (dealId: string) => {
     try {
       const response = await orderService.completeDeal(dealId)
@@ -213,6 +223,24 @@ export const useOrder = () => {
       // Обновляем список откликов
       await getMyServiceResponses()
       return response
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const acceptServiceResponse = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.acceptServiceResponse(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const rejectServiceResponse = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.rejectServiceResponse(id)
     } finally {
       isLoading.value = false
     }
@@ -281,6 +309,24 @@ export const useOrder = () => {
     }
   }
 
+  const acceptRequestResponse = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.acceptRequestResponse(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const rejectRequestResponse = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.rejectRequestResponse(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const deleteRequestResponse = async (id: string) => {
     isLoading.value = true
     try {
@@ -316,12 +362,15 @@ export const useOrder = () => {
     acceptDeal,
     rejectDeal,
     completeDeal,
+    cancelDeal,
 
     // Service Responses
     getServiceResponses,
     getMyServiceResponses,
     createServiceResponse,
     updateServiceResponse,
+    acceptServiceResponse,
+    rejectServiceResponse,
     deleteServiceResponse,
 
     // Request Responses
@@ -329,6 +378,8 @@ export const useOrder = () => {
     getMyRequestResponses,
     createRequestResponse,
     updateRequestResponse,
+    acceptRequestResponse,
+    rejectRequestResponse,
     deleteRequestResponse,
   }
 }

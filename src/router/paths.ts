@@ -4,14 +4,20 @@ export const PATHS = {
   MARKET: '/market',
   DEALS: '/deals',
   PROFILE: '/profile',
-  // под-экраны маркета
-  SERVICE_CREATE: '/market/create',
-  SERVICE_DETAIL: '/market/:id',
-  SERVICE_RESPOND: '/market/:id/respond',
+  // под-экраны маркета · услуги (вы исполнитель)
+  SERVICE_CREATE: '/market/services/create',
+  SERVICE_DETAIL: '/market/services/:id',
+  // под-экраны маркета · заявки (вы заказчик)
+  REQUEST_CREATE: '/market/requests/create',
+  REQUEST_DETAIL: '/market/requests/:id',
+  REQUEST_EDIT: '/market/requests/:id/edit',
+  REQUEST_RESPOND: '/market/requests/:id/respond',
 } as const
 
 export type AppPath = (typeof PATHS)[keyof typeof PATHS]
 
 // помощники для навигации с параметром
-export const serviceDetailPath = (id: string) => `/market/${id}`
-export const serviceRespondPath = (id: string) => `/market/${id}/respond`
+export const serviceDetailPath = (id: string) => `/market/services/${id}`
+export const requestDetailPath = (id: string) => `/market/requests/${id}`
+export const requestEditPath = (id: string) => `/market/requests/${id}/edit`
+export const requestRespondPath = (id: string) => `/market/requests/${id}/respond`

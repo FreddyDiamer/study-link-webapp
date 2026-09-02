@@ -1,34 +1,32 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
-import { PATHS, serviceDetailPath } from '@/router/paths'
+import { PATHS } from '@/router/paths'
 
 interface Props {
   title: string
   sub?: string
   back?: boolean
-  reload?: boolean
+  /** «+» справа — в макете открывает развилку намерения */
   add?: boolean
+  /** куда возвращает «‹», если некуда возвращаться в истории */
+  backTo?: string
 }
-const props = withDefaults(defineProps<Props>(), { back: false, reload: false, add: false })
-const emit = defineEmits<{ reload: []; add: [] }>()
+const props = withDefaults(defineProps<Props>(), {
+  back: false,
+  add: false,
+  backTo: PATHS.MARKET,
+})
+const emit = defineEmits<{ add: [] }>()
 
-const route = useRoute()
 const router = useRouter()
 const telegramStore = useTelegramStore()
 
 const goBack = () => {
   telegramStore.hapticFeedback('light')
-  if (route.name === 'service-respond' && route.params.id) {
-    router.push(serviceDetailPath(route.params.id as string))
-  } else {
-    router.push(PATHS.MARKET)
-  }
-}
-
-const onReload = () => {
-  telegramStore.hapticFeedback('light')
-  emit('reload')
+  // внутри Mini App история может быть пустой — тогда уходим на заданный экран
+  if (window.history.state?.back) router.back()
+  else router.push(props.backTo)
 }
 
 const onAdd = () => {
@@ -38,9 +36,7 @@ const onAdd = () => {
 </script>
 
 <template>
-  <header
-    class="shrink-0 flex items-center gap-3 px-4 pt-1.5 pb-3.5 border-b border-d-sk-base"
-  >
+  <header class="shrink-0 flex items-center gap-3 px-4 pt-1.5 pb-3.5 border-b border-d-sk-base">
     <!-- back -->
     <button
       v-if="back"
@@ -76,19 +72,11 @@ const onAdd = () => {
 
     <button
       v-if="add"
-      class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-accent text-d-ink flex items-center justify-center text-[26px] leading-none font-light shadow-d-logo"
-      aria-label="Добавить услугу"
+      class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-accent text-d-ink flex items-center justify-center text-[26px] leading-none font-light"
+      aria-label="Создать"
       @click="onAdd"
     >
       +
-    </button>
-    <button
-      v-if="reload"
-      class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-panel border border-d-border flex items-center justify-center text-d-text-second text-[18px]"
-      aria-label="Обновить"
-      @click="onReload"
-    >
-      ↻
     </button>
   </header>
 </template>

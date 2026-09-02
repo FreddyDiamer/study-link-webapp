@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useService } from '@/shared/composables'
+import { useService, useToast } from '@/shared/composables'
 import { useEducationStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS } from '@/router/paths'
@@ -11,12 +11,12 @@ const router = useRouter()
 const edu = useEducationStore()
 const telegramStore = useTelegramStore()
 const { createService } = useService()
+const { showToast } = useToast()
 
 const subjectId = ref('')
 const teacherId = ref('')
 const price = ref('')
 const description = ref('')
-const deadline = ref('')
 const submitting = ref(false)
 const error = ref('')
 
@@ -44,9 +44,9 @@ const submit = async () => {
       teacherId: teacherId.value,
       price: Math.round(Number(price.value) * 100), // рубли → копейки
       description: description.value || undefined,
-      deadline: deadline.value || undefined,
     })
     telegramStore.hapticFeedback('success')
+    showToast('Услуга опубликована')
     router.push(PATHS.MARKET)
   } catch (e) {
     console.error('Не удалось создать услугу:', e)
@@ -62,7 +62,7 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col h-full">
-    <AppHeader title="Новая услуга" back />
+    <AppHeader title="Новая услуга" sub="Вы исполнитель" back />
 
     <div class="flex-1 overflow-y-auto px-[18px] py-4 flex flex-col gap-5">
       <!-- предмет -->
@@ -77,7 +77,10 @@ onMounted(() => {
             <option value="" disabled>Выберите предмет</option>
             <option v-for="s in edu.activeSubjects" :key="s.id" :value="s.id">{{ s.name }}</option>
           </select>
-          <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-d-text-hint">▾</span>
+          <span
+            class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-d-text-hint"
+            >▾</span
+          >
         </div>
       </div>
 
@@ -96,13 +99,16 @@ onMounted(() => {
               {{ t.fullName }}
             </option>
           </select>
-          <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-d-text-hint">▾</span>
+          <span
+            class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-d-text-hint"
+            >▾</span
+          >
         </div>
       </div>
 
       <!-- цена -->
       <div>
-        <label class="block text-overline uppercase text-d-text-second mb-2.5">Цена</label>
+        <label class="block text-overline uppercase text-d-text-second mb-2.5">Цена занятия</label>
         <div
           class="flex items-center h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 focus-within:border-d-accent transition-colors"
         >
@@ -130,18 +136,6 @@ onMounted(() => {
         />
       </div>
 
-      <!-- дедлайн -->
-      <div>
-        <label class="block text-overline uppercase text-d-text-second mb-2.5">
-          Срок <span class="text-d-text-hint normal-case font-normal">· необязательно</span>
-        </label>
-        <input
-          v-model="deadline"
-          type="date"
-          class="d-select w-full h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 text-body focus:border-d-accent focus:outline-none transition-colors"
-        />
-      </div>
-
       <p v-if="error" class="text-caption text-d-coral">{{ error }}</p>
     </div>
 
@@ -153,7 +147,7 @@ onMounted(() => {
         :disabled="!canSubmit"
         @click="submit"
       >
-        Создать услугу
+        Опубликовать услугу
       </button>
     </div>
   </div>
