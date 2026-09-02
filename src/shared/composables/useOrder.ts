@@ -156,6 +156,15 @@ export const useOrder = () => {
     }
   }
 
+  const reopenDeal = async (dealId: string) => {
+    try {
+      return await orderService.reopenDeal(dealId)
+    } catch (error) {
+      console.error('Ошибка возврата сделки в работу:', error)
+      throw error
+    }
+  }
+
   const cancelDeal = async (dealId: string, reason?: string) => {
     try {
       const response = await orderService.cancelDeal(dealId, reason)
@@ -363,6 +372,7 @@ export const useOrder = () => {
     rejectDeal,
     completeDeal,
     cancelDeal,
+    reopenDeal,
 
     // Service Responses
     getServiceResponses,

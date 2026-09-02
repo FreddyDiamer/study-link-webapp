@@ -161,6 +161,8 @@ export interface Deal {
   // подтверждение выполнения каждой стороной; сделка закрывается по обоим
   studentConfirmedAt?: string | null
   tutorConfirmedAt?: string | null
+  /** когда сделка закроется без второй стороны; считает бэкенд */
+  autoConfirmAt?: string | null
   // отмена: кто, когда и почему — видно обеим сторонам
   cancelledAt?: string | null
   cancelledById?: string | null

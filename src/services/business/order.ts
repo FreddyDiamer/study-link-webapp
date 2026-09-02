@@ -212,6 +212,21 @@ export class OrderService {
     }
   }
 
+  async reopenDeal(id: string): Promise<Deal> {
+    try {
+      this.telegramStore.hapticFeedback('light')
+
+      const deal = await ordersApi.reopenDeal(id)
+
+      this.telegramStore.showAlert('Сделка снова в работе')
+
+      return this.convertDealToRubles(deal)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при возврате сделки в работу')
+      throw error
+    }
+  }
+
   async cancelDeal(id: string, reason?: string): Promise<Deal> {
     try {
       this.telegramStore.hapticFeedback('medium')

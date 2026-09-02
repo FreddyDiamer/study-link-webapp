@@ -59,8 +59,11 @@ export const ordersApi = {
   // Отклонить сделку
   rejectDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/reject`),
 
-  // Завершить сделку
+  // Подтвердить выполнение со своей стороны
   completeDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/complete`),
+
+  // Работа ещё не готова: снять подтверждение второй стороны
+  reopenDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/reopen`),
 
   // Отменить сделку с причиной — она видна обеим сторонам
   cancelDeal: (id: string, reason?: string) =>

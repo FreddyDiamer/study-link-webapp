@@ -12,7 +12,7 @@ import { DealStatus, type Deal } from '@/shared/types'
 
 const auth = useAuthStore()
 const telegramStore = useTelegramStore()
-const { getDeals, completeDeal, cancelDeal } = useOrder()
+const { getDeals, completeDeal, cancelDeal, reopenDeal } = useOrder()
 const { showToast } = useToast()
 const { refresh: refreshDealsBadge } = useDealsBadge()
 
@@ -95,6 +95,22 @@ const confirm = async (deal: Deal) => {
   }
 }
 
+// работа ещё не готова: снимаем подтверждение второй стороны и останавливаем таймер
+const reopen = async (deal: Deal) => {
+  if (busy.value) return
+  busy.value = true
+  try {
+    await reopenDeal(deal.id)
+    showToast('Сделка снова в работе')
+    await load()
+    await refreshDealsBadge()
+  } catch (e) {
+    console.error('Не удалось вернуть сделку в работу:', e)
+  } finally {
+    busy.value = false
+  }
+}
+
 const askCancel = (deal: Deal) => {
   dealToCancel.value = deal
   cancelSheet.value = true
@@ -148,6 +164,7 @@ onMounted(() => {
             @confirm="confirm"
             @cancel="askCancel"
             @contact="markContacted"
+            @reopen="reopen"
           />
           <DealReviews
             v-if="deal.status === DealStatus.COMPLETED"

@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { addDays, formatDayMonth, formatKopeks } from '@/shared/utils'
+import { formatDayMonth, formatKopeks } from '@/shared/utils'
 import { DealStatus, type Deal } from '@/shared/types'
 import DealChecklist from './DealChecklist.vue'
 import ContactButton from './ContactButton.vue'
 
 export type DealRole = 'customer' | 'worker'
-
-/** Столько ждём вторую сторону, дальше сделка закрывается сама (см. бэкенд). */
-const AUTO_CONFIRM_DAYS = 3
 
 interface Props {
   deal: Deal
@@ -24,6 +21,7 @@ const emit = defineEmits<{
   confirm: [deal: Deal]
   cancel: [deal: Deal]
   contact: [deal: Deal]
+  reopen: [deal: Deal]
 }>()
 
 const isCustomer = computed(() => props.role === 'customer')
@@ -47,8 +45,15 @@ const closedByTimeout = computed(() => isDone.value && !theirConfirmedAt.value)
 const counterparty = computed(() => (isCustomer.value ? props.deal.tutor : props.deal.student))
 const theirName = computed(() => counterparty.value?.name || '—')
 
+// вторая сторона отметилась, я ещё нет — работа могла и не быть готовой
+const theyConfirmedFirst = computed(
+  () => isActive.value && !!theirConfirmedAt.value && !iConfirmed.value,
+)
+
 // до первого сообщения главное — договориться, а не жать подтверждение
-const needsContact = computed(() => isActive.value && !props.contacted && !iConfirmed.value)
+const needsContact = computed(
+  () => isActive.value && !props.contacted && !iConfirmed.value && !theyConfirmedFirst.value,
+)
 
 const statusLabel = computed(() => {
   if (isCancelled.value) return 'Отменена'
@@ -107,10 +112,9 @@ const checklist = computed(() => [
   },
 ])
 
-// срок, после которого сделка закроется без второй стороны
-const autoCloseDate = computed(() =>
-  myConfirmedAt.value ? formatDayMonth(addDays(myConfirmedAt.value, AUTO_CONFIRM_DAYS)) : '',
-)
+// срок авто-закрытия приходит с бэкенда: он учитывает дедлайн сделки,
+// поэтому длинную работу не закроют раньше её собственного срока
+const autoCloseDate = computed(() => formatDayMonth(props.deal.autoConfirmAt))
 
 const cancelledBy = computed(() => {
   if (!props.deal.cancelledById) return ''
@@ -180,8 +184,22 @@ const cancelledBy = computed(() => {
           Всё в порядке — сделка ждёт {{ theirName }}
         </div>
         <div class="text-caption text-d-text-hint">
-          Если ответа не будет три дня, сделка закроется автоматически<span v-if="autoCloseDate">
-            — {{ autoCloseDate }}</span
+          <template v-if="autoCloseDate">
+            Если ответа не будет, сделка закроется автоматически — {{ autoCloseDate }}.
+          </template>
+          <template v-else>Сделка закроется автоматически, если ответа не будет.</template>
+        </div>
+      </div>
+
+      <!-- работа сдана, ждут меня -->
+      <div
+        v-else-if="theyConfirmedFirst"
+        class="mt-4 bg-d-ink border border-d-border rounded-[12px] px-3.5 py-3"
+      >
+        <div class="text-subhead font-semibold mb-1">{{ theirName }} отметил работу сделанной</div>
+        <div class="text-caption text-d-text-hint">
+          Проверьте и подтвердите. Если работа ещё не готова — скажите об этом, сделка вернётся в
+          работу<span v-if="autoCloseDate"> и не закроется {{ autoCloseDate }}</span
           >.
         </div>
       </div>
@@ -228,6 +246,14 @@ const cancelledBy = computed(() => {
         @click="emit('confirm', deal)"
       >
         {{ confirmLabel }}
+      </button>
+      <button
+        v-if="theyConfirmedFirst"
+        class="press w-full h-11 rounded-[13px] bg-d-surface border border-d-border-soft text-subhead font-semibold mb-2.5 disabled:opacity-40"
+        :disabled="busy"
+        @click="emit('reopen', deal)"
+      >
+        Работа ещё не готова
       </button>
       <ContactButton
         class="mb-2.5"
