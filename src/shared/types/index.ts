@@ -16,8 +16,8 @@ export interface User {
   lastActivity: string
   createdAt: string
   updatedAt: string
-  rating: number
-  /** число отзывов; приходит вместе с рейтингом там, где бэкенд его отдаёт */
+  /** рейтинг приходит не во всех выдачах — источник истины в /reviews/reputation */
+  rating?: number
   reviewsCount?: number
 }
 
@@ -158,6 +158,13 @@ export interface Deal {
   price: number // в копейках
   deadline?: string
   status: DealStatus
+  // подтверждение выполнения каждой стороной; сделка закрывается по обоим
+  studentConfirmedAt?: string | null
+  tutorConfirmedAt?: string | null
+  // отмена: кто, когда и почему — видно обеим сторонам
+  cancelledAt?: string | null
+  cancelledById?: string | null
+  cancelReason?: string | null
   serviceResponseId?: string
   requestResponseId?: string
   createdAt: string
@@ -166,6 +173,7 @@ export interface Deal {
   tutor: User
   subject: Subject
   teacher: Teacher
+  reviews?: Review[]
   serviceResponse?: ServiceResponse
   requestResponse?: RequestResponse
   review?: Review
@@ -303,11 +311,22 @@ export interface CreateRequestResponseDto {
 }
 
 export interface CreateReviewDto {
+  // автор, получатель и его роль выводятся на сервере из сделки
   dealId: string
-  targetId: string
-  targetRole: UserRole
   rating: number
   comment?: string
+}
+
+/** Средний рейтинг и число отзывов в одной роли. */
+export interface RoleReputation {
+  rating: number
+  count: number
+}
+
+/** Две репутации пользователя: как исполнителя и как заказчика. */
+export interface Reputation {
+  tutor: RoleReputation
+  student: RoleReputation
 }
 
 // =============================================================================

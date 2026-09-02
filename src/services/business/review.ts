@@ -1,6 +1,6 @@
 import { reviewsApi } from '@/services/api'
 import { useTelegramStore } from '@/stores'
-import type { Review, CreateReviewDto } from '@/shared/types'
+import type { Review, CreateReviewDto, Reputation } from '@/shared/types'
 
 export class ReviewService {
   private get telegramStore() {
@@ -9,9 +9,19 @@ export class ReviewService {
 
   async getUserReviews(userId: string): Promise<Review[]> {
     try {
-      return await reviewsApi.getUserReviews(userId)
+      const response = await reviewsApi.getUserReviews(userId)
+      return response?.items ?? []
     } catch (error) {
       this.handleError(error, 'Ошибка при получении отзывов пользователя')
+      throw error
+    }
+  }
+
+  async getReputation(userId: string): Promise<Reputation> {
+    try {
+      return await reviewsApi.getReputation(userId)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении репутации')
       throw error
     }
   }
@@ -113,9 +123,6 @@ export class ReviewService {
   private validateReviewData(data: CreateReviewDto): void {
     if (!data.dealId) {
       throw new Error('Укажите сделку')
-    }
-    if (!data.targetId) {
-      throw new Error('Укажите пользователя для отзыва')
     }
     if (!data.rating || data.rating < 1 || data.rating > 5) {
       throw new Error('Рейтинг должен быть от 1 до 5')

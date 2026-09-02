@@ -26,7 +26,7 @@ const service = ref<Service | null>(null)
 const reviews = ref<Review[]>([])
 
 const rating = computed(() => service.value?.tutor?.rating ?? 0)
-const reviewsCount = computed(() => reviews.value.length)
+const reviewsCount = computed(() => service.value?.tutor?.reviewsCount ?? reviews.value.length)
 
 // распределение оценок (ширины полос относительно макс. корзины)
 const distribution = computed<number[] | undefined>(() => {

@@ -37,7 +37,7 @@ const stars = computed(() => {
         :class="
           role === 'tutor' ? 'bg-d-accent/[0.16] text-d-accent' : 'bg-d-teal/[0.16] text-d-teal'
         "
-        >{{ role === 'tutor' ? 'исполнитель' : 'заказчик' }}</span
+        >за роль {{ role === 'tutor' ? 'исполнителя' : 'заказчика' }}</span
       >
       <span class="ml-auto text-d-rating text-[12px] tracking-[1px]">{{ stars }}</span>
     </div>

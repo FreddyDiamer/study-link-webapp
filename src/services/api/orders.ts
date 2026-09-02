@@ -62,8 +62,9 @@ export const ordersApi = {
   // Завершить сделку
   completeDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/complete`),
 
-  // Отменить сделку
-  cancelDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/cancel`),
+  // Отменить сделку с причиной — она видна обеим сторонам
+  cancelDeal: (id: string, reason?: string) =>
+    apiClient.patch<Deal>(`/marketplace/deals/${id}/cancel`, reason ? { reason } : {}),
 
   // =============================================================================
   // SERVICE RESPONSES (Отклики студентов на услуги)

@@ -212,11 +212,11 @@ export class OrderService {
     }
   }
 
-  async cancelDeal(id: string): Promise<Deal> {
+  async cancelDeal(id: string, reason?: string): Promise<Deal> {
     try {
       this.telegramStore.hapticFeedback('medium')
 
-      const deal = await ordersApi.cancelDeal(id)
+      const deal = await ordersApi.cancelDeal(id, reason)
 
       this.telegramStore.showAlert('Сделка отменена!')
 

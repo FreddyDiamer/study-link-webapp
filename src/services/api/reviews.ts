@@ -1,9 +1,13 @@
 import { apiClient } from './client'
-import type { Review, CreateReviewDto } from '@/shared/types'
+import type { Review, CreateReviewDto, Reputation } from '@/shared/types'
 
 export const reviewsApi = {
-  // Получить отзывы пользователя
-  getUserReviews: (userId: string) => apiClient.get<Review[]>(`/reviews/user/${userId}`),
+  // Получить отзывы о пользователе (бэкенд отдаёт { items, total })
+  getUserReviews: (userId: string) =>
+    apiClient.get<{ items: Review[]; total: number }>(`/reviews/by-target/${userId}`),
+
+  // Две репутации пользователя: как исполнителя и как заказчика
+  getReputation: (userId: string) => apiClient.get<Reputation>(`/reviews/reputation/${userId}`),
 
   // Получить отзыв по ID
   getReview: (id: string) => apiClient.get<Review>(`/reviews/${id}`),

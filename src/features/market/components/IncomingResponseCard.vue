@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
-import { countWithWord, formatDeadline, formatKopeks } from '@/shared/utils'
+import { RatingChip } from '@/shared/components/ui'
+import { countWithWord, formatDeadline, formatJoined, formatKopeks } from '@/shared/utils'
 import { ResponseStatus, type RequestResponse } from '@/shared/types'
 
 interface Props {
@@ -19,8 +20,18 @@ const isAccepted = computed(() => props.response.status === ResponseStatus.ACCEP
 const isClosed = computed(() => props.decided && !isAccepted.value)
 const isPending = computed(() => !props.decided && props.response.status === ResponseStatus.PENDING)
 
+const tutor = computed(() => props.response.tutor)
+const rating = computed(() => tutor.value?.rating ?? null)
+const hasRating = computed(() => rating.value != null && rating.value > 0)
+
 const reviewsLabel = computed(() =>
-  countWithWord(props.response.tutor?.reviewsCount ?? 0, 'отзыв', 'отзыва', 'отзывов'),
+  countWithWord(tutor.value?.reviewsCount ?? 0, 'отзыв', 'отзыва', 'отзывов'),
+)
+
+// пока репутации нет, доверие держат проверяемые факты о человеке,
+// а не оценка: группа и дата регистрации
+const trustLine = computed(() =>
+  [tutor.value?.group?.number, formatJoined(tutor.value?.createdAt)].filter(Boolean).join(' · '),
 )
 </script>
 
@@ -31,19 +42,20 @@ const reviewsLabel = computed(() =>
     :style="delay ? { animationDelay: delay } : undefined"
   >
     <div class="flex items-center gap-2.5 mb-2.5">
-      <AvatarChip :name="response.tutor?.name" size="md" />
+      <AvatarChip :name="tutor?.name" size="md" />
       <div class="flex-1 min-w-0">
-        <div class="text-subhead font-semibold truncate">
-          {{ response.tutor?.name || 'Репетитор' }}
-        </div>
-        <div class="flex items-center gap-1 mt-0.5">
+        <div class="text-subhead font-semibold truncate">{{ tutor?.name || 'Репетитор' }}</div>
+
+        <div v-if="hasRating" class="flex items-center gap-1 mt-0.5">
           <span class="text-d-rating text-[11px]">★</span>
-          <span class="text-[12px] font-bold text-d-rating tnum">
-            {{ (response.tutor?.rating ?? 0).toFixed(1) }}
-          </span>
+          <span class="text-[12px] font-bold text-d-rating tnum">{{ rating!.toFixed(1) }}</span>
           <span class="text-[11px] text-d-text-hint">· {{ reviewsLabel }}</span>
         </div>
+        <div v-else-if="trustLine" class="text-[11px] text-d-text-hint mt-0.5">
+          {{ trustLine }}
+        </div>
       </div>
+
       <span
         v-if="isAccepted"
         class="shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full bg-d-teal/[0.16] text-d-teal animate-d-pop"
@@ -54,6 +66,7 @@ const reviewsLabel = computed(() =>
         class="shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full bg-d-text-mute/20 text-d-text-second"
         >Закрыт</span
       >
+      <RatingChip v-else-if="!hasRating" class="shrink-0" :rating="null" />
     </div>
 
     <p v-if="response.message" class="text-subhead text-d-text-second mb-3">

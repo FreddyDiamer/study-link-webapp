@@ -13,6 +13,8 @@ import ServiceCard from '../components/ServiceCard.vue'
 import RequestCard from '../components/RequestCard.vue'
 import CardSkeleton from '../components/CardSkeleton.vue'
 import EmptyFeed from '../components/EmptyFeed.vue'
+import EmptyMarket from '../components/EmptyMarket.vue'
+import FeedEnd from '../components/FeedEnd.vue'
 import CreateIntentSheet from '../components/CreateIntentSheet.vue'
 import type { Request, Service } from '@/shared/types'
 
@@ -67,6 +69,18 @@ const isEmpty = computed(() =>
   isRequests.value ? !visibleRequests.value.length : !visibleServices.value.length,
 )
 const isFiltered = computed(() => !!subjectId.value || !!query.value.trim())
+
+// короткая лента без фильтра — это не «мало результатов», а ранний продукт:
+// её нужно закрыть смыслом, а не оборвать
+const visibleCount = computed(() =>
+  isRequests.value ? visibleRequests.value.length : visibleServices.value.length,
+)
+const showFeedEnd = computed(
+  () => !isFiltered.value && visibleCount.value > 0 && visibleCount.value <= 3,
+)
+const feedEndLabel = computed(() =>
+  isRequests.value ? 'Это все заявки на сегодня' : 'Это все услуги на сегодня',
+)
 
 const headerSub = computed(() => (isRequests.value ? 'Кому нужна помощь' : 'Кто предлагает помощь'))
 const feedHint = computed(() =>
@@ -145,11 +159,32 @@ onMounted(load)
         <CardSkeleton v-for="n in 4" :key="n" />
       </template>
 
+      <!-- фильтр ничего не нашёл -->
       <EmptyFeed
-        v-else-if="isEmpty"
+        v-else-if="isEmpty && isFiltered"
         :title="emptyTitle"
-        :filtered="isFiltered"
+        filtered
         @reset="resetFilter"
+      />
+
+      <!-- на платформе пока никого: зовём на другую сторону сделки -->
+      <EmptyMarket
+        v-else-if="isEmpty && isRequests"
+        title="Заявок пока никто не опубликовал"
+        text="Вы можете быть первым: заявку увидят все репетиторы по вашему предмету."
+        primary-label="Создать заявку"
+        secondary-label="Смотреть услуги"
+        @primary="router.push(PATHS.REQUEST_CREATE)"
+        @secondary="segment = 'services'"
+      />
+      <EmptyMarket
+        v-else-if="isEmpty"
+        title="Услуг пока никто не опубликовал"
+        text="Вы можете быть первым: услуга встанет в начало ленты и её увидят все, кто ищет помощь по вашему предмету."
+        primary-label="Предложить услугу"
+        secondary-label="Смотреть заявки"
+        @primary="router.push(PATHS.SERVICE_CREATE)"
+        @secondary="segment = 'requests'"
       />
 
       <template v-else-if="isRequests">
@@ -172,6 +207,12 @@ onMounted(load)
           @click="openService(s.id)"
         />
       </template>
+
+      <FeedEnd
+        v-if="showFeedEnd"
+        :label="feedEndLabel"
+        @create-service="router.push(PATHS.SERVICE_CREATE)"
+      />
     </div>
 
     <CreateIntentSheet

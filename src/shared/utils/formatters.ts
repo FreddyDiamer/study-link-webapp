@@ -93,3 +93,25 @@ export const formatDeadline = (date?: string | Date | null, prefix = 'до'): st
   )
   return prefix ? `${prefix} ${formatted}` : formatted
 }
+
+/** Дата без года: «24 июня». Используется в чек-листах и отзывах. */
+export const formatDayMonth = (date?: string | Date | null): string => {
+  if (!date) return ''
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  if (Number.isNaN(dateObj.getTime())) return ''
+  return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' }).format(dateObj)
+}
+
+/** «с 2 июня» — на новом профиле это одна из немногих проверяемых опор доверия. */
+export const formatJoined = (date?: string | Date | null): string => {
+  const formatted = formatDayMonth(date)
+  return formatted ? `с ${formatted}` : ''
+}
+
+/** Прибавляет дни к дате — срок авто-закрытия сделки. */
+export const addDays = (date: string | Date, days: number): Date => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  const result = new Date(dateObj)
+  result.setDate(result.getDate() + days)
+  return result
+}

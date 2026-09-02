@@ -156,9 +156,9 @@ export const useOrder = () => {
     }
   }
 
-  const cancelDeal = async (dealId: string) => {
+  const cancelDeal = async (dealId: string, reason?: string) => {
     try {
-      const response = await orderService.cancelDeal(dealId)
+      const response = await orderService.cancelDeal(dealId, reason)
       return response
     } catch (error) {
       console.error('Ошибка отмены сделки:', error)

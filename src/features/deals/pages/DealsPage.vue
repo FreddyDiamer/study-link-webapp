@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useDealsBadge, useOrder, useToast } from '@/shared/composables'
-import { reviewService } from '@/services/business'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { SegmentControl } from '@/shared/components/ui'
 import DealCard, { type DealRole } from '../components/DealCard.vue'
-import ReviewForm from '../components/ReviewForm.vue'
+import DealReviews from '../components/DealReviews.vue'
+import CancelSheet from '../components/CancelSheet.vue'
 import { DealStatus, type Deal } from '@/shared/types'
 
 const auth = useAuthStore()
 const telegramStore = useTelegramStore()
-const { getDeals, acceptDeal, updateDeal, completeDeal, cancelDeal } = useOrder()
+const { getDeals, completeDeal, cancelDeal } = useOrder()
 const { showToast } = useToast()
 const { refresh: refreshDealsBadge } = useDealsBadge()
 
@@ -21,12 +21,17 @@ const ROLES = [
   { id: 'worker', label: 'Я исполнитель' },
 ] as const
 
+const CONTACTED_KEY = 'sl:contacted-deals'
+
 const role = ref<DealRole>('customer')
-const loading = ref(true)
+const loading = ref(false)
 const busy = ref(false)
 const deals = ref<Deal[]>([])
-// рейтинг уже оставленного мной отзыва, по id сделки
-const myRatings = ref<Record<string, number>>({})
+const cancelSheet = ref(false)
+const dealToCancel = ref<Deal | null>(null)
+// сделки, по которым уже открывали переписку: после этого главным становится
+// подтверждение, а не кнопка «Написать»
+const contacted = ref<string[]>([])
 
 // роль в сделке определяется самой сделкой, а не режимом человека
 const visibleDeals = computed(() =>
@@ -35,14 +40,22 @@ const visibleDeals = computed(() =>
   ),
 )
 
-const loadMyReview = async (deal: Deal) => {
-  if (deal.status !== DealStatus.COMPLETED) return
+const readContacted = () => {
   try {
-    const reviews = await reviewService.getDealReviews(deal.id)
-    const mine = reviews.find((r) => r.authorId === auth.user?.id)
-    if (mine) myRatings.value[deal.id] = mine.rating
-  } catch (e) {
-    console.error('Не удалось загрузить отзыв по сделке:', e)
+    const raw = localStorage.getItem(CONTACTED_KEY)
+    contacted.value = raw ? (JSON.parse(raw) as string[]) : []
+  } catch {
+    contacted.value = []
+  }
+}
+
+const markContacted = (deal: Deal) => {
+  if (contacted.value.includes(deal.id)) return
+  contacted.value = [...contacted.value, deal.id]
+  try {
+    localStorage.setItem(CONTACTED_KEY, JSON.stringify(contacted.value))
+  } catch {
+    // приватный режим — потеряем только приоритет кнопок
   }
 }
 
@@ -51,8 +64,6 @@ const load = async () => {
   try {
     const res = await getDeals()
     deals.value = res?.items ?? []
-    myRatings.value = {}
-    await Promise.all(deals.value.map(loadMyReview))
   } catch (e) {
     console.error('Не удалось загрузить сделки:', e)
   } finally {
@@ -61,34 +72,41 @@ const load = async () => {
 }
 
 /**
- * В макете статуса три, на бэкенде пять: одна кнопка проводит сделку
- * через промежуточные переходы до «Завершена».
+ * Подтверждение со своей стороны. Сделку закрывает бэкенд, когда отметились обе:
+ * в одиночку рейтинг себе не нарисуешь.
  */
-const complete = async (deal: Deal) => {
+const confirm = async (deal: Deal) => {
   if (busy.value) return
   busy.value = true
   telegramStore.hapticFeedback('medium')
   try {
-    if (deal.status === DealStatus.PENDING) await acceptDeal(deal.id)
-    if (deal.status === DealStatus.PENDING || deal.status === DealStatus.ACCEPTED) {
-      await updateDeal(deal.id, { status: DealStatus.IN_PROGRESS })
-    }
-    await completeDeal(deal.id)
-    showToast('Сделка завершена')
+    const updated = await completeDeal(deal.id)
+    showToast(
+      updated?.status === DealStatus.COMPLETED
+        ? 'Сделка завершена'
+        : 'Ждём подтверждения второй стороны',
+    )
     await load()
     await refreshDealsBadge()
   } catch (e) {
-    console.error('Не удалось завершить сделку:', e)
+    console.error('Не удалось подтвердить выполнение:', e)
   } finally {
     busy.value = false
   }
 }
 
-const cancel = async (deal: Deal) => {
-  if (busy.value) return
+const askCancel = (deal: Deal) => {
+  dealToCancel.value = deal
+  cancelSheet.value = true
+}
+
+const cancel = async (reason: string) => {
+  const deal = dealToCancel.value
+  dealToCancel.value = null
+  if (!deal || busy.value) return
   busy.value = true
   try {
-    await cancelDeal(deal.id)
+    await cancelDeal(deal.id, reason)
     showToast('Сделка отменена')
     await load()
     await refreshDealsBadge()
@@ -99,11 +117,10 @@ const cancel = async (deal: Deal) => {
   }
 }
 
-const onReviewed = async () => {
-  await load()
-}
-
-onMounted(load)
+onMounted(() => {
+  readContacted()
+  load()
+})
 </script>
 
 <template>
@@ -123,14 +140,21 @@ onMounted(load)
 
       <template v-else>
         <div v-for="deal in visibleDeals" :key="deal.id">
-          <DealCard :deal="deal" :role="role" :busy="busy" @complete="complete" @cancel="cancel" />
-          <ReviewForm
+          <DealCard
+            :deal="deal"
+            :role="role"
+            :busy="busy"
+            :contacted="contacted.includes(deal.id)"
+            @confirm="confirm"
+            @cancel="askCancel"
+            @contact="markContacted"
+          />
+          <DealReviews
             v-if="deal.status === DealStatus.COMPLETED"
             class="mb-3.5"
             :deal="deal"
             :role="role"
-            :existing-rating="myRatings[deal.id]"
-            @submitted="onReviewed"
+            @submitted="load"
           />
         </div>
 
@@ -139,5 +163,7 @@ onMounted(load)
         </p>
       </template>
     </div>
+
+    <CancelSheet v-model="cancelSheet" @pick="cancel" />
   </div>
 </template>

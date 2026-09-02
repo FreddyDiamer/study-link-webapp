@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
+import { RatingChip } from '@/shared/components/ui'
 import { countWithWord, formatKopeks } from '@/shared/utils'
 import type { Service } from '@/shared/types'
 
@@ -11,9 +12,13 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const reviewsLabel = computed(() =>
-  countWithWord(props.service.tutor?.reviewsCount ?? 0, 'отзыв', 'отзыва', 'отзывов'),
-)
+const rating = computed(() => props.service.tutor?.rating ?? null)
+
+// пока оценок нет, строка отзывов должна называть это словами, а не нулём
+const reviewsLabel = computed(() => {
+  const count = props.service.tutor?.reviewsCount ?? 0
+  return count > 0 ? countWithWord(count, 'отзыв', 'отзыва', 'отзывов') : 'Оценок пока нет'
+})
 </script>
 
 <template>
@@ -24,12 +29,7 @@ const reviewsLabel = computed(() =>
     <div class="flex items-center gap-2.5 mb-3">
       <AvatarChip :name="service.tutor?.name" size="md" />
       <span class="text-caption font-semibold">{{ service.tutor?.name || 'Репетитор' }}</span>
-      <span class="ml-auto flex items-center gap-1.5 bg-d-rating/[0.12] px-2.5 py-1 rounded-full">
-        <span class="text-d-rating text-[12px]">★</span>
-        <span class="text-[12px] font-bold text-d-rating tnum">
-          {{ (service.tutor?.rating ?? 0).toFixed(1) }}
-        </span>
-      </span>
+      <RatingChip class="ml-auto" :rating="rating" />
     </div>
 
     <h3 class="text-title-m mb-1.5">
