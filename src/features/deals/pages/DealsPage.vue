@@ -4,7 +4,7 @@ import { useDealsBadge, useOrder, useToast } from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
-import { SegmentControl } from '@/shared/components/ui'
+import { LoadError, SegmentControl } from '@/shared/components/ui'
 import DealCard, { type DealRole } from '../components/DealCard.vue'
 import DealReviews from '../components/DealReviews.vue'
 import CancelSheet from '../components/CancelSheet.vue'
@@ -25,6 +25,7 @@ const CONTACTED_KEY = 'sl:contacted-deals'
 
 const role = ref<DealRole>('customer')
 const loading = ref(false)
+const failed = ref(false)
 const busy = ref(false)
 const deals = ref<Deal[]>([])
 const cancelSheet = ref(false)
@@ -64,8 +65,10 @@ const load = async () => {
   try {
     const res = await getDeals()
     deals.value = res?.items ?? []
+    failed.value = false
   } catch (e) {
     console.error('Не удалось загрузить сделки:', e)
+    failed.value = true
   } finally {
     loading.value = false
   }
@@ -156,6 +159,15 @@ onMounted(() => {
               class="w-6 h-6 rounded-full border-2 border-d-border-soft border-t-d-accent animate-d-spin"
             />
           </div>
+
+          <LoadError
+            v-else-if="failed && !deals.length"
+            compact
+            title="Сделки не загрузились"
+            text="Статусы и подтверждения сохранены на сервере, ничего не потеряно."
+            :loading="loading"
+            @retry="load"
+          />
 
           <!-- при обновлении оставляем список на месте: мигание списком читается как сбой -->
           <template v-else>

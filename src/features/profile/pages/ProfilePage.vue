@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 import ReviewItem from '@/shared/components/ReviewItem.vue'
+import { LoadError } from '@/shared/components/ui'
 import ReputationPair from '../components/ReputationPair.vue'
 import GroupSheet from '../components/GroupSheet.vue'
 import MyResponsesBlock from '../components/MyResponsesBlock.vue'
@@ -34,6 +35,8 @@ const loading = ref(true)
 const groupSheet = ref(false)
 const profile = ref<User | null>(null)
 const reviews = ref<Review[]>([])
+// имя и username есть локально — сбой отбирает только репутацию
+const reputationFailed = ref(false)
 const myRequests = ref<Request[]>([])
 const myServices = ref<Service[]>([])
 // две репутации: за работу исполнителем и за поведение заказчиком, считает бэкенд
@@ -50,12 +53,18 @@ const load = async () => {
     const me = await userService.getProfile()
     profile.value = me
     if (me?.id) {
-      const [userReviews, userReputation] = await Promise.all([
-        reviewService.getUserReviews(me.id),
-        reviewService.getReputation(me.id),
-      ])
-      reviews.value = userReviews
-      reputation.value = userReputation
+      try {
+        const [userReviews, userReputation] = await Promise.all([
+          reviewService.getUserReviews(me.id),
+          reviewService.getReputation(me.id),
+        ])
+        reviews.value = userReviews
+        reputation.value = userReputation
+        reputationFailed.value = false
+      } catch (e) {
+        console.error('Не удалось загрузить репутацию:', e)
+        reputationFailed.value = true
+      }
     }
     const [requests, services] = await Promise.all([
       getMyRequests(),
@@ -170,7 +179,17 @@ onMounted(load)
         </button>
       </div>
 
+      <LoadError
+        v-if="reputationFailed"
+        compact
+        class="bg-d-panel border border-d-border rounded-sheet mb-3.5"
+        title="Рейтинг и отзывы не загрузились"
+        text="Это сбой связи, а не сброс репутации."
+        @retry="load"
+      />
+
       <ReputationPair
+        v-else
         class="reveal mb-3.5"
         style="animation-delay: 0.07s"
         :tutor="reputation.tutor"

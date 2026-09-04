@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useOrder, useService } from '@/shared/composables'
+import { usePullToRefresh, useOrder, useService } from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS, requestDetailPath, serviceDetailPath } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
-import { SegmentControl } from '@/shared/components/ui'
+import { LoadError, SegmentControl } from '@/shared/components/ui'
 import SearchField from '../components/SearchField.vue'
 import SubjectChips from '../components/SubjectChips.vue'
 import ServiceCard from '../components/ServiceCard.vue'
@@ -37,6 +37,10 @@ const segment = ref<MarketSeg>('requests')
 const subjectId = ref('')
 const query = ref('')
 const loading = ref(true)
+// пустота и сбой должны выглядеть по-разному: у пустоты «создать», у сбоя «повторить»
+const failed = ref(false)
+const errorCode = ref<number | string | undefined>()
+const lastTry = ref('')
 const intentSheet = ref(false)
 const services = ref<Service[]>([])
 const requests = ref<Request[]>([])
@@ -105,12 +109,22 @@ const load = async () => {
     const [svc, req] = await Promise.all([getActiveServices(), getRequests()])
     services.value = svc?.items ?? []
     requests.value = req?.items ?? []
+    failed.value = false
   } catch (e) {
     console.error('Не удалось загрузить ленту:', e)
+    failed.value = true
+    errorCode.value = (e as { response?: { status?: number } })?.response?.status
+    lastTry.value = new Date().toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
   } finally {
     loading.value = false
   }
 }
+
+const scroller = ref<HTMLElement | null>(null)
+const { pull, refreshing, bind } = usePullToRefresh(scroller, load)
 
 const isMine = (request: Request) => request.studentId === auth.user?.id
 
@@ -154,13 +168,47 @@ onMounted(load)
       <SubjectChips v-model="subjectId" />
     </div>
 
-    <div class="relative flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px]">
+    <div
+      ref="scroller"
+      class="relative flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px]"
+      v-bind="bind()"
+    >
+      <!-- потянули вниз: старые карточки остаются на месте и притухают -->
+      <div
+        class="flex items-center justify-center gap-2 overflow-hidden transition-[height] duration-200"
+        :style="{ height: `${pull}px` }"
+      >
+        <span
+          v-if="pull > 0"
+          class="w-4 h-4 rounded-full border-2 border-d-border-soft border-t-d-accent"
+          :class="refreshing ? 'animate-d-spin' : ''"
+        />
+        <span v-if="pull > 24" class="text-caption text-d-text-hint">
+          {{ refreshing ? 'Обновляем ленту' : 'Отпустите, чтобы обновить' }}
+        </span>
+      </div>
+
       <!-- контент догоняет едущую пилюлю сегмента, а не подменяется рывком -->
       <Transition name="swap" mode="out-in">
-        <div :key="`${segment}-${loading}`" class="flex flex-col gap-3">
-          <template v-if="loading">
+        <div
+          :key="`${segment}-${loading}-${failed}`"
+          class="flex flex-col gap-3 transition-opacity"
+          :class="refreshing ? 'opacity-60' : ''"
+        >
+          <template v-if="loading && !refreshing">
             <CardSkeleton v-for="n in 4" :key="n" />
           </template>
+
+          <!-- сбой: не пустота. знак «!», текст «заявки на месте», действие «Повторить» -->
+          <LoadError
+            v-else-if="failed"
+            title="Не получилось загрузить ленту"
+            text="Заявки на месте — до них не дошёл ответ сервера. Проверьте соединение и попробуйте ещё раз."
+            :code="errorCode"
+            :at="lastTry"
+            :loading="loading"
+            @retry="load"
+          />
 
           <!-- фильтр ничего не нашёл -->
           <EmptyFeed
