@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { BottomSheet } from '@/shared/components/ui'
+import { useTelegramStore } from '@/stores/telegram'
 import { useEducation } from '@/shared/composables'
 
 interface Props {
@@ -9,11 +10,14 @@ interface Props {
 defineProps<Props>()
 
 const open = defineModel<boolean>({ required: true })
+
+const telegramStore = useTelegramStore()
 const emit = defineEmits<{ pick: [groupId: string] }>()
 
 const { groups } = useEducation()
 
 const pick = (groupId: string) => {
+  telegramStore.hapticFeedback('light')
   open.value = false
   emit('pick', groupId)
 }

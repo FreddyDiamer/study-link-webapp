@@ -169,6 +169,35 @@
     transform: scale(0.975);
   }
 
+  /* переход между экранами: короткий и по направлению движения */
+  .route-enter-active,
+  .route-leave-active {
+    transition:
+      opacity 0.16s ease,
+      transform 0.16s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .route-enter-from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .route-leave-to {
+    opacity: 0;
+  }
+
+  /* смена сегмента: контент догоняет едущую пилюлю, а не подменяется рывком */
+  .swap-enter-active,
+  .swap-leave-active {
+    transition: opacity 0.14s ease;
+  }
+  .swap-enter-from,
+  .swap-leave-to {
+    opacity: 0;
+  }
+  .swap-leave-active {
+    position: absolute;
+    inset: 0;
+  }
+
   /* скелетон-плашка: бегущий блик */
   .skeleton {
     background: linear-gradient(
@@ -188,5 +217,18 @@
 
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Уважаем системную настройку: движение гасим, состояния оставляем.
+   Без этого экран прыгает у тех, кто анимации выключил намеренно. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

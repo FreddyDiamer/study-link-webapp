@@ -148,37 +148,42 @@ onMounted(() => {
     </div>
 
     <div class="flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px]">
-      <div v-if="loading" class="flex items-center justify-center py-16">
-        <span
-          class="w-6 h-6 rounded-full border-2 border-d-border-soft border-t-d-accent animate-d-spin"
-        />
-      </div>
+      <!-- смена роли: список догоняет пилюлю сегмента -->
+      <Transition name="swap" mode="out-in">
+        <div :key="`${role}-${loading}`">
+          <div v-if="loading" class="flex items-center justify-center py-16">
+            <span
+              class="w-6 h-6 rounded-full border-2 border-d-border-soft border-t-d-accent animate-d-spin"
+            />
+          </div>
 
-      <template v-else>
-        <div v-for="deal in visibleDeals" :key="deal.id">
-          <DealCard
-            :deal="deal"
-            :role="role"
-            :busy="busy"
-            :contacted="contacted.includes(deal.id)"
-            @confirm="confirm"
-            @cancel="askCancel"
-            @contact="markContacted"
-            @reopen="reopen"
-          />
-          <DealReviews
-            v-if="deal.status === DealStatus.COMPLETED"
-            class="mb-3.5"
-            :deal="deal"
-            :role="role"
-            @submitted="load"
-          />
+          <template v-else>
+            <div v-for="deal in visibleDeals" :key="deal.id">
+              <DealCard
+                :deal="deal"
+                :role="role"
+                :busy="busy"
+                :contacted="contacted.includes(deal.id)"
+                @confirm="confirm"
+                @cancel="askCancel"
+                @contact="markContacted"
+                @reopen="reopen"
+              />
+              <DealReviews
+                v-if="deal.status === DealStatus.COMPLETED"
+                class="mb-3.5"
+                :deal="deal"
+                :role="role"
+                @submitted="load"
+              />
+            </div>
+
+            <p v-if="!visibleDeals.length" class="text-center text-d-text-hint text-subhead py-10">
+              {{ role === 'customer' ? 'Вы ещё не заказывали занятий' : 'У вас пока нет заказов' }}
+            </p>
+          </template>
         </div>
-
-        <p v-if="!visibleDeals.length" class="text-center text-d-text-hint text-subhead py-10">
-          {{ role === 'customer' ? 'Вы ещё не заказывали занятий' : 'У вас пока нет заказов' }}
-        </p>
-      </template>
+      </Transition>
     </div>
 
     <CancelSheet v-model="cancelSheet" @pick="cancel" />

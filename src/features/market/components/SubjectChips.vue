@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useEducation } from '@/shared/composables'
+import { useTelegramStore } from '@/stores/telegram'
 
 /** '' — «Все»; иначе id предмета */
 const model = defineModel<string>({ required: true })
 
 const { activeSubjects } = useEducation()
+const telegramStore = useTelegramStore()
+
+const pick = (id: string) => {
+  if (model.value === id) return
+  telegramStore.hapticFeedback('light')
+  model.value = id
+}
 
 const chips = computed(() => [
   { id: '', name: 'Все' },
@@ -20,7 +28,7 @@ const chips = computed(() => [
       :key="chip.id || 'all'"
       class="press shrink-0 px-3.5 py-2 rounded-full text-caption font-semibold whitespace-nowrap transition-colors duration-200"
       :class="model === chip.id ? 'bg-d-accent text-d-ink' : 'bg-d-panel text-d-text-second'"
-      @click="model = chip.id"
+      @click="pick(chip.id)"
     >
       {{ chip.name }}
     </button>

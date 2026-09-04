@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { BottomSheet } from '@/shared/components/ui'
+import { useTelegramStore } from '@/stores/telegram'
 
 const open = defineModel<boolean>({ required: true })
+
+const telegramStore = useTelegramStore()
 const emit = defineEmits<{ request: []; service: [] }>()
 
 const pick = (intent: 'request' | 'service') => {
+  telegramStore.hapticFeedback('light')
   open.value = false
   if (intent === 'request') emit('request')
   else emit('service')

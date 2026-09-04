@@ -154,65 +154,70 @@ onMounted(load)
       <SubjectChips v-model="subjectId" />
     </div>
 
-    <div class="flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px] flex flex-col gap-3">
-      <template v-if="loading">
-        <CardSkeleton v-for="n in 4" :key="n" />
-      </template>
+    <div class="relative flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px]">
+      <!-- контент догоняет едущую пилюлю сегмента, а не подменяется рывком -->
+      <Transition name="swap" mode="out-in">
+        <div :key="`${segment}-${loading}`" class="flex flex-col gap-3">
+          <template v-if="loading">
+            <CardSkeleton v-for="n in 4" :key="n" />
+          </template>
 
-      <!-- фильтр ничего не нашёл -->
-      <EmptyFeed
-        v-else-if="isEmpty && isFiltered"
-        :title="emptyTitle"
-        filtered
-        @reset="resetFilter"
-      />
+          <!-- фильтр ничего не нашёл -->
+          <EmptyFeed
+            v-else-if="isEmpty && isFiltered"
+            :title="emptyTitle"
+            filtered
+            @reset="resetFilter"
+          />
 
-      <!-- на платформе пока никого: зовём на другую сторону сделки -->
-      <EmptyMarket
-        v-else-if="isEmpty && isRequests"
-        title="Заявок пока никто не опубликовал"
-        text="Вы можете быть первым: заявку увидят все репетиторы по вашему предмету."
-        primary-label="Создать заявку"
-        secondary-label="Смотреть услуги"
-        @primary="router.push(PATHS.REQUEST_CREATE)"
-        @secondary="segment = 'services'"
-      />
-      <EmptyMarket
-        v-else-if="isEmpty"
-        title="Услуг пока никто не опубликовал"
-        text="Вы можете быть первым: услуга встанет в начало ленты и её увидят все, кто ищет помощь по вашему предмету."
-        primary-label="Предложить услугу"
-        secondary-label="Смотреть заявки"
-        @primary="router.push(PATHS.SERVICE_CREATE)"
-        @secondary="segment = 'requests'"
-      />
+          <!-- на платформе пока никого: зовём на другую сторону сделки -->
+          <EmptyMarket
+            v-else-if="isEmpty && isRequests"
+            title="Заявок пока никто не опубликовал"
+            text="Вы можете быть первым: заявку увидят все репетиторы по вашему предмету."
+            primary-label="Создать заявку"
+            secondary-label="Смотреть услуги"
+            @primary="router.push(PATHS.REQUEST_CREATE)"
+            @secondary="segment = 'services'"
+          />
+          <EmptyMarket
+            v-else-if="isEmpty"
+            title="Услуг пока никто не опубликовал"
+            text="Вы можете быть первым: услуга встанет в начало ленты и её увидят все, кто ищет помощь по вашему предмету."
+            primary-label="Предложить услугу"
+            secondary-label="Смотреть заявки"
+            @primary="router.push(PATHS.SERVICE_CREATE)"
+            @secondary="segment = 'requests'"
+          />
 
-      <template v-else-if="isRequests">
-        <RequestCard
-          v-for="(q, i) in visibleRequests"
-          :key="q.id"
-          :request="q"
-          :mine="isMine(q)"
-          :delay="delay(i)"
-          @click="openRequest(q.id)"
-        />
-      </template>
+          <template v-else-if="isRequests">
+            <RequestCard
+              v-for="(q, i) in visibleRequests"
+              :key="q.id"
+              :request="q"
+              :mine="isMine(q)"
+              :delay="delay(i)"
+              @click="openRequest(q.id)"
+            />
+          </template>
 
-      <template v-else>
-        <ServiceCard
-          v-for="(s, i) in visibleServices"
-          :key="s.id"
-          :service="s"
-          :delay="delay(i)"
-          @click="openService(s.id)"
-        />
-      </template>
+          <template v-else>
+            <ServiceCard
+              v-for="(s, i) in visibleServices"
+              :key="s.id"
+              :service="s"
+              :delay="delay(i)"
+              @click="openService(s.id)"
+            />
+          </template>
 
-      <FeedEnd
-        v-if="showFeedEnd"
-        :label="feedEndLabel"
-        @create-service="router.push(PATHS.SERVICE_CREATE)"
-      />
+          <FeedEnd
+            v-if="showFeedEnd"
+            :label="feedEndLabel"
+            @create-service="router.push(PATHS.SERVICE_CREATE)"
+          />
+        </div>
+      </Transition>
     </div>
 
     <CreateIntentSheet

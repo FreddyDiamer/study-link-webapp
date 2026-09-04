@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { BottomSheet } from '@/shared/components/ui'
+import { useTelegramStore } from '@/stores/telegram'
 
 const open = defineModel<boolean>({ required: true })
+
+const telegramStore = useTelegramStore()
 const emit = defineEmits<{ pick: [reason: string] }>()
 
 // причину видит вторая сторона, поэтому формулировки нейтральные
@@ -13,6 +16,7 @@ const REASONS = [
 ]
 
 const pick = (reason: string) => {
+  telegramStore.hapticFeedback('medium')
   open.value = false
   emit('pick', reason)
 }

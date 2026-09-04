@@ -57,7 +57,11 @@ onMounted(initializeApp)
       </div>
 
       <!-- приложение -->
-      <RouterView v-else-if="isAuthed" />
+      <RouterView v-else-if="isAuthed" v-slot="{ Component: Page }">
+        <Transition name="route" mode="out-in">
+          <component :is="Page" />
+        </Transition>
+      </RouterView>
 
       <!-- веб-вход (только дев-окружение) -->
       <DevLogin v-else-if="isDev" @authed="onDevAuthed" />

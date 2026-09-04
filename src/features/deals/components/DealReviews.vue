@@ -37,6 +37,13 @@ const stars = (value: number) => '★★★★★'.slice(0, value) + '☆☆☆�
 // свой отзыв не ждёт чужого, но молчание второй стороны нужно назвать
 const myRoleWord = computed(() => (isCustomer.value ? 'заказчика' : 'исполнителя'))
 
+// оценка ставится мгновенно — вибро здесь заменяет отсутствующий «щелчок»
+const setRating = (value: number) => {
+  if (rating.value === value) return
+  telegramStore.hapticFeedback('light')
+  rating.value = value
+}
+
 const submit = async () => {
   if (!rating.value || submitting.value) return
   submitting.value = true
@@ -68,10 +75,10 @@ const submit = async () => {
       <button
         v-for="n in 5"
         :key="n"
-        class="press text-[34px] leading-none transition-colors duration-200"
-        :class="n <= rating ? 'text-d-rating' : 'text-d-border-soft'"
+        class="text-[34px] leading-none transition-[color,transform] duration-200 ease-d-pop active:scale-90"
+        :class="n <= rating ? 'text-d-rating scale-105' : 'text-d-border-soft'"
         :aria-label="`Оценка ${n}`"
-        @click="rating = n"
+        @click="setRating(n)"
       >
         ★
       </button>
