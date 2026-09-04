@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { requestDetailPath } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
-import { DateField, MoneyInput } from '@/shared/components/ui'
+import { ActionButton, DateField, MoneyInput } from '@/shared/components/ui'
 import { formatKopeks } from '@/shared/utils'
 import type { Request } from '@/shared/types'
 
@@ -100,13 +100,7 @@ onMounted(async () => {
     <div
       class="shrink-0 px-[18px] pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] bg-d-ink border-t border-d-border"
     >
-      <button
-        class="press w-full h-[52px] rounded-[13px] bg-d-accent text-d-ink text-body font-bold disabled:opacity-40"
-        :disabled="submitting"
-        @click="submit"
-      >
-        Отправить отклик
-      </button>
+      <ActionButton :loading="submitting" @click="submit">Отправить отклик</ActionButton>
     </div>
   </div>
 </template>

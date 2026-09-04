@@ -6,6 +6,7 @@ import { useEducationStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
+import { ActionButton } from '@/shared/components/ui'
 
 const router = useRouter()
 const edu = useEducationStore()
@@ -142,13 +143,9 @@ onMounted(() => {
     <div
       class="shrink-0 px-[18px] pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] bg-d-ink border-t border-d-border"
     >
-      <button
-        class="press w-full h-[52px] rounded-[13px] bg-d-accent text-d-ink text-body font-bold disabled:opacity-40"
-        :disabled="!canSubmit"
-        @click="submit"
-      >
+      <ActionButton :loading="submitting" :disabled="!canSubmit" @click="submit">
         Опубликовать услугу
-      </button>
+      </ActionButton>
     </div>
   </div>
 </template>

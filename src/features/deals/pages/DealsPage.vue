@@ -150,13 +150,14 @@ onMounted(() => {
     <div class="flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px]">
       <!-- смена роли: список догоняет пилюлю сегмента -->
       <Transition name="swap" mode="out-in">
-        <div :key="`${role}-${loading}`">
-          <div v-if="loading" class="flex items-center justify-center py-16">
+        <div :key="role">
+          <div v-if="loading && !deals.length" class="flex items-center justify-center py-16">
             <span
               class="w-6 h-6 rounded-full border-2 border-d-border-soft border-t-d-accent animate-d-spin"
             />
           </div>
 
+          <!-- при обновлении оставляем список на месте: мигание списком читается как сбой -->
           <template v-else>
             <div v-for="deal in visibleDeals" :key="deal.id">
               <DealCard

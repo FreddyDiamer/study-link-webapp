@@ -98,7 +98,7 @@ onMounted(refresh)
 
       <span
         v-if="tab.id === 'deals' && activeCount > 0"
-        class="absolute top-1 right-[22px] min-w-[18px] h-[18px] px-1.5 rounded-full bg-d-coral text-white text-[10px] font-bold flex items-center justify-center"
+        class="absolute top-1 right-[22px] min-w-[18px] h-[18px] px-1.5 rounded-full bg-d-coral text-white text-[10px] font-bold flex items-center justify-center animate-d-pop"
       >
         {{ activeCount }}
       </span>

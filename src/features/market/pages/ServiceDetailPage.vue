@@ -6,6 +6,7 @@ import { reviewService } from '@/services/business'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
+import { ActionButton } from '@/shared/components/ui'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 import ReputationHero from '../components/ReputationHero.vue'
 import { formatKopeks } from '@/shared/utils'
@@ -137,14 +138,7 @@ onMounted(load)
         >
           ✓ Заявка отправлена
         </div>
-        <button
-          v-else
-          class="press w-full h-[52px] rounded-[13px] bg-d-accent text-d-ink text-body font-bold disabled:opacity-40"
-          :disabled="booking"
-          @click="book"
-        >
-          Записаться
-        </button>
+        <ActionButton v-else :loading="booking" @click="book">Записаться</ActionButton>
       </div>
     </template>
   </div>
