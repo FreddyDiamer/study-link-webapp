@@ -12,8 +12,10 @@ export const useDealsBadge = () => {
   const refresh = async () => {
     try {
       const response = await orderService.getDeals()
+      // активна любая незавершённая сделка, а не только IN_PROGRESS:
+      // карточка считает так же, бейдж не должен расходиться с ней
       activeCount.value = (response?.items ?? []).filter(
-        (deal) => deal.status === DealStatus.IN_PROGRESS,
+        (deal) => deal.status !== DealStatus.COMPLETED && deal.status !== DealStatus.CANCELLED,
       ).length
     } catch {
       // бейдж — вспомогательный элемент, молча оставляем прежнее значение
