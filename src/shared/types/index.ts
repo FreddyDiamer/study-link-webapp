@@ -19,6 +19,9 @@ export interface User {
   /** рейтинг приходит не во всех выдачах — источник истины в /reviews/reputation */
   rating?: number
   reviewsCount?: number
+  /** уведомления бота: отписка не должна означать блокировку */
+  telegramNotificationsEnabled?: boolean
+  notificationPreferences?: NotificationPreferences
 }
 
 export interface Tutor extends User {

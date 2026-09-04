@@ -4,6 +4,9 @@ export const PATHS = {
   MARKET: '/market',
   DEALS: '/deals',
   PROFILE: '/profile',
+  MY_RESPONSES: '/profile/responses',
+  PROFILE_EDIT: '/profile/edit',
+  NOTIFICATIONS: '/profile/notifications',
   // под-экраны маркета · услуги (вы исполнитель)
   SERVICE_CREATE: '/market/services/create',
   SERVICE_DETAIL: '/market/services/:id',

@@ -2,13 +2,14 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { reviewService, userService } from '@/services/business'
-import { useOrder, useService, useToast } from '@/shared/composables'
+import { useMyResponses, useOrder, useService, useToast } from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 import ReviewItem from '@/shared/components/ReviewItem.vue'
 import ReputationPair from '../components/ReputationPair.vue'
 import GroupSheet from '../components/GroupSheet.vue'
+import MyResponsesBlock from '../components/MyResponsesBlock.vue'
 import { countWithWord, formatDayMonth, formatJoined, formatKopeks } from '@/shared/utils'
 import { requestDetailPath } from '@/router/paths'
 import { PATHS } from '@/router/paths'
@@ -26,6 +27,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const { getMyRequests } = useOrder()
 const { getMyServices, activateService } = useService()
+const myResponses = useMyResponses()
 const { showToast } = useToast()
 
 const loading = ref(true)
@@ -55,7 +57,11 @@ const load = async () => {
       reviews.value = userReviews
       reputation.value = userReputation
     }
-    const [requests, services] = await Promise.all([getMyRequests(), getMyServices()])
+    const [requests, services] = await Promise.all([
+      getMyRequests(),
+      getMyServices(),
+      myResponses.load(),
+    ])
     myRequests.value = requests?.items ?? []
     myServices.value = services?.items ?? []
   } catch (e) {
@@ -140,6 +146,30 @@ onMounted(load)
         <span class="ml-auto text-subhead font-semibold text-d-accent">Изменить</span>
       </button>
 
+      <!-- настройки: две строки, обе ведут на свой экран -->
+      <div class="reveal flex flex-col gap-2.5 mb-3.5" style="animation-delay: 0.05s">
+        <button
+          class="press w-full flex items-center bg-d-panel border border-d-border rounded-[14px] px-4 py-[15px] text-left"
+          @click="router.push(PATHS.PROFILE_EDIT)"
+        >
+          <span>
+            <span class="block text-overline uppercase text-d-text-hint mb-1">О себе</span>
+            <span class="block text-subhead text-d-text-second line-clamp-1">
+              {{ profile.description || 'Расскажите, что и как вы ведёте' }}
+            </span>
+          </span>
+          <span class="ml-auto pl-3 text-subhead font-semibold text-d-accent">Изменить</span>
+        </button>
+
+        <button
+          class="press w-full flex items-center bg-d-panel border border-d-border rounded-[14px] px-4 py-[15px] text-left"
+          @click="router.push(PATHS.NOTIFICATIONS)"
+        >
+          <span class="text-body">Уведомления</span>
+          <span class="ml-auto text-d-text-hint text-[20px] leading-none">›</span>
+        </button>
+      </div>
+
       <ReputationPair
         class="reveal mb-3.5"
         style="animation-delay: 0.07s"
@@ -182,6 +212,19 @@ onMounted(load)
           </button>
         </template>
       </div>
+
+      <!-- мои отклики: ожидание нужно видеть в одном месте -->
+      <MyResponsesBlock
+        class="reveal mb-3.5"
+        style="animation-delay: 0.1s"
+        :items="myResponses.items.value"
+        :pending="myResponses.pending.value"
+        :accepted="myResponses.accepted.value"
+        :closed="myResponses.closed.value"
+        :waiting-label="myResponses.waitingLabel"
+        @open="router.push(PATHS.MY_RESPONSES)"
+        @browse="router.push(PATHS.MARKET)"
+      />
 
       <!-- мои заявки -->
       <div

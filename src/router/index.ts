@@ -50,6 +50,21 @@ const router = createRouter({
       component: () => import('../features/deals/pages/DealsPage.vue'),
     },
     {
+      path: PATHS.MY_RESPONSES,
+      name: 'my-responses',
+      component: () => import('../features/profile/pages/MyResponsesPage.vue'),
+    },
+    {
+      path: PATHS.PROFILE_EDIT,
+      name: 'profile-edit',
+      component: () => import('../features/profile/pages/EditProfilePage.vue'),
+    },
+    {
+      path: PATHS.NOTIFICATIONS,
+      name: 'notifications',
+      component: () => import('../features/profile/pages/NotificationsPage.vue'),
+    },
+    {
       path: PATHS.PROFILE,
       name: 'profile',
       component: () => import('../features/profile/pages/ProfilePage.vue'),
