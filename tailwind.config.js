@@ -2,86 +2,108 @@
 export default {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
+    // extend — токены дизайн-системы Study Link «Defiant» (холодный сланец + индиго).
+    // Дефолты Tailwind (rounded-full, spacing, white) остаются рабочими.
+    // В коде используем d-* / семантические радиусы / типографику.
     extend: {
       colors: {
-        // Telegram темная тема
-        telegram: {
-          bg: '#17212B',
-          secondary: '#242F3D',
-          accent: '#64B5F6',
-          text: '#FFFFFF',
-          textSecondary: '#8E9297',
-          button: '#2AABEE',
-          buttonHover: '#229ED9',
-          destructive: '#E53E3E',
-          success: '#48BB78',
-          warning: '#ED8936',
-          border: '#2C3E50',
-          input: '#1A252F',
-          card: '#1E2832',
-        },
-        // Градиенты для карточек
-        gradient: {
-          from: '#667eea',
-          to: '#764ba2',
-        },
-
-        // Кастомные цвета
-        custom: {
-          primary: 'var(--custom-primary)',
-          secondary: 'var(--custom-secondary)',
+        d: {
+          // ---- surfaces ----
+          ink: '#0E0F13', // фон приложения
+          panel: '#15171D', // карточки, приподнятые блоки
+          surface: '#21252E', // вложенные поверхности, треки, чипы
+          border: '#21252E', // хайрлайн по умолчанию
+          'border-soft': '#2A2F3A', // обводка инпутов/иконок
+          'border-hover': '#3A4150', // бордер карточки в hover
+          // ---- text ----
+          text: '#E8EAED', // основной текст
+          'text-bright': '#C9CFD8', // тело отзыва / акцентный текст
+          'text-second': '#8A93A3', // вторичный текст
+          'text-hint': '#5B6472', // подписи, мета
+          'text-mute': '#4B5159', // неактивная иконка таба
+          // ---- accent (единственный акцент действия) ----
+          accent: '#7C8CFF',
+          'accent-hi': '#9AA6FF', // активный шаг / В работе
+          // ---- rating (ТОЛЬКО рейтинг и отзывы) ----
+          rating: '#FFC247',
+          'rating-dim': '#A8843C',
+          // ---- semantic / avatar chips ----
+          teal: '#3FB5A8', // завершено / успех
+          coral: '#E97A6B', // деструктив / аватар-чип
+          // ---- skeleton ----
+          'sk-base': '#1A1D24',
+          'sk-hi': '#242833',
         },
       },
       fontFamily: {
-        sans: [
-          'Inter',
-          'SF Pro Display',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'system-ui',
-          'sans-serif',
-        ],
+        // системный стек как в Telegram
+        sl: ['-apple-system', 'SF Pro Text', 'Roboto', 'Segoe UI', 'sans-serif'],
+        sans: ['-apple-system', 'SF Pro Text', 'Roboto', 'Segoe UI', 'sans-serif'],
       },
       fontSize: {
-        xs: ['0.75rem', { lineHeight: '1rem' }],
-        sm: ['0.875rem', { lineHeight: '1.25rem' }],
-        base: ['1rem', { lineHeight: '1.5rem' }],
-        lg: ['1.125rem', { lineHeight: '1.75rem' }],
-        xl: ['1.25rem', { lineHeight: '1.75rem' }],
-        '2xl': ['1.5rem', { lineHeight: '2rem' }],
-        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-      },
-      spacing: {
-        18: '4.5rem',
-        88: '22rem',
+        'screen-title': ['26px', { lineHeight: '1.05', fontWeight: '700', letterSpacing: '-0.02em' }],
+        'title-l': ['22px', { lineHeight: '1.1', fontWeight: '700' }],
+        'title-m': ['17px', { lineHeight: '22px', fontWeight: '600' }], // card-title
+        price: ['19px', { lineHeight: '1', fontWeight: '700' }],
+        'price-lg': ['22px', { lineHeight: '1', fontWeight: '700' }],
+        'rating-hero': ['38px', { lineHeight: '0.9', fontWeight: '700' }],
+        body: ['16px', { lineHeight: '1.45' }],
+        review: ['14px', { lineHeight: '1.45' }],
+        subhead: ['14px', { lineHeight: '19px' }],
+        caption: ['13px', { lineHeight: '16px' }],
+        overline: ['12px', { lineHeight: '1', fontWeight: '600', letterSpacing: '0.05em' }],
+        micro: ['10px', { lineHeight: '1', fontWeight: '600', letterSpacing: '0.04em' }],
       },
       borderRadius: {
-        xl: '0.75rem',
-        '2xl': '1rem',
+        chip: '9px', // мелкие чипы, аватар-чипы
+        field: '10px', // инпуты, мелкие кнопки
+        card: '15px', // карточки ленты
+        sheet: '16px', // крупные блоки
+        avatar: '17px', // аватар профиля
       },
       boxShadow: {
-        telegram: '0 2px 8px rgba(0, 0, 0, 0.15)',
-        card: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'd-logo': '0 4px 18px rgba(124,140,255,.35)',
+        'd-toast': '0 12px 30px rgba(0,0,0,.4)',
+        'd-phone': '0 30px 90px rgba(0,0,0,.55)',
       },
-      animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'bounce-subtle': 'bounceSubtle 0.6s ease-in-out',
+      transitionTimingFunction: {
+        'd-spring': 'cubic-bezier(.3,.8,.3,1)',
+        'd-out': 'cubic-bezier(.2,.7,.2,1)',
+        'd-pop': 'cubic-bezier(.2,.8,.2,1)',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        'd-shimmer': {
+          '0%': { backgroundPosition: '-340px 0' },
+          '100%': { backgroundPosition: '340px 0' },
         },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        'd-fadeup': {
+          from: { opacity: '0', transform: 'translateY(12px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
         },
-        bounceSubtle: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-5px)' },
+        'd-growx': { from: { transform: 'scaleX(0)' }, to: { transform: 'scaleX(1)' } },
+        'd-toastin': {
+          from: { opacity: '0', transform: 'translateY(-14px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
         },
+        'd-ringspin': { to: { transform: 'rotate(360deg)' } },
+        'd-sheetup': {
+          from: { transform: 'translateY(100%)' },
+          to: { transform: 'translateY(0)' },
+        },
+        'd-pop': {
+          '0%': { transform: 'scale(.6)', opacity: '0' },
+          '60%': { transform: 'scale(1.15)' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+      },
+      animation: {
+        'd-shimmer': 'd-shimmer 1.3s infinite linear',
+        'd-fadeup': 'd-fadeup 0.5s cubic-bezier(.2,.7,.2,1) both',
+        'd-growx': 'd-growx 0.7s cubic-bezier(.3,.8,.3,1) both',
+        'd-toastin': 'd-toastin 0.26s cubic-bezier(.2,.8,.2,1)',
+        'd-spin': 'd-ringspin 0.7s linear infinite',
+        'd-sheetup': 'd-sheetup 0.3s cubic-bezier(.3,.8,.3,1)',
+        'd-pop': 'd-pop 0.3s cubic-bezier(.2,.8,.2,1)',
       },
     },
   },

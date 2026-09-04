@@ -16,7 +16,12 @@ export interface User {
   lastActivity: string
   createdAt: string
   updatedAt: string
-  rating: number
+  /** рейтинг приходит не во всех выдачах — источник истины в /reviews/reputation */
+  rating?: number
+  reviewsCount?: number
+  /** уведомления бота: отписка не должна означать блокировку */
+  telegramNotificationsEnabled?: boolean
+  notificationPreferences?: NotificationPreferences
 }
 
 export interface Tutor extends User {
@@ -131,6 +136,12 @@ export interface Service {
   responses?: ServiceResponse[]
 }
 
+export enum RequestStatus {
+  OPEN = 'OPEN',
+  MATCHED = 'MATCHED',
+  CLOSED = 'CLOSED',
+}
+
 export interface Request {
   id: string
   studentId: string
@@ -138,6 +149,8 @@ export interface Request {
   teacherId: string
   description?: string
   budget?: number // в копейках
+  status: RequestStatus
+  closedAt?: string | null
   deadline?: string
   createdAt: string
   updatedAt: string
@@ -156,6 +169,15 @@ export interface Deal {
   price: number // в копейках
   deadline?: string
   status: DealStatus
+  // подтверждение выполнения каждой стороной; сделка закрывается по обоим
+  studentConfirmedAt?: string | null
+  tutorConfirmedAt?: string | null
+  /** когда сделка закроется без второй стороны; считает бэкенд */
+  autoConfirmAt?: string | null
+  // отмена: кто, когда и почему — видно обеим сторонам
+  cancelledAt?: string | null
+  cancelledById?: string | null
+  cancelReason?: string | null
   serviceResponseId?: string
   requestResponseId?: string
   createdAt: string
@@ -164,6 +186,7 @@ export interface Deal {
   tutor: User
   subject: Subject
   teacher: Teacher
+  reviews?: Review[]
   serviceResponse?: ServiceResponse
   requestResponse?: RequestResponse
   review?: Review
@@ -300,12 +323,31 @@ export interface CreateRequestResponseDto {
   proposedDeadline?: string
 }
 
+/** Настройки уведомлений: отписка не должна означать блокировку бота. */
+export interface NotificationPreferences {
+  onResponse?: boolean
+  onDeal?: boolean
+  onReview?: boolean
+  onDigest?: boolean
+}
+
 export interface CreateReviewDto {
+  // автор, получатель и его роль выводятся на сервере из сделки
   dealId: string
-  targetId: string
-  targetRole: UserRole
   rating: number
   comment?: string
+}
+
+/** Средний рейтинг и число отзывов в одной роли. */
+export interface RoleReputation {
+  rating: number
+  count: number
+}
+
+/** Две репутации пользователя: как исполнителя и как заказчика. */
+export interface Reputation {
+  tutor: RoleReputation
+  student: RoleReputation
 }
 
 // =============================================================================

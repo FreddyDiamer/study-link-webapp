@@ -12,6 +12,10 @@ import type {
   PaginatedResponse,
 } from '@/shared/types'
 
+/** Денежные границы в копейках: от 100 ₽ до 50 000 ₽. */
+const MIN_MONEY_KOPEKS = 10_000
+const MAX_MONEY_KOPEKS = 5_000_000
+
 export class OrderService {
   private get telegramStore() {
     return useTelegramStore()
@@ -97,6 +101,32 @@ export class OrderService {
       return this.convertRequestToRubles(request)
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении заявки')
+      throw error
+    }
+  }
+
+  async closeRequest(id: string): Promise<Request> {
+    try {
+      this.telegramStore.hapticFeedback('medium')
+
+      const request = await ordersApi.closeRequest(id)
+
+      return this.convertRequestToRubles(request)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при закрытии заявки')
+      throw error
+    }
+  }
+
+  async reopenRequest(id: string): Promise<Request> {
+    try {
+      this.telegramStore.hapticFeedback('success')
+
+      const request = await ordersApi.reopenRequest(id)
+
+      return this.convertRequestToRubles(request)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при переоткрытии заявки')
       throw error
     }
   }
@@ -208,11 +238,26 @@ export class OrderService {
     }
   }
 
-  async cancelDeal(id: string): Promise<Deal> {
+  async reopenDeal(id: string): Promise<Deal> {
+    try {
+      this.telegramStore.hapticFeedback('light')
+
+      const deal = await ordersApi.reopenDeal(id)
+
+      this.telegramStore.showAlert('Сделка снова в работе')
+
+      return this.convertDealToRubles(deal)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при возврате сделки в работу')
+      throw error
+    }
+  }
+
+  async cancelDeal(id: string, reason?: string): Promise<Deal> {
     try {
       this.telegramStore.hapticFeedback('medium')
 
-      const deal = await ordersApi.cancelDeal(id)
+      const deal = await ordersApi.cancelDeal(id, reason)
 
       this.telegramStore.showAlert('Сделка отменена!')
 
@@ -290,6 +335,34 @@ export class OrderService {
       return this.convertServiceResponseToRubles(response)
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении отклика')
+      throw error
+    }
+  }
+
+  async acceptServiceResponse(id: string): Promise<ServiceResponse> {
+    try {
+      this.telegramStore.hapticFeedback('success')
+
+      const response = await ordersApi.acceptServiceResponse(id)
+
+      this.telegramStore.showAlert('Сделка создана!')
+
+      return this.convertServiceResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при принятии отклика')
+      throw error
+    }
+  }
+
+  async rejectServiceResponse(id: string): Promise<ServiceResponse> {
+    try {
+      this.telegramStore.hapticFeedback('medium')
+
+      const response = await ordersApi.rejectServiceResponse(id)
+
+      return this.convertServiceResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при отклонении отклика')
       throw error
     }
   }
@@ -378,6 +451,34 @@ export class OrderService {
     }
   }
 
+  async acceptRequestResponse(id: string): Promise<RequestResponse> {
+    try {
+      this.telegramStore.hapticFeedback('success')
+
+      const response = await ordersApi.acceptRequestResponse(id)
+
+      this.telegramStore.showAlert('Сделка создана!')
+
+      return this.convertRequestResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при принятии отклика')
+      throw error
+    }
+  }
+
+  async rejectRequestResponse(id: string): Promise<RequestResponse> {
+    try {
+      this.telegramStore.hapticFeedback('medium')
+
+      const response = await ordersApi.rejectRequestResponse(id)
+
+      return this.convertRequestResponseToRubles(response)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при отклонении отклика')
+      throw error
+    }
+  }
+
   async deleteRequestResponse(id: string): Promise<void> {
     try {
       this.telegramStore.hapticFeedback('medium')
@@ -405,33 +506,21 @@ export class OrderService {
     if (data.description && data.description.length > 500) {
       throw new Error('Описание не должно превышать 500 символов')
     }
-    if (data.budget && data.budget < 100) {
-      throw new Error('Бюджет должен быть не менее 100 рублей')
-    }
-    if (data.budget && data.budget > 50000) {
-      throw new Error('Бюджет не должен превышать 50000 рублей')
-    }
+    this.validateMoney(data.budget, 'Бюджет')
   }
 
   private validateUpdateRequestData(data: any): void {
     if (data.description && data.description.length > 500) {
       throw new Error('Описание не должно превышать 500 символов')
     }
-    if (data.budget && data.budget < 100) {
-      throw new Error('Бюджет должен быть не менее 100 рублей')
-    }
-    if (data.budget && data.budget > 10000) {
-      throw new Error('Бюджет не должен превышать 10000 рублей')
-    }
+    this.validateMoney(data.budget, 'Бюджет')
   }
 
   private validateServiceResponseData(data: any): void {
     if (!data.serviceId) {
       throw new Error('Укажите услугу')
     }
-    if (data.price && data.price < 100) {
-      throw new Error('Цена должна быть не менее 100 рублей')
-    }
+    this.validateMoney(data.price, 'Цена')
     if (data.message && data.message.length > 500) {
       throw new Error('Сообщение не должно превышать 500 символов')
     }
@@ -441,11 +530,23 @@ export class OrderService {
     if (!data.requestId) {
       throw new Error('Укажите заявку')
     }
-    if (data.price && data.price < 100) {
-      throw new Error('Цена должна быть не менее 100 рублей')
-    }
+    this.validateMoney(data.price, 'Цена')
     if (data.message && data.message.length > 500) {
       throw new Error('Сообщение не должно превышать 500 символов')
+    }
+  }
+
+  /**
+   * Суммы ходят в копейках, а пользователю сообщаем в рублях.
+   * Порог не применяется к пустому значению: бюджет и цена отклика необязательны.
+   */
+  private validateMoney(kopeks: number | undefined, label: string): void {
+    if (!kopeks) return
+    if (kopeks < MIN_MONEY_KOPEKS) {
+      throw new Error(`${label} должна быть не менее ${MIN_MONEY_KOPEKS / 100} рублей`)
+    }
+    if (kopeks > MAX_MONEY_KOPEKS) {
+      throw new Error(`${label} не должна превышать ${MAX_MONEY_KOPEKS / 100} рублей`)
     }
   }
 

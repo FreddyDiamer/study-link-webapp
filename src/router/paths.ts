@@ -1,28 +1,26 @@
 export const PATHS = {
-  // Core
   HOME: '/',
-
-  // Student paths
-  STUDENT_MAIN: '/student',
-  STUDENT_ORDERS: '/student/orders',
-  STUDENT_CREATE_ORDER: '/student/orders/create',
-  STUDENT_EDIT_ORDER: '/student/orders/:id/edit',
-  STUDENT_ORDER_DETAILS: '/student/orders/:id',
-  STUDENT_TUTORS: '/student/tutors',
-  STUDENT_SERVICES: '/student/services',
-  STUDENT_FAVORITES: '/student/favorites',
-  STUDENT_PROFILE: '/student/profile',
-  STUDENT_EDIT_PROFILE: '/student/profile/edit',
-
-  // Tutor paths
-  TUTOR_MAIN: '/tutor',
-  TUTOR_SERVICES: '/tutor/services',
-  TUTOR_CREATE_SERVICE: '/tutor/services/create',
-  TUTOR_EDIT_SERVICE: '/tutor/services/:id/edit',
-  TUTOR_SERVICE_RESPONSES: '/tutor/services/:id/responses',
-  TUTOR_ORDERS: '/tutor/orders',
-  TUTOR_PROFILE: '/tutor/profile',
-  TUTOR_EDIT_PROFILE: '/tutor/profile/edit',
+  // 3 таба дизайна
+  MARKET: '/market',
+  DEALS: '/deals',
+  PROFILE: '/profile',
+  MY_RESPONSES: '/profile/responses',
+  PROFILE_EDIT: '/profile/edit',
+  NOTIFICATIONS: '/profile/notifications',
+  // под-экраны маркета · услуги (вы исполнитель)
+  SERVICE_CREATE: '/market/services/create',
+  SERVICE_DETAIL: '/market/services/:id',
+  // под-экраны маркета · заявки (вы заказчик)
+  REQUEST_CREATE: '/market/requests/create',
+  REQUEST_DETAIL: '/market/requests/:id',
+  REQUEST_EDIT: '/market/requests/:id/edit',
+  REQUEST_RESPOND: '/market/requests/:id/respond',
 } as const
 
 export type AppPath = (typeof PATHS)[keyof typeof PATHS]
+
+// помощники для навигации с параметром
+export const serviceDetailPath = (id: string) => `/market/services/${id}`
+export const requestDetailPath = (id: string) => `/market/requests/${id}`
+export const requestEditPath = (id: string) => `/market/requests/${id}/edit`
+export const requestRespondPath = (id: string) => `/market/requests/${id}/respond`

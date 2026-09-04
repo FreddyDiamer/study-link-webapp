@@ -79,6 +79,24 @@ export const useOrder = () => {
     }
   }
 
+  const closeRequest = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.closeRequest(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const reopenRequest = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.reopenRequest(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const deleteRequest = async (id: string) => {
     isLoading.value = true
     try {
@@ -156,6 +174,25 @@ export const useOrder = () => {
     }
   }
 
+  const reopenDeal = async (dealId: string) => {
+    try {
+      return await orderService.reopenDeal(dealId)
+    } catch (error) {
+      console.error('Ошибка возврата сделки в работу:', error)
+      throw error
+    }
+  }
+
+  const cancelDeal = async (dealId: string, reason?: string) => {
+    try {
+      const response = await orderService.cancelDeal(dealId, reason)
+      return response
+    } catch (error) {
+      console.error('Ошибка отмены сделки:', error)
+      throw error
+    }
+  }
+
   const completeDeal = async (dealId: string) => {
     try {
       const response = await orderService.completeDeal(dealId)
@@ -213,6 +250,24 @@ export const useOrder = () => {
       // Обновляем список откликов
       await getMyServiceResponses()
       return response
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const acceptServiceResponse = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.acceptServiceResponse(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const rejectServiceResponse = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.rejectServiceResponse(id)
     } finally {
       isLoading.value = false
     }
@@ -281,6 +336,24 @@ export const useOrder = () => {
     }
   }
 
+  const acceptRequestResponse = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.acceptRequestResponse(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const rejectRequestResponse = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.rejectRequestResponse(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const deleteRequestResponse = async (id: string) => {
     isLoading.value = true
     try {
@@ -306,21 +379,28 @@ export const useOrder = () => {
     getRequest,
     createRequest,
     updateRequest,
+    closeRequest,
+    reopenRequest,
     deleteRequest,
 
     // Deals
     getDeals,
     getMyTutorDeals,
     getDeal,
+    updateDeal,
     acceptDeal,
     rejectDeal,
     completeDeal,
+    cancelDeal,
+    reopenDeal,
 
     // Service Responses
     getServiceResponses,
     getMyServiceResponses,
     createServiceResponse,
     updateServiceResponse,
+    acceptServiceResponse,
+    rejectServiceResponse,
     deleteServiceResponse,
 
     // Request Responses
@@ -328,6 +408,8 @@ export const useOrder = () => {
     getMyRequestResponses,
     createRequestResponse,
     updateRequestResponse,
+    acceptRequestResponse,
+    rejectRequestResponse,
     deleteRequestResponse,
   }
 }

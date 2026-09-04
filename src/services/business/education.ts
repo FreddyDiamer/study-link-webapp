@@ -1,6 +1,6 @@
 import { educationApi } from '@/services/api'
 import { useTelegramStore } from '@/stores'
-import type { Subject, Teacher, TeacherSubject } from '@/shared/types'
+import type { Group, Subject, Teacher, TeacherSubject } from '@/shared/types'
 
 export class EducationService {
   private get telegramStore() {
@@ -16,15 +16,6 @@ export class EducationService {
       return await educationApi.getSubjects()
     } catch (error) {
       this.handleError(error, 'Ошибка при получении предметов')
-      throw error
-    }
-  }
-
-  async getActiveSubjects(): Promise<Subject[]> {
-    try {
-      return await educationApi.getActiveSubjects()
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении активных предметов')
       throw error
     }
   }
@@ -92,15 +83,29 @@ export class EducationService {
   }
 
   // =============================================================================
+  // GROUPS
+  // =============================================================================
+
+  async getGroups(): Promise<Group[]> {
+    try {
+      return await educationApi.getGroups()
+    } catch (error) {
+      this.handleError(error, 'Ошибка при получении групп')
+      throw error
+    }
+  }
+
+  // =============================================================================
   // UTILITY METHODS
   // =============================================================================
 
   async getSubjectsWithTeachers(): Promise<Array<Subject & { teachers: Teacher[] }>> {
     try {
-      const [subjects, teacherSubjects] = await Promise.all([
-        this.getActiveSubjects(),
+      const [allSubjects, teacherSubjects] = await Promise.all([
+        this.getSubjects(),
         this.getTeacherSubjects(),
       ])
+      const subjects = allSubjects.filter((subject) => subject.isActive)
 
       return subjects.map((subject) => ({
         ...subject,

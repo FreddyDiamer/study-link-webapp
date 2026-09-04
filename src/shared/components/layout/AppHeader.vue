@@ -1,198 +1,98 @@
 <script setup lang="ts">
-// Vue
-import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-// Store
 import { useTelegramStore } from '@/stores/telegram'
-import { useAppStore, type UserFlow } from '@/stores/app'
-
-// Component
-import Button from '@/shared/components/ui/Button.vue'
-import { StudentIcon, TutorIcon, ArrowIcon } from '@components/icons'
-
-// Constants
 import { PATHS } from '@/router/paths'
 
-// Composables
+interface Props {
+  title: string
+  sub?: string
+  back?: boolean
+  /** «+» справа — в макете открывает развилку намерения */
+  add?: boolean
+  /** «···» справа — меню действий над своим объектом */
+  menu?: boolean
+  /** куда возвращает «‹», если некуда возвращаться в истории */
+  backTo?: string
+}
+const props = withDefaults(defineProps<Props>(), {
+  back: false,
+  add: false,
+  menu: false,
+  backTo: PATHS.MARKET,
+})
+const emit = defineEmits<{ add: []; menu: [] }>()
+
 const router = useRouter()
-
-// Stores
 const telegramStore = useTelegramStore()
-const appStore = useAppStore()
 
-// Data
-const showFlowSelector = ref(false)
-
-// Computed
-const userInitials = computed(() => {
-  const firstName = telegramStore.firstName || 'Пользователь'
-  const lastName = telegramStore.lastName || ''
-  return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase()
-})
-
-const flowDisplayName = computed(() => {
-  switch (appStore.currentFlow) {
-    case 'student':
-      return 'Студент'
-    case 'tutor':
-      return 'Репетитор'
-    default:
-      return 'Выбрать роль'
-  }
-})
-
-// Methods
-const openHomePage = () => {
+const goBack = () => {
   telegramStore.hapticFeedback('light')
-
-  if (appStore.isStudentFlow) {
-    router.push(PATHS.STUDENT_MAIN)
-  } else {
-    router.push(PATHS.TUTOR_MAIN)
-  }
+  // внутри Mini App история может быть пустой — тогда уходим на заданный экран
+  if (window.history.state?.back) router.back()
+  else router.push(props.backTo)
 }
 
-const openProfilePage = () => {
+const onAdd = () => {
   telegramStore.hapticFeedback('light')
-  router.push(PATHS.STUDENT_PROFILE)
+  emit('add')
 }
 
-const toggleFlowSelector = () => {
+const onMenu = () => {
   telegramStore.hapticFeedback('light')
-  showFlowSelector.value = !showFlowSelector.value
-}
-
-const selectFlow = (flow: UserFlow) => {
-  telegramStore.hapticFeedback('medium')
-
-  appStore.setFlow(flow)
-  showFlowSelector.value = false
-
-  openHomePage()
-}
-
-const handleLogoClick = () => {
-  if (appStore.isStudentFlow) {
-    router.push(PATHS.STUDENT_MAIN)
-  } else {
-    router.push(PATHS.TUTOR_MAIN)
-  }
+  emit('menu')
 }
 </script>
 
 <template>
-  <header
-    class="bg-telegram-card border-b border-telegram-border fixed top-0 left-0 right-0 z-50 backdrop-blur-sm"
-  >
-    <div class="flex items-center justify-between px-4 h-14">
-      <!-- Logo/Title -->
-      <div class="flex items-center space-x-3" @click="handleLogoClick">
-        <div
-          class="w-8 h-8 rounded-lg flex items-center justify-center"
-          :class="{
-            'bg-telegram-success': appStore.isTutorFlow,
-            'bg-telegram-accent': appStore.isStudentFlow,
-          }"
-        >
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-            />
-          </svg>
-        </div>
-        <h1 class="text-lg font-semibold text-telegram-text">KAI</h1>
+  <header class="shrink-0 flex items-center gap-3 px-4 pt-1.5 pb-3.5 border-b border-d-sk-base">
+    <!-- back -->
+    <button
+      v-if="back"
+      class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-panel border border-d-border flex items-center justify-center text-d-accent text-2xl leading-none"
+      aria-label="Назад"
+      @click="goBack"
+    >
+      ‹
+    </button>
+    <!-- logo -->
+    <span
+      v-else
+      class="shrink-0 w-10 h-10 rounded-[12px] bg-d-accent flex items-center justify-center shadow-d-logo"
+    >
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+        <path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z" fill="#0E0F13" />
+        <path
+          d="M6.5 11.2V15c0 1 2.5 2.2 5.5 2.2s5.5-1.2 5.5-2.2v-3.8"
+          stroke="#0E0F13"
+          stroke-width="1.7"
+        />
+      </svg>
+    </span>
+
+    <div class="flex-1 min-w-0">
+      <div class="text-[19px] font-bold tracking-[-0.015em] leading-[1.15] truncate">
+        {{ title }}
       </div>
-
-      <!-- Flow Selector & Profile -->
-      <div class="flex items-center space-x-2">
-        <!-- Flow Selector -->
-        <div class="relative">
-          <Button
-            variant="ghost"
-            @click="toggleFlowSelector"
-            size="sm"
-            class="flex items-center gap-2 px-1.5"
-            :class="{
-              'text-telegram-success': appStore.isTutorFlow,
-              'text-telegram-accent': appStore.isStudentFlow,
-            }"
-          >
-            <div v-if="appStore.isStudentFlow" class="icon-wrapper bg-telegram-accent">
-              <StudentIcon class="size-5" />
-            </div>
-            <div v-else class="icon-wrapper bg-telegram-success">
-              <TutorIcon class="size-5" />
-            </div>
-
-            {{ flowDisplayName }}
-
-            <ArrowIcon
-              class="size-4 transition-transform duration-200"
-              :class="{ 'rotate-180': showFlowSelector }"
-            />
-          </Button>
-
-          <!-- Flow Dropdown -->
-          <div
-            v-if="showFlowSelector"
-            class="absolute right-0 top-full mt-2 w-48 bg-telegram-card border border-telegram-border rounded-xl shadow-lg py-2 z-10"
-          >
-            <button
-              @click="selectFlow('student')"
-              class="w-full px-4 py-3 text-left hover:bg-telegram-secondary transition-colors duration-150 flex items-center space-x-3"
-              :class="{ 'bg-telegram-secondary': appStore.isStudentFlow }"
-            >
-              <div class="icon-wrapper bg-telegram-accent">
-                <StudentIcon class="size-5" />
-              </div>
-              <div>
-                <div class="text-telegram-text font-medium text-sm">Студент</div>
-                <div class="text-telegram-textSecondary text-xs">Ищу репетитора</div>
-              </div>
-            </button>
-
-            <button
-              @click="selectFlow('tutor')"
-              class="w-full px-4 py-3 text-left hover:bg-telegram-secondary transition-colors duration-150 flex items-center space-x-3"
-              :class="{ 'bg-telegram-secondary': appStore.isTutorFlow }"
-            >
-              <div class="icon-wrapper bg-telegram-success">
-                <TutorIcon class="size-5" />
-              </div>
-              <div>
-                <div class="text-telegram-text font-medium text-sm">Репетитор</div>
-                <div class="text-telegram-textSecondary text-xs">Предлагаю услуги</div>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <!-- Profile Avatar -->
-        <div
-          class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-medium"
-          :class="{
-            'bg-telegram-success': appStore.isTutorFlow,
-            'bg-telegram-accent': appStore.isStudentFlow,
-          }"
-          @click="openProfilePage"
-        >
-          {{ userInitials }}
-        </div>
+      <div v-if="sub" class="text-[12px] text-d-text-hint leading-[1.2] mt-px truncate">
+        {{ sub }}
       </div>
     </div>
 
-    <!-- Click outside to close dropdown -->
-    <div v-if="showFlowSelector" @click="showFlowSelector = false" class="fixed inset-0 z-0"></div>
+    <button
+      v-if="menu"
+      class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-panel border border-d-border flex items-center justify-center text-d-text-second text-[20px] leading-none"
+      aria-label="Действия"
+      @click="onMenu"
+    >
+      ···
+    </button>
+    <button
+      v-else-if="add"
+      class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-accent text-d-ink flex items-center justify-center text-[26px] leading-none font-light"
+      aria-label="Создать"
+      @click="onAdd"
+    >
+      +
+    </button>
   </header>
 </template>
-
-<style scoped lang="scss">
-.icon-wrapper {
-  @apply w-8 h-8 rounded-lg text-white;
-  @apply flex items-center justify-center;
-}
-</style>

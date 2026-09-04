@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#0E0F13}
+  body{font-family:-apple-system,"SF Pro Text",Roboto,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;color:#E8EAED}
+  @keyframes shimmer{0%{background-position:-340px 0}100%{background-position:340px 0}}
+  @keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes toastin{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+  @keyframes ringspin{to{transform:rotate(360deg)}}
+  .sk{background:linear-gradient(90deg,#1A1D24 0%,#242833 50%,#1A1D24 100%);background-size:340px 100%;animation:shimmer 1.3s infinite linear;border-radius:7px}
+  .press{transition:transform .12s ease, border-color .2s ease, background .2s ease}
+  .press:active{transform:scale(.975)}
+  ::-webkit-scrollbar{width:0;height:0}
+  .reveal{animation:fadeup .5s cubic-bezier(.2,.7,.2,1) both}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#0E0F13;padding:0 0 90px">
+
+  <!-- ===== MASTHEAD ===== -->
+  <div style="padding:52px 28px 40px;border-bottom:1px solid #1A1D24">
+    <div style="max-width:1180px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:26px">
+        <div style="width:32px;height:32px;border-radius:9px;background:#7C8CFF;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(124,140,255,.35)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z" fill="#0E0F13"/><path d="M6.5 11.2V15c0 1 2.5 2.2 5.5 2.2s5.5-1.2 5.5-2.2v-3.8" stroke="#0E0F13" stroke-width="1.6"/></svg>
+        </div>
+        <span style="font-size:16px;font-weight:600;letter-spacing:-.01em">Study Link</span>
+        <span style="margin-left:6px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#5B6472">Responsive edition</span>
+      </div>
+      <h1 style="font-size:42px;line-height:1.05;font-weight:700;letter-spacing:-.025em;max-width:760px">Репутация решает.<br><span style="color:#8A93A3">Отзывы — в центре каждого экрана.</span></h1>
+      <p style="font-size:16px;line-height:1.55;color:#8A93A3;max-width:540px;margin-top:20px">Без кричащего цвета. Берём отзывчивостью: живой скелетон, плавные переходы, тактильные нажатия и рейтинг, который видно сразу.</p>
+    </div>
+  </div>
+
+  <div style="max-width:1180px;margin:0 auto;padding:0 28px">
+
+  <!-- ============ 01 SYSTEM ============ -->
+  <div style="display:flex;align-items:baseline;gap:14px;margin:52px 0 22px">
+    <div style="font-size:13px;font-weight:700;color:#7C8CFF;font-variant-numeric:tabular-nums">01</div>
+    <h2 style="font-size:20px;font-weight:700;letter-spacing:-.01em">Палитра и акценты</h2>
+    <div style="flex:1;height:1px;background:#1A1D24"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-bottom:52px">
+    <div style="background:#15171D;border:1px solid #21252E;border-radius:16px;padding:22px">
+      <div style="font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:#5B6472;text-transform:uppercase;margin-bottom:16px">Холодный сланец · индиго</div>
+      <div style="display:flex;height:64px;border-radius:10px;overflow:hidden;margin-bottom:16px">
+        <div style="flex:2.2;background:#0E0F13"></div><div style="flex:1.4;background:#15171D"></div><div style="flex:1;background:#21252E"></div><div style="flex:1;background:#E8EAED"></div>
+        <div style="flex:1.8;background:#7C8CFF"></div><div style="flex:1;background:#FFC247;display:flex;align-items:flex-end;padding:7px"><span style="font-size:10px;font-weight:700;color:#0E0F13">★</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:ui-monospace,monospace;font-size:11px;color:#5B6472">
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#0E0F13;border:1px solid #2A2F3A"></span>ink · 0E0F13</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#21252E"></span>surface · 21252E</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#7C8CFF"></span>accent · 7C8CFF</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#FFC247"></span>rating · FFC247</div>
+      </div>
+    </div>
+    <div style="background:#15171D;border:1px solid #21252E;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px;justify-content:center">
+      <div style="font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:#5B6472;text-transform:uppercase">Принцип</div>
+      <div style="font-size:15px;line-height:1.5;color:#C9CFD8">Индиго — единственный акцент действия. <b style="color:#FFC247">Золото</b> закреплено только за рейтингом и отзывами, чтобы репутация всегда читалась первой.</div>
+    </div>
+  </div>
+
+  <!-- ============ 02 PROTOTYPE ============ -->
+  <div style="display:flex;align-items:baseline;gap:14px;margin:0 0 8px">
+    <div style="font-size:13px;font-weight:700;color:#7C8CFF;font-variant-numeric:tabular-nums">02</div>
+    <h2 style="font-size:20px;font-weight:700;letter-spacing:-.01em">Прототип</h2>
+    <div style="flex:1;height:1px;background:#1A1D24"></div>
+  </div>
+  <p style="font-size:14px;color:#5B6472;margin-bottom:14px;max-width:560px">Открой — увидишь скелетон, потом карточки «всплывут» по очереди. Переключатель скользит, нажатия пружинят, в карточке репетитора рейтинг и распределение отзывов анимируются. Кнопка <b style="color:#8A93A3">↻</b> повторит загрузку.</p>
+
+  <div style="display:flex;justify-content:center">
+    <div style="width:346px;background:#000;border:1px solid #21252E;border-radius:46px;padding:11px;box-shadow:0 30px 90px rgba(0,0,0,.55)">
+      <div style="position:relative;width:324px;height:690px;border-radius:36px;overflow:hidden;background:#0E0F13;display:flex;flex-direction:column">
+
+        <!-- status bar -->
+        <div style="height:34px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:13px;font-weight:600;z-index:5">
+          <span style="font-variant-numeric:tabular-nums">9:41</span>
+          <span style="display:flex;align-items:center;gap:5px;font-size:11px">●●●<span style="width:22px;height:11px;border:1px solid #E8EAED;border-radius:3px;display:inline-block;position:relative"><span style="position:absolute;inset:1.5px;width:70%;background:#7C8CFF;border-radius:1px"></span></span></span>
+        </div>
+
+        <!-- toast -->
+        <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:42px;left:16px;right:16px;z-index:30;background:#21252E;border:1px solid #2A2F3A;color:#E8EAED;border-radius:12px;padding:12px 16px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:9px;animation:toastin .26s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 30px rgba(0,0,0,.4)"><span style="width:18px;height:18px;border-radius:99px;background:#7C8CFF;color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">✓</span>{{ toast }}</div>
+        </sc-if>
+
+        <!-- ===== APP HEADER (persistent) ===== -->
+        <div style="flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:6px 16px 14px;border-bottom:1px solid #1A1D24">
+          <sc-if value="{{ headerBack }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ back }}" class="press" style="width:40px;height:40px;border-radius:12px;background:#15171D;border:1px solid #21252E;display:flex;align-items:center;justify-content:center;color:#7C8CFF;font-size:24px;line-height:1;cursor:pointer;flex:0 0 auto">‹</div>
+          </sc-if>
+          <sc-if value="{{ headerLogo }}" hint-placeholder-val="{{ true }}">
+            <div style="width:40px;height:40px;border-radius:12px;background:#7C8CFF;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 4px 16px rgba(124,140,255,.32)">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z" fill="#0E0F13"/><path d="M6.5 11.2V15c0 1 2.5 2.2 5.5 2.2s5.5-1.2 5.5-2.2v-3.8" stroke="#0E0F13" stroke-width="1.7"/></svg>
+            </div>
+          </sc-if>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:19px;font-weight:700;letter-spacing:-.015em;line-height:1.15">{{ headerTitle }}</div>
+            <sc-if value="{{ hasHeaderSub }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;color:#5B6472;line-height:1.2;margin-top:1px">{{ headerSub }}</div></sc-if>
+          </div>
+          <sc-if value="{{ headerReload }}" hint-placeholder-val="{{ true }}">
+            <div onClick="{{ reload }}" class="press" style="width:40px;height:40px;border-radius:12px;background:#15171D;border:1px solid #21252E;display:flex;align-items:center;justify-content:center;color:#8A93A3;font-size:18px;cursor:pointer;flex:0 0 auto">↻</div>
+          </sc-if>
+        </div>
+
+        <!-- ===== MARKET ===== -->
+        <sc-if value="{{ isMarket }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:0 0 auto;padding:14px 18px 12px">
+            <!-- sliding segment -->
+            <div style="position:relative;display:flex;background:#15171D;border:1px solid #21252E;border-radius:12px;padding:4px;margin-bottom:14px;height:44px">
+              <div style="position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:9px;background:#7C8CFF;transition:transform .32s cubic-bezier(.3,.8,.3,1);transform:translateX({{ segShift }})"></div>
+              <div onClick="{{ setSegment }}" data-seg="services" style="flex:1;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;font-weight:600;transition:color .25s;color:{{ segSvcColor }}">Услуги</div>
+              <div onClick="{{ setSegment }}" data-seg="requests" style="flex:1;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;font-weight:600;transition:color .25s;color:{{ segReqColor }}">Заявки</div>
+            </div>
+          </div>
+
+          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:2px 18px 18px;display:flex;flex-direction:column;gap:12px">
+            <!-- SKELETON -->
+            <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+              <sc-for list="{{ skeletons }}" as="k" hint-placeholder-count="4">
+                <div style="background:#15171D;border:1px solid #21252E;border-radius:15px;padding:16px">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px"><span class="sk" style="width:30px;height:30px;border-radius:9px"></span><span class="sk" style="width:110px;height:11px"></span><span class="sk" style="width:42px;height:18px;margin-left:auto;border-radius:99px"></span></div>
+                  <span class="sk" style="display:block;width:78%;height:16px;margin-bottom:11px"></span>
+                  <span class="sk" style="display:block;width:100%;height:11px;margin-bottom:7px"></span>
+                  <span class="sk" style="display:block;width:55%;height:11px;margin-bottom:16px"></span>
+                  <div style="display:flex;justify-content:space-between"><span class="sk" style="width:84px;height:20px"></span><span class="sk" style="width:60px;height:11px"></span></div>
+                </div>
+              </sc-for>
+            </sc-if>
+
+            <!-- LOADED · services -->
+            <sc-if value="{{ showServices }}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{ services }}" as="s" hint-placeholder-count="4">
+                <div onClick="{{ open }}" data-id="{{ s.id }}" class="press reveal" style="background:#15171D;border:1px solid #21252E;border-radius:15px;padding:16px;cursor:pointer;animation-delay:{{ s.delay }}" style-hover="border-color:#3A4150">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">
+                    <span style="width:30px;height:30px;border-radius:9px;background:{{ s.chip }};color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">{{ s.initials }}</span>
+                    <span style="font-size:13px;font-weight:600">{{ s.tutor }}</span>
+                    <!-- reputation pill, gold, leading -->
+                    <span style="margin-left:auto;display:flex;align-items:center;gap:5px;background:rgba(255,194,71,.12);padding:4px 10px;border-radius:99px"><span style="color:#FFC247;font-size:12px">★</span><span style="font-size:12px;font-weight:700;color:#FFC247;font-variant-numeric:tabular-nums">{{ s.rating }}</span><span style="font-size:11px;color:#A8843C">· {{ s.reviews }}</span></span>
+                  </div>
+                  <div style="font-size:17px;font-weight:600;line-height:22px;margin-bottom:7px">{{ s.subject }} · {{ s.teacher }}</div>
+                  <div style="font-size:14px;line-height:19px;color:#8A93A3;margin-bottom:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ s.desc }}</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between">
+                    <span style="font-size:19px;font-weight:700;font-variant-numeric:tabular-nums">{{ s.priceText }}</span>
+                    <span style="font-size:13px;color:#5B6472">{{ s.responses }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </sc-if>
+
+            <!-- LOADED · requests -->
+            <sc-if value="{{ showRequests }}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{ requests }}" as="q" hint-placeholder-count="3">
+                <div class="press reveal" style="background:#15171D;border:1px solid #21252E;border-radius:15px;padding:16px;cursor:pointer;animation-delay:{{ q.delay }}">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px"><span style="width:30px;height:30px;border-radius:9px;background:{{ q.chip }};color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">{{ q.initials }}</span><span style="font-size:13px;font-weight:600">{{ q.student }}</span></div>
+                  <div style="font-size:17px;font-weight:600;line-height:22px;margin-bottom:7px">{{ q.subject }} · {{ q.teacher }}</div>
+                  <div style="font-size:14px;line-height:19px;color:#8A93A3;margin-bottom:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ q.desc }}</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:19px;font-weight:700;font-variant-numeric:tabular-nums">{{ q.budgetText }}</span><span style="font-size:13px;color:#5B6472">{{ q.count }}</span></div>
+                </div>
+              </sc-for>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ===== DETAIL (reviews-forward) ===== -->
+        <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:16px 18px 18px">
+            <!-- tutor + big reputation -->
+            <div class="reveal" style="display:flex;align-items:center;gap:13px;margin-bottom:18px">
+              <span style="width:54px;height:54px;border-radius:15px;background:{{ cur.chip }};color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;flex:0 0 auto">{{ cur.initials }}</span>
+              <div><div style="font-size:18px;font-weight:600">{{ cur.tutor }}</div><div style="font-size:13px;color:#5B6472;margin-top:2px">{{ cur.subject }} · {{ cur.teacher }}</div></div>
+            </div>
+
+            <!-- REPUTATION HERO -->
+            <div class="reveal" style="display:flex;gap:14px;background:#15171D;border:1px solid #21252E;border-radius:16px;padding:18px;margin-bottom:14px;animation-delay:.05s">
+              <div style="text-align:center;flex:0 0 auto;padding-right:14px;border-right:1px solid #21252E;display:flex;flex-direction:column;justify-content:center">
+                <div style="font-size:38px;font-weight:700;color:#FFC247;line-height:1;font-variant-numeric:tabular-nums">{{ cur.rating }}</div>
+                <div style="color:#FFC247;font-size:13px;letter-spacing:2px;margin-top:6px">{{ cur.stars }}</div>
+                <div style="font-size:12px;color:#5B6472;margin-top:5px">{{ cur.reviews }} отзывов</div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px">
+                <sc-for list="{{ cur.dist }}" as="d" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:11px;color:#5B6472;width:8px;font-variant-numeric:tabular-nums">{{ d.star }}</span>
+                    <span style="flex:1;height:6px;border-radius:99px;background:#21252E;overflow:hidden"><span style="display:block;height:100%;width:{{ d.pct }};border-radius:99px;background:#FFC247;transform-origin:left;animation:growx .7s cubic-bezier(.3,.8,.3,1) both;animation-delay:{{ d.delay }}"></span></span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- price + responses -->
+            <div class="reveal" style="display:flex;gap:12px;margin-bottom:18px;animation-delay:.1s">
+              <div style="flex:1;background:#15171D;border:1px solid #21252E;border-radius:13px;padding:14px"><div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#5B6472;margin-bottom:6px">Цена</div><div style="font-size:22px;font-weight:700;font-variant-numeric:tabular-nums">{{ cur.priceText }}</div></div>
+              <div style="flex:1;background:#15171D;border:1px solid #21252E;border-radius:13px;padding:14px"><div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#5B6472;margin-bottom:6px">Откликов</div><div style="font-size:22px;font-weight:700;font-variant-numeric:tabular-nums">{{ cur.respCount }}</div></div>
+            </div>
+
+            <!-- recent reviews -->
+            <div class="reveal" style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#5B6472;margin-bottom:11px;animation-delay:.14s">Последние отзывы</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ cur.reviewList }}" as="r" hint-placeholder-count="2">
+                <div class="reveal" style="background:#15171D;border:1px solid #21252E;border-radius:13px;padding:14px;animation-delay:{{ r.delay }}">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+                    <span style="width:26px;height:26px;border-radius:8px;background:{{ r.chip }};color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">{{ r.initials }}</span>
+                    <span style="font-size:13px;font-weight:600">{{ r.author }}</span>
+                    <span style="margin-left:auto;color:#FFC247;font-size:12px;letter-spacing:1px">{{ r.stars }}</span>
+                  </div>
+                  <div style="font-size:14px;line-height:1.45;color:#C9CFD8">{{ r.text }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="flex:0 0 auto;padding:13px 18px;background:#0E0F13;border-top:1px solid #1A1D24">
+            <sc-if value="{{ responded }}" hint-placeholder-val="{{ false }}">
+              <div style="height:52px;border-radius:13px;border:1.5px solid #7C8CFF;color:#7C8CFF;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:600">✓ Вы откликнулись</div>
+            </sc-if>
+            <sc-if value="{{ notResponded }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ goRespond }}" class="press" style="width:100%;height:52px;border:none;border-radius:13px;background:#7C8CFF;color:#0E0F13;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">Откликнуться</button>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ===== RESPOND ===== -->
+        <sc-if value="{{ isRespond }}" hint-placeholder-val="{{ false }}">
+          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:16px 18px 18px">
+            <div class="reveal" style="background:#15171D;border-left:3px solid #7C8CFF;border-radius:10px;padding:14px 16px;margin-bottom:22px">
+              <div style="font-size:15px;font-weight:600;margin-bottom:3px">{{ cur.subject }} · {{ cur.teacher }}</div>
+              <div style="font-size:13px;color:#5B6472">{{ cur.tutor }} · {{ cur.priceText }}</div>
+            </div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8A93A3;margin-bottom:9px">Сообщение</div>
+            <div style="min-height:94px;border-radius:12px;background:#15171D;border:1.5px solid #7C8CFF;padding:14px 16px;font-size:16px;line-height:1.45;margin-bottom:20px">Готов помочь, есть опыт с этим преподавателем. Разберём всё по шагам.<span style="width:2px;height:19px;background:#7C8CFF;display:inline-block;vertical-align:-3px"></span></div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#8A93A3;margin-bottom:9px">Ваша цена</div>
+            <div style="height:52px;border-radius:12px;background:#15171D;border:1.5px solid #21252E;display:flex;align-items:center;padding:0 16px"><span style="font-size:16px;color:#5B6472">₽</span><span style="flex:1;text-align:right;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">1 400</span></div>
+          </div>
+          <div style="flex:0 0 auto;padding:13px 18px;background:#0E0F13;border-top:1px solid #1A1D24">
+            <button onClick="{{ submitResponse }}" class="press" style="width:100%;height:52px;border:none;border-radius:13px;background:#7C8CFF;color:#0E0F13;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">Отправить отклик</button>
+          </div>
+        </sc-if>
+
+        <!-- ===== DEALS ===== -->
+        <sc-if value="{{ isDeals }}" hint-placeholder-val="{{ false }}">
+          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:16px 18px 18px">
+            <div class="reveal" style="background:#15171D;border:1px solid #21252E;border-radius:16px;padding:18px;margin-bottom:16px">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:7px">
+                <div style="font-size:18px;font-weight:600;line-height:1.1">Мат. анализ<br>Иванов И.И.</div>
+                <span style="font-size:12px;font-weight:600;padding:4px 11px;border-radius:99px;background:{{ stBadgeBg }};color:{{ stBadgeColor }}">{{ dealStatusLabel }}</span>
+              </div>
+              <div style="font-size:14px;color:#5B6472;margin-bottom:20px">с Анна Петрова · <span style="color:#E8EAED;font-weight:600;font-variant-numeric:tabular-nums">1 400 ₽</span></div>
+              <!-- animated stepper -->
+              <div style="display:flex;align-items:center;margin-bottom:8px">
+                <sc-for list="{{ steps }}" as="st" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;flex:{{ st.flex }}">
+                    <span style="width:30px;height:30px;border-radius:9px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:{{ st.bg }};color:{{ st.fg }};border:{{ st.border }};transition:background .4s,color .4s,border .4s">{{ st.icon }}</span>
+                    <sc-if value="{{ st.notLast }}" hint-placeholder-val="{{ true }}"><span style="flex:1;height:3px;background:#21252E;margin:0 5px;border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:100%;background:#7C8CFF;transform-origin:left;transform:scaleX({{ st.fill }});transition:transform .5s cubic-bezier(.3,.8,.3,1)"></span></span></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#5B6472"><span>Создана</span><span>Завершена</span></div>
+            </div>
+            <button onClick="{{ advanceDeal }}" class="press" style="width:100%;height:50px;border:none;border-radius:13px;background:{{ advBg }};color:{{ advColor }};font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">{{ advLabel }}</button>
+          </div>
+        </sc-if>
+
+        <!-- ===== PROFILE ===== -->
+        <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+          <div ref="{{ setScroller }}" style="flex:1;overflow-y:auto;padding:16px 18px 18px">
+            <div class="reveal" style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+              <span style="width:60px;height:60px;border-radius:17px;background:#7C8CFF;color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700">МК</span>
+              <div><div style="font-size:21px;font-weight:700;letter-spacing:-.01em">Максим Котов</div><div style="font-size:13px;color:#5B6472;margin-top:2px">@maksim_k · Группа 4-301</div></div>
+            </div>
+            <!-- reputation hero on profile -->
+            <div class="reveal" style="background:#15171D;border:1px solid #21252E;border-radius:16px;padding:18px;margin-bottom:16px;animation-delay:.05s">
+              <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:14px">
+                <div style="font-size:40px;font-weight:700;color:#FFC247;line-height:.9;font-variant-numeric:tabular-nums">4.9</div>
+                <div style="padding-bottom:4px"><div style="color:#FFC247;font-size:14px;letter-spacing:2px">★★★★★</div><div style="font-size:12px;color:#5B6472;margin-top:3px">18 отзывов о вас</div></div>
+              </div>
+              <sc-for list="{{ profileReviews }}" as="r" hint-placeholder-count="2">
+                <div class="reveal" style="border-top:1px solid #21252E;padding-top:12px;margin-top:12px;animation-delay:{{ r.delay }}">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:24px;height:24px;border-radius:7px;background:{{ r.chip }};color:#0E0F13;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">{{ r.initials }}</span><span style="font-size:13px;font-weight:600">{{ r.author }}</span><span style="margin-left:auto;color:#FFC247;font-size:11px;letter-spacing:1px">{{ r.stars }}</span></div>
+                  <div style="font-size:13px;line-height:1.45;color:#8A93A3">{{ r.text }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div class="reveal" style="display:flex;align-items:center;justify-content:space-between;background:#15171D;border:1px solid #21252E;border-radius:14px;padding:16px;animation-delay:.1s">
+              <span style="font-size:14px;color:#8A93A3">Баланс</span><span style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">3 250 ₽</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== TAB BAR ===== -->
+        <div style="flex:0 0 auto;display:flex;gap:6px;background:#15171D;border-top:1px solid #21252E;padding:10px 12px 26px">
+          <div onClick="{{ setTab }}" data-id="market" class="press" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;border-radius:14px;cursor:pointer;color:{{ colMarket }};background:{{ bgMarket }};transition:color .2s,background .2s">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            <span style="font-size:11px;font-weight:600;letter-spacing:.01em">Маркет</span>
+          </div>
+          <div onClick="{{ setTab }}" data-id="deals" class="press" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;border-radius:14px;cursor:pointer;color:{{ colDeals }};background:{{ bgDeals }};transition:color .2s,background .2s">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2 5-5"/><path d="M3 9l4-4 5 3 5-3 4 4-4 5-5-2-5 2-4-5Z"/></svg>
+            <span style="font-size:11px;font-weight:600;letter-spacing:.01em">Сделки</span>
+          </div>
+          <div onClick="{{ setTab }}" data-id="profile" class="press" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;border-radius:14px;cursor:pointer;color:{{ colProfile }};background:{{ bgProfile }};transition:color .2s,background .2s">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <span style="font-size:11px;font-weight:600;letter-spacing:.01em">Профиль</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { tab:'market', screen:'market', segment:'services', selId:0, responded:false, dealStatus:'ACCEPTED', loading:true };
+
+  componentDidMount(){ this._t = setTimeout(()=>this.setState({ loading:false }), 1500); }
+
+  money(kop){ return Math.round(kop/100).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ') + ' ₽'; }
+  starStr(n){ const f=Math.round(n); return '★★★★★'.slice(0,f) + '☆☆☆☆☆'.slice(0,5-f); }
+
+  get reviewsPool(){
+    return [
+      { author:'Ольга К.', initials:'ОК', chip:'#7C8CFF', stars:'★★★★★', text:'Объясняет так, что наконец-то всё встало на места. Закрыла на отлично.' },
+      { author:'Артём Л.', initials:'АЛ', chip:'#3FB5A8', stars:'★★★★★', text:'На связи в любое время, разобрали все мои пробелы перед экзаменом.' },
+      { author:'Дина С.', initials:'ДС', chip:'#E97A6B', stars:'★★★★☆', text:'Сильный преподаватель, чуть не хватило времени на практику.' },
+    ];
+  }
+
+  get services(){
+    return [
+      { id:0, subject:'Мат. анализ', teacher:'Иванов И.И.', tutor:'Анна Петрова', initials:'АП', chip:'#7C8CFF', rating:4.9, reviews:24, price:150000, desc:'Пределы, производные, интегралы. Готовлю к сессии без паники.', responses:'12 откликов', respCount:12, dist:[96,80,30,8,2] },
+      { id:1, subject:'Физика', teacher:'Сидорова М.А.', tutor:'Дмитрий Волков', initials:'ДВ', chip:'#3FB5A8', rating:4.8, reviews:41, price:180000, desc:'Механика, электродинамика, разбор олимпиадных задач.', responses:'8 откликов', respCount:8, dist:[90,72,40,12,4] },
+      { id:2, subject:'Python', teacher:'Петров А.С.', tutor:'Игорь Лебедев', initials:'ИЛ', chip:'#FFC247', rating:4.6, reviews:9, price:200000, desc:'С нуля до уверенного кода. Структуры данных, лабы.', responses:'15 откликов', respCount:15, dist:[78,60,44,20,6] },
+      { id:3, subject:'Английский', teacher:'Кузнецова О.В.', tutor:'Мария Орлова', initials:'МО', chip:'#E97A6B', rating:5.0, reviews:33, price:120000, desc:'Разговорный, грамматика, подготовка к зачёту.', responses:'6 откликов', respCount:6, dist:[100,42,14,4,0] },
+    ];
+  }
+  get requests(){
+    return [
+      { id:0, subject:'Химия', teacher:'Белова Н.П.', student:'Ольга Зайцева', initials:'ОЗ', chip:'#E97A6B', budget:150000, desc:'Органическая химия, разбор задач к коллоквиуму.', count:'2 отклика' },
+      { id:1, subject:'Высшая математика', teacher:'Иванов И.И.', student:'Артём Лис', initials:'АЛ', chip:'#7C8CFF', budget:0, desc:'Линейная алгебра: матрицы, определители, системы.', count:'5 откликов' },
+      { id:2, subject:'История', teacher:'Орлов Д.К.', student:'Нина Ким', initials:'НК', chip:'#3FB5A8', budget:100000, desc:'Подготовка к семинару, помощь с эссе.', count:'1 отклик' },
+    ];
+  }
+
+  reload(){ clearTimeout(this._t); this.setState({ loading:true }); this._t=setTimeout(()=>this.setState({loading:false}),1400); this.toTop(); }
+  open(e){ this.setState({ screen:'detail', selId:+e.currentTarget.dataset.id }); this.toTop(); }
+  setTab(e){ const t=e.currentTarget.dataset.id; this.setState({ tab:t, screen:t }); this.toTop(); }
+  setSegment(e){ this.setState({ segment:e.currentTarget.dataset.seg }); }
+  goRespond(){ this.setState({ screen:'respond' }); this.toTop(); }
+  back(){ const s=this.state.screen; if(s==='respond') this.setState({screen:'detail'}); else this.setState({screen:'market',tab:'market'}); this.toTop(); }
+  toTop(){ if(this.scroller) this.scroller.scrollTop=0; }
+  submitResponse(){ this.setState({ responded:true, screen:'detail', toast:'Отклик отправлен' }); this.toTop(); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),2000); }
+  advanceDeal(){ const o=['PENDING','ACCEPTED','IN_PROGRESS','COMPLETED']; const i=o.indexOf(this.state.dealStatus); if(i<o.length-1) this.setState({dealStatus:o[i+1]}); }
+
+  renderVals(){
+    const seg=this.state.segment, segS = seg==='services';
+    const svc=this.services.map((s,i)=>({
+      ...s, priceText:this.money(s.price), rating:s.rating.toFixed(1), stars:this.starStr(s.rating),
+      delay:(i*0.07)+'s',
+      dist:s.dist.map((p,j)=>({ star:5-j, pct:p+'%', delay:(0.15+j*0.06)+'s' })),
+      reviewList:this.reviewsPool.slice(0,2).map((r,k)=>({ ...r, delay:(0.18+k*0.07)+'s' })),
+    }));
+    const cur=svc[this.state.selId]||svc[0];
+    const reqs=this.requests.map((q,i)=>({ ...q, budgetText: q.budget>0?'до '+this.money(q.budget):'Бюджет не указан', delay:(i*0.07)+'s' }));
+    const sc=this.state.screen;
+
+    const order=['PENDING','ACCEPTED','IN_PROGRESS','COMPLETED'];
+    const labels={PENDING:'Ожидает',ACCEPTED:'Принята',IN_PROGRESS:'В работе',COMPLETED:'Завершена'};
+    const badge={PENDING:['rgba(255,194,71,.14)','#FFC247'],ACCEPTED:['rgba(124,140,255,.16)','#7C8CFF'],IN_PROGRESS:['rgba(124,140,255,.16)','#9AA6FF'],COMPLETED:['rgba(63,181,168,.16)','#3FB5A8']};
+    const ci=order.indexOf(this.state.dealStatus);
+    const steps=order.map((k,i)=>{
+      const done=i<ci, active=i===ci, last=i===order.length-1;
+      let bg,fg,border,icon;
+      if(done){ bg='#7C8CFF'; fg='#0E0F13'; border='none'; icon='✓'; }
+      else if(active){ bg='rgba(124,140,255,.18)'; fg='#7C8CFF'; border='1.5px solid #7C8CFF'; icon=String(i+1); }
+      else { bg='transparent'; fg='#5B6472'; border='1.5px solid #2A2F3A'; icon=String(i+1); }
+      return { bg,fg,border,icon, notLast:!last, flex:last?'0 0 auto':'1', fill: i<ci?'1':'0' };
+    });
+    const advLabel={PENDING:'Подтвердить',ACCEPTED:'Перевести в работу',IN_PROGRESS:'Завершить сделку',COMPLETED:'✓ Сделка завершена'}[this.state.dealStatus];
+    const completed=this.state.dealStatus==='COMPLETED';
+    const tcol=(t)=> this.state.tab===t ? '#7C8CFF' : '#5B6472';
+    const tbg=(t)=> this.state.tab===t ? 'rgba(124,140,255,.14)' : 'transparent';
+    const profileReviews=this.reviewsPool.slice(0,2).map((r,k)=>({ ...r, delay:(0.1+k*0.07)+'s' }));
+
+    // ---- единый хедер ----
+    const headerMap = {
+      market:  { title:'Маркет',     sub:'Найдите репетитора',  back:false, reload:true  },
+      deals:   { title:'Сделки',     sub:'Ваши активные занятия', back:false, reload:false },
+      profile: { title:'Профиль',    sub:'',                    back:false, reload:false },
+      detail:  { title:'Репетитор',  sub:cur.subject,           back:true,  reload:false },
+      respond: { title:'Ваш отклик', sub:cur.tutor,             back:true,  reload:false },
+    };
+    const H = headerMap[sc] || headerMap.market;
+
+    return {
+      services:svc, cur, requests:reqs,
+      skeletons:[1,2,3,4],
+      loading:this.state.loading,
+      showServices: !this.state.loading && segS,
+      showRequests: !this.state.loading && !segS,
+      isMarket:sc==='market', isDetail:sc==='detail', isRespond:sc==='respond', isDeals:sc==='deals', isProfile:sc==='profile',
+      responded:this.state.responded, notResponded:!this.state.responded,
+      toast:this.state.toast||'', hasToast:!!this.state.toast,
+      segShift: segS?'0%':'100%',
+      segSvcColor: segS?'#0E0F13':'#8A93A3', segReqColor: segS?'#8A93A3':'#0E0F13',
+      steps, dealStatusLabel:labels[this.state.dealStatus],
+      stBadgeBg:badge[this.state.dealStatus][0], stBadgeColor:badge[this.state.dealStatus][1],
+      advLabel, advBg: completed?'#15171D':'#7C8CFF', advColor: completed?'#3FB5A8':'#0E0F13',
+      profileReviews,
+      colMarket:tcol('market'), colDeals:tcol('deals'), colProfile:tcol('profile'),
+      bgMarket:tbg('market'), bgDeals:tbg('deals'), bgProfile:tbg('profile'),
+      headerTitle:H.title, headerSub:H.sub, hasHeaderSub:!!H.sub,
+      headerBack:H.back, headerLogo:!H.back, headerReload:H.reload,
+      reload:()=>this.reload(), open:(e)=>this.open(e), setTab:(e)=>this.setTab(e), setSegment:(e)=>this.setSegment(e),
+      goRespond:()=>this.goRespond(), back:()=>this.back(), submitResponse:()=>this.submitResponse(), advanceDeal:()=>this.advanceDeal(),
+      setScroller:(el)=>{ this.scroller=el; },
+    };
+  }
+}
+</script>
+</body>
+</html>

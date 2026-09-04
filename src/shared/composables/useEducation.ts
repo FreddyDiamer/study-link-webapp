@@ -8,6 +8,7 @@ export const useEducation = () => {
   const subjects = computed(() => educationStore.subjects)
   const activeSubjects = computed(() => educationStore.activeSubjects)
   const teachers = computed(() => educationStore.teachers)
+  const groups = computed(() => educationStore.groups)
   const isLoading = computed(() => educationStore.isLoading)
   const error = computed(() => educationStore.error)
   const isInitialized = computed(() => educationStore.isInitialized)
@@ -28,6 +29,7 @@ export const useEducation = () => {
     subjects,
     activeSubjects,
     teachers,
+    groups,
     isLoading,
     error,
     isInitialized,
