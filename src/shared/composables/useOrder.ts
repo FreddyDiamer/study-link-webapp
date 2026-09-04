@@ -79,6 +79,24 @@ export const useOrder = () => {
     }
   }
 
+  const closeRequest = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.closeRequest(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const reopenRequest = async (id: string) => {
+    isLoading.value = true
+    try {
+      return await orderService.reopenRequest(id)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const deleteRequest = async (id: string) => {
     isLoading.value = true
     try {
@@ -361,6 +379,8 @@ export const useOrder = () => {
     getRequest,
     createRequest,
     updateRequest,
+    closeRequest,
+    reopenRequest,
     deleteRequest,
 
     // Deals

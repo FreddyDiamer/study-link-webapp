@@ -9,15 +9,18 @@ interface Props {
   back?: boolean
   /** «+» справа — в макете открывает развилку намерения */
   add?: boolean
+  /** «···» справа — меню действий над своим объектом */
+  menu?: boolean
   /** куда возвращает «‹», если некуда возвращаться в истории */
   backTo?: string
 }
 const props = withDefaults(defineProps<Props>(), {
   back: false,
   add: false,
+  menu: false,
   backTo: PATHS.MARKET,
 })
-const emit = defineEmits<{ add: [] }>()
+const emit = defineEmits<{ add: []; menu: [] }>()
 
 const router = useRouter()
 const telegramStore = useTelegramStore()
@@ -32,6 +35,11 @@ const goBack = () => {
 const onAdd = () => {
   telegramStore.hapticFeedback('light')
   emit('add')
+}
+
+const onMenu = () => {
+  telegramStore.hapticFeedback('light')
+  emit('menu')
 }
 </script>
 
@@ -71,7 +79,15 @@ const onAdd = () => {
     </div>
 
     <button
-      v-if="add"
+      v-if="menu"
+      class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-panel border border-d-border flex items-center justify-center text-d-text-second text-[20px] leading-none"
+      aria-label="Действия"
+      @click="onMenu"
+    >
+      ···
+    </button>
+    <button
+      v-else-if="add"
       class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-accent text-d-ink flex items-center justify-center text-[26px] leading-none font-light"
       aria-label="Создать"
       @click="onAdd"

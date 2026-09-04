@@ -133,6 +133,12 @@ export interface Service {
   responses?: ServiceResponse[]
 }
 
+export enum RequestStatus {
+  OPEN = 'OPEN',
+  MATCHED = 'MATCHED',
+  CLOSED = 'CLOSED',
+}
+
 export interface Request {
   id: string
   studentId: string
@@ -140,6 +146,8 @@ export interface Request {
   teacherId: string
   description?: string
   budget?: number // в копейках
+  status: RequestStatus
+  closedAt?: string | null
   deadline?: string
   createdAt: string
   updatedAt: string
@@ -310,6 +318,14 @@ export interface CreateRequestResponseDto {
   message?: string
   price?: number
   proposedDeadline?: string
+}
+
+/** Настройки уведомлений: отписка не должна означать блокировку бота. */
+export interface NotificationPreferences {
+  onResponse?: boolean
+  onDeal?: boolean
+  onReview?: boolean
+  onDigest?: boolean
 }
 
 export interface CreateReviewDto {

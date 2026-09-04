@@ -33,6 +33,12 @@ export const ordersApi = {
   updateRequest: (id: string, data: UpdateRequestDto) =>
     apiClient.patch<Request>(`/marketplace/requests/${id}`, data),
 
+  // Закрыть заявку: уходит из ленты, отклики отклоняются
+  closeRequest: (id: string) => apiClient.patch<Request>(`/marketplace/requests/${id}/close`),
+
+  // Переоткрыть: создаётся новая публикация с теми же условиями
+  reopenRequest: (id: string) => apiClient.post<Request>(`/marketplace/requests/${id}/reopen`),
+
   // Удалить заявку
   deleteRequest: (id: string) => apiClient.delete(`/marketplace/requests/${id}`),
 

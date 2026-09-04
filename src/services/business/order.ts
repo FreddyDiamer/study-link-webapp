@@ -105,6 +105,32 @@ export class OrderService {
     }
   }
 
+  async closeRequest(id: string): Promise<Request> {
+    try {
+      this.telegramStore.hapticFeedback('medium')
+
+      const request = await ordersApi.closeRequest(id)
+
+      return this.convertRequestToRubles(request)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при закрытии заявки')
+      throw error
+    }
+  }
+
+  async reopenRequest(id: string): Promise<Request> {
+    try {
+      this.telegramStore.hapticFeedback('success')
+
+      const request = await ordersApi.reopenRequest(id)
+
+      return this.convertRequestToRubles(request)
+    } catch (error) {
+      this.handleError(error, 'Ошибка при переоткрытии заявки')
+      throw error
+    }
+  }
+
   async deleteRequest(id: string): Promise<void> {
     try {
       this.telegramStore.hapticFeedback('medium')

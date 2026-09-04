@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 import { countWithWord, formatDeadline, formatKopeks } from '@/shared/utils'
-import type { Request } from '@/shared/types'
+import { RequestStatus, type Request } from '@/shared/types'
 
 interface Props {
   request: Request
@@ -24,22 +24,34 @@ const responsesLabel = computed(() =>
 )
 
 const deadlineText = computed(() => formatDeadline(props.request.deadline))
+
+// заявка не провалилась, она сработала — метка нейтральная, без коралла
+const isOpen = computed(() => props.request.status === RequestStatus.OPEN)
+const statusLabel = computed(() =>
+  props.request.status === RequestStatus.MATCHED ? 'Репетитор найден' : 'Закрыта',
+)
 </script>
 
 <template>
   <article
     class="press reveal bg-d-panel border border-d-border rounded-card p-4 cursor-pointer hover:border-d-border-hover"
+    :class="isOpen ? '' : 'opacity-[0.72]'"
     :style="delay ? { animationDelay: delay } : undefined"
   >
     <div class="flex items-center gap-2.5 mb-3">
       <AvatarChip :name="request.student?.name" size="md" />
       <span class="text-caption font-semibold">{{ request.student?.name || 'Студент' }}</span>
       <span
-        v-if="mine"
+        v-if="mine && isOpen"
         class="text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-accent/[0.16] text-d-accent"
         >Моя</span
       >
-      <span class="ml-auto text-[12px] text-d-text-hint">{{ responsesLabel }}</span>
+      <span
+        v-else-if="!isOpen"
+        class="text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-text-mute/20 text-d-text-second"
+        >{{ statusLabel }}</span
+      >
+      <span v-if="isOpen" class="ml-auto text-[12px] text-d-text-hint">{{ responsesLabel }}</span>
     </div>
 
     <h3 class="text-title-m mb-1.5">
@@ -51,7 +63,9 @@ const deadlineText = computed(() => formatDeadline(props.request.deadline))
 
     <div class="flex items-center justify-between">
       <span class="text-price tnum">{{ budgetText }}</span>
-      <span class="text-caption text-d-text-hint">{{ deadlineText }}</span>
+      <span class="text-caption text-d-text-hint">
+        {{ isOpen ? deadlineText : 'Отклики закрыты' }}
+      </span>
     </div>
   </article>
 </template>

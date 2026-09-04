@@ -9,15 +9,23 @@ import AvatarChip from '@/shared/components/AvatarChip.vue'
 import ReviewItem from '@/shared/components/ReviewItem.vue'
 import ReputationPair from '../components/ReputationPair.vue'
 import GroupSheet from '../components/GroupSheet.vue'
-import { countWithWord, formatJoined, formatKopeks } from '@/shared/utils'
+import { countWithWord, formatDayMonth, formatJoined, formatKopeks } from '@/shared/utils'
 import { requestDetailPath } from '@/router/paths'
 import { PATHS } from '@/router/paths'
-import type { Reputation, Request, Review, Service, User } from '@/shared/types'
+import {
+  RequestStatus,
+  ServiceStatus,
+  type Reputation,
+  type Request,
+  type Review,
+  type Service,
+  type User,
+} from '@/shared/types'
 
 const router = useRouter()
 const auth = useAuthStore()
 const { getMyRequests } = useOrder()
-const { getMyServices } = useService()
+const { getMyServices, activateService } = useService()
 const { showToast } = useToast()
 
 const loading = ref(true)
@@ -76,6 +84,20 @@ const responsesLabel = (request: Request) =>
 const responsesCount = (count: number) => countWithWord(count, 'заявка', 'заявки', 'заявок')
 
 const roleOf = (review: Review) => (review.targetRole === 'TUTOR' ? 'tutor' : 'student')
+
+const isRequestOpen = (request: Request) => request.status === RequestStatus.OPEN
+const isServiceListed = (service: Service) => service.status === ServiceStatus.ACTIVE
+
+// вернуть скрытую услугу в ленту — её единственное действие, поэтому здесь же
+const returnToFeed = async (service: Service) => {
+  try {
+    await activateService(service.id)
+    showToast('Услуга вернулась в ленту')
+    await load()
+  } catch (e) {
+    console.error('Не удалось вернуть услугу в ленту:', e)
+  }
+}
 
 onMounted(load)
 </script>
@@ -173,16 +195,33 @@ onMounted(load)
           v-for="request in myRequests"
           :key="request.id"
           class="press reveal w-full bg-d-panel border border-d-border rounded-[14px] p-[15px] text-left"
+          :class="isRequestOpen(request) ? '' : 'opacity-[0.72]'"
           style="animation-delay: 0.1s"
           @click="router.push(requestDetailPath(request.id))"
         >
+          <div class="flex items-center gap-2 mb-2">
+            <span
+              class="text-[11px] font-bold px-2.5 py-[3px] rounded-full"
+              :class="
+                isRequestOpen(request)
+                  ? 'bg-d-teal/[0.16] text-d-teal'
+                  : 'bg-d-text-mute/20 text-d-text-second'
+              "
+            >
+              {{ isRequestOpen(request) ? 'Активна' : 'Закрыта' }}
+            </span>
+            <span class="ml-auto text-[12px] text-d-text-hint">
+              {{
+                isRequestOpen(request)
+                  ? responsesLabel(request)
+                  : `Закрыта ${formatDayMonth(request.closedAt)}`
+              }}
+            </span>
+          </div>
           <div class="text-[16px] font-semibold mb-1.5">
             {{ request.subject?.name }} · {{ request.teacher?.fullName }}
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-[16px] font-bold tnum">{{ budgetText(request) }}</span>
-            <span class="text-[12px] text-d-text-hint">{{ responsesLabel(request) }}</span>
-          </div>
+          <div class="text-[16px] font-bold tnum">{{ budgetText(request) }}</div>
         </button>
       </div>
       <p v-else class="text-subhead text-d-text-hint">Вы ещё не создавали заявок</p>
