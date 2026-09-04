@@ -79,7 +79,7 @@ pnpm format       # prettier --write src/
 ### Environment (`.env`, see `.env.example`)
 
 - `VITE_API_BASE_URL` — backend base URL (default `http://localhost:3000/api`).
-- `VITE_MOCK_TELEGRAM_INIT_DATA` — fake Telegram `initData` for local dev outside Telegram.
+- `VITE_MOCK_TELEGRAM_INIT_DATA` — fake Telegram `initData` for local dev outside Telegram. Honoured only in dev builds (`import.meta.env.DEV`); production bundles never contain it.
 
 ---
 
@@ -92,7 +92,8 @@ Pages / Components  →  composables (use*)  →  services/business  →  servic
 ```
 
 - **`services/api/*`** — thin axios wrappers over `apiClient`. `apiClient` injects the bearer token,
-  unwraps `ApiResponse<T>.data`, and on **401** clears auth and redirects to `/auth`. No business logic.
+  unwraps `ApiResponse<T>.data`, and on **401** clears auth storage and dispatches `AUTH_EXPIRED_EVENT`
+  (`App.vue` retries the Telegram login once, then shows a "session expired" screen). No business logic.
 - **`services/business/*`** — singleton service classes (`authService`, `orderService`,
   `serviceService`, `tutorService`, `userService`, `educationService`, `reviewService`). They hold
   validation, kopeks↔rubles conversion, Telegram side effects (haptics/alerts), and translate errors
@@ -177,8 +178,9 @@ two-sided reviews) and the everyday-use states (request lifecycle, ownership act
 menu, outgoing responses, profile and notifications, honest failure states vs emptiness).
 
 Known gaps: a service has no view counter (the canvas shows one), and there is no pagination —
-the feed shows what the first page returns. `vite.config.ts` still has a `// TODO: remove this`
-on `allowedHosts: true`. The previous architecture (two role flows) is preserved in the
+the feed shows what the first page returns. `vite.config.ts` whitelists dev-server hosts explicitly
+(add your tunnel host to `allowedHosts`) and injects a production-only CSP (`script-src` self +
+telegram.org, `connect-src` self + the `VITE_API_BASE_URL` origin). The previous architecture (two role flows) is preserved in the
 `no-design-system-branch` branch.
 
 ---

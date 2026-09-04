@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
-import { API_BASE_URL, STORAGE_KEYS } from '@/shared/constants'
+import { API_BASE_URL, AUTH_EXPIRED_EVENT, STORAGE_KEYS } from '@/shared/constants'
 import type { ApiResponse } from '@/shared/types'
 
 class ApiClient {
@@ -35,11 +35,11 @@ class ApiClient {
       (response: AxiosResponse<ApiResponse<any>>) => response,
       (error) => {
         if (error.response?.status === 401) {
-          // Очищаем токен при 401
+          // Очищаем токен при 401 и сообщаем приложению: маршрута /auth нет,
+          // повторный вход по initData делает App.vue
           localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
           localStorage.removeItem(STORAGE_KEYS.USER)
-          // Редирект на авторизацию
-          window.location.href = '/auth'
+          window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT))
         }
         return Promise.reject(error)
       },

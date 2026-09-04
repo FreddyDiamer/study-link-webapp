@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import BottomNav from '@/shared/components/layout/BottomNav.vue'
 import DevLogin from '@/features/auth/DevLogin.vue'
 import { AppToast } from '@/shared/components/ui'
 import { useAuthStore, useEducationStore } from '@/stores'
-import { MOCK_INIT_DATA } from './shared/constants'
+import { AUTH_EXPIRED_EVENT, MOCK_INIT_DATA } from './shared/constants'
 
 const authStore = useAuthStore()
 const educationStore = useEducationStore()
@@ -41,7 +41,32 @@ const onDevAuthed = () => {
   initEducation()
 }
 
-onMounted(initializeApp)
+// 401 от API: сбрасываем сессию и один раз пробуем войти заново по initData;
+// если и это не удалось — показываем экран «откройте в Telegram» вместо цикла перезагрузок
+const sessionExpired = ref(false)
+let reloginAttempted = false
+const handleAuthExpired = async () => {
+  authStore.clearAuth()
+  if (reloginAttempted) {
+    sessionExpired.value = true
+    return
+  }
+  reloginAttempted = true
+  await initializeApp()
+  if (!authStore.isAuthenticated) sessionExpired.value = true
+}
+
+const handleRetryLogin = async () => {
+  sessionExpired.value = false
+  await initializeApp()
+  if (!authStore.isAuthenticated) sessionExpired.value = true
+}
+
+onMounted(() => {
+  window.addEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired)
+  initializeApp()
+})
+onBeforeUnmount(() => window.removeEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired))
 </script>
 
 <template>
@@ -62,6 +87,21 @@ onMounted(initializeApp)
           <component :is="Page" />
         </Transition>
       </RouterView>
+
+      <!-- сессия истекла -->
+      <div
+        v-else-if="sessionExpired"
+        class="flex flex-col items-center justify-center h-full px-8 text-center gap-4"
+      >
+        <p class="text-subhead text-d-text-second">Сессия истекла. Войдите заново.</p>
+        <button
+          type="button"
+          class="press h-11 px-6 rounded-[13px] bg-d-accent text-d-ink text-subhead font-bold"
+          @click="handleRetryLogin"
+        >
+          Войти снова
+        </button>
+      </div>
 
       <!-- веб-вход (только дев-окружение) -->
       <DevLogin v-else-if="isDev" @authed="onDevAuthed" />

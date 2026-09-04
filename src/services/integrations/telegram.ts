@@ -35,10 +35,8 @@ class TelegramService {
 
     this.configurate()
 
-    console.log('Telegram WebApp initialized', {
-      version: this.webapp.version,
-      user: this.getUser(),
-    })
+    // без данных пользователя: консоль production-сборки не место для PII
+    console.log('Telegram WebApp initialized', { version: this.webapp.version })
 
     return true
   }

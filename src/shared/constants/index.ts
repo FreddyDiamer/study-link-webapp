@@ -5,7 +5,14 @@ export const APP_VERSION = '1.0.0'
 // API endpoints
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
 
-export const MOCK_INIT_DATA = import.meta.env.VITE_MOCK_TELEGRAM_INIT_DATA || ''
+// Мок initData только для dev-сборки: в production бандл он не попадает,
+// даже если переменная задана в окружении сборки
+export const MOCK_INIT_DATA = import.meta.env.DEV
+  ? import.meta.env.VITE_MOCK_TELEGRAM_INIT_DATA || ''
+  : ''
+
+// Событие window: API ответил 401, сессию нужно переустановить
+export const AUTH_EXPIRED_EVENT = 'studylink:auth-expired'
 
 // Telegram constants
 export const TELEGRAM_BOT_NAME = 'kai_repetitor_bot'

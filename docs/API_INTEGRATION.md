@@ -17,10 +17,11 @@ Run the backend locally alongside `pnpm dev` (frontend on port 3050, backend on 
 
 ## Auth flow
 
-1. Telegram provides `initData` to the Mini App (in browser dev, `VITE_MOCK_TELEGRAM_INIT_DATA` is used instead).
+1. Telegram provides `initData` to the Mini App (in browser dev, `VITE_MOCK_TELEGRAM_INIT_DATA` is used instead — dev builds only, it is stripped from production bundles).
 2. Frontend sends it to `POST /auth/telegram` and receives a JWT.
 3. Token and user are persisted in localStorage (`kai_auth_token`, `kai_user` — `STORAGE_KEYS`).
-4. `services/api/client.ts` interceptors attach `Authorization: Bearer <token>` to every request; on **401** they clear auth storage and redirect to `/auth`.
+4. `services/api/client.ts` interceptors attach `Authorization: Bearer <token>` to every request; on **401** they clear auth storage and dispatch `AUTH_EXPIRED_EVENT` — `App.vue` retries the Telegram login once and otherwise shows a "session expired" screen with a retry button.
+5. Production builds ship a `Content-Security-Policy` meta tag (`vite.config.ts`): `connect-src` is limited to the app origin and the origin of `VITE_API_BASE_URL`, so the API must be on that exact origin at build time.
 
 Canonical auth state lives in `stores/auth.ts` (see CLAUDE.md → Target patterns).
 
@@ -45,4 +46,5 @@ Resource areas: auth, users, education (subjects/teachers reference data), marke
 
 - Network tab: check the raw envelope, statuses, and the `Authorization` header.
 - Vue DevTools: Pinia store state (`auth`, `education`, `app`, `telegram`).
-- 401 loops usually mean an expired/invalid token in localStorage — clear `kai_*` keys.
+- Repeated 401s mean an expired/invalid token in localStorage — the app clears `kai_*` keys itself and re-logins once; if the "session expired" screen appears, the backend rejected the fresh `initData` too.
+- Requests blocked with a CSP error in the console mean `VITE_API_BASE_URL` at build time pointed to a different origin than the one the app calls.
