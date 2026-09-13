@@ -87,8 +87,6 @@ export class ServiceService {
 
       const service = await tutorsApi.createService(serviceData)
 
-      this.telegramStore.showAlert('Услуга успешно создана!')
-
       return this.convertServiceToRubles(service)
     } catch (error) {
       this.handleError(error, 'Ошибка при создании услуги')
@@ -113,8 +111,6 @@ export class ServiceService {
 
       const service = await tutorsApi.updateService(id, updateData)
 
-      this.telegramStore.showAlert('Услуга обновлена!')
-
       return this.convertServiceToRubles(service)
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении услуги')
@@ -127,8 +123,6 @@ export class ServiceService {
       this.telegramStore.hapticFeedback('light')
 
       const service = await tutorsApi.activateService(id)
-
-      this.telegramStore.showAlert('Услуга активирована!')
 
       return this.convertServiceToRubles(service)
     } catch (error) {
@@ -143,8 +137,6 @@ export class ServiceService {
 
       const service = await tutorsApi.deactivateService(id)
 
-      this.telegramStore.showAlert('Услуга деактивирована!')
-
       return this.convertServiceToRubles(service)
     } catch (error) {
       this.handleError(error, 'Ошибка при деактивации услуги')
@@ -157,8 +149,6 @@ export class ServiceService {
       this.telegramStore.hapticFeedback('medium')
 
       await tutorsApi.deleteService(id)
-
-      this.telegramStore.showAlert('Услуга удалена!')
     } catch (error) {
       this.handleError(error, 'Ошибка при удалении услуги')
       throw error

@@ -127,6 +127,7 @@ const scroller = ref<HTMLElement | null>(null)
 const { pull, refreshing, bind } = usePullToRefresh(scroller, load)
 
 const isMine = (request: Request) => request.studentId === auth.user?.id
+const isMyService = (service: Service) => service.tutorId === auth.user?.id
 
 const openService = (id: string) => {
   telegramStore.hapticFeedback('light')
@@ -254,6 +255,7 @@ onMounted(load)
               v-for="(s, i) in visibleServices"
               :key="s.id"
               :service="s"
+              :mine="isMyService(s)"
               :delay="delay(i)"
               @click="openService(s.id)"
             />

@@ -80,8 +80,11 @@ export const ordersApi = {
   // =============================================================================
 
   // Получить отклики на услугу
+  // бэкенд отдаёт { items, total }, а не массив, как у откликов на заявки
   getServiceResponses: (serviceId: string) =>
-    apiClient.get<ServiceResponse[]>(`/marketplace/service-responses/by-service/${serviceId}`),
+    apiClient.get<PaginatedResponse<ServiceResponse>>(
+      `/marketplace/service-responses/by-service/${serviceId}`,
+    ),
 
   // Получить мои отклики на услуги
   getMyServiceResponses: () =>

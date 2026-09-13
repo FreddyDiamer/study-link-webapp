@@ -25,8 +25,6 @@ export class UserService {
 
       const user = await usersApi.updateProfile(data)
 
-      this.telegramStore.showAlert('Профиль обновлен!')
-
       return this.convertUserToRubles(user)
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении профиля')

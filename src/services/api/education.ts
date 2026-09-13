@@ -30,8 +30,18 @@ export const educationApi = {
   // TEACHER SUBJECTS
   // =============================================================================
 
-  getTeacherSubjects(): Promise<TeacherSubject[]> {
-    return apiClient.get('/education/teacher-subjects')
+  // `/education/teacher-subjects` отдаёт страницу (по умолчанию 10 связей), а фильтру
+  // «преподаватели по предмету» нужны все. У `/subjects/active` связи вложены целиком
+  // и без пагинации — разворачиваем их, подставляя предмет-родителя.
+  async getTeacherSubjects(): Promise<TeacherSubject[]> {
+    const subjects = await apiClient.get<{
+      items: (Subject & {
+        teacherSubjects?: (Omit<TeacherSubject, 'subject'> & { teacher: Teacher })[]
+      })[]
+    }>('/education/subjects/active')
+    return (subjects.items ?? []).flatMap((subject) =>
+      (subject.teacherSubjects ?? []).map((ts) => ({ ...ts, subject })),
+    )
   },
 
   getTeacherSubjectsByTeacher(teacherId: string): Promise<TeacherSubject[]> {

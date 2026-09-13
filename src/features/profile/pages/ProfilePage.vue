@@ -12,7 +12,7 @@ import ReputationPair from '../components/ReputationPair.vue'
 import GroupSheet from '../components/GroupSheet.vue'
 import MyResponsesBlock from '../components/MyResponsesBlock.vue'
 import { countWithWord, formatDayMonth, formatJoined, formatKopeks } from '@/shared/utils'
-import { requestDetailPath } from '@/router/paths'
+import { requestDetailPath, serviceDetailPath } from '@/router/paths'
 import { PATHS } from '@/router/paths'
 import {
   RequestStatus,
@@ -27,7 +27,7 @@ import {
 const router = useRouter()
 const auth = useAuthStore()
 const { getMyRequests } = useOrder()
-const { getMyServices, activateService } = useService()
+const { getMyServices } = useService()
 const myResponses = useMyResponses()
 const { showToast } = useToast()
 
@@ -96,23 +96,12 @@ const budgetText = (request: Request) =>
 const responsesLabel = (request: Request) =>
   countWithWord(request.responses?.length ?? 0, 'отклик', 'отклика', 'откликов')
 
-const responsesCount = (count: number) => countWithWord(count, 'заявка', 'заявки', 'заявок')
+const responsesCount = (count: number) => countWithWord(count, 'запись', 'записи', 'записей')
 
 const roleOf = (review: Review) => (review.targetRole === 'TUTOR' ? 'tutor' : 'student')
 
 const isRequestOpen = (request: Request) => request.status === RequestStatus.OPEN
 const isServiceListed = (service: Service) => service.status === ServiceStatus.ACTIVE
-
-// вернуть скрытую услугу в ленту — её единственное действие, поэтому здесь же
-const returnToFeed = async (service: Service) => {
-  try {
-    await activateService(service.id)
-    showToast('Услуга вернулась в ленту')
-    await load()
-  } catch (e) {
-    console.error('Не удалось вернуть услугу в ленту:', e)
-  }
-}
 
 onMounted(load)
 </script>
@@ -291,13 +280,23 @@ onMounted(load)
       <template v-if="myServices.length">
         <div class="text-overline uppercase text-d-text-hint mt-5 mb-2.5">Мои услуги</div>
         <div class="flex flex-col gap-2.5">
-          <div
+          <!-- записи принимаются на экране услуги: карточка ведёт туда -->
+          <button
             v-for="service in myServices"
             :key="service.id"
-            class="bg-d-panel border border-d-border rounded-[14px] p-[15px]"
+            class="press w-full text-left bg-d-panel border border-d-border rounded-[14px] p-[15px]"
+            :class="isServiceListed(service) ? '' : 'opacity-[0.72]'"
+            @click="router.push(serviceDetailPath(service.id))"
           >
-            <div class="text-[16px] font-semibold mb-1.5">
-              {{ service.subject?.name }} · {{ service.teacher?.fullName }}
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-[16px] font-semibold">
+                {{ service.subject?.name }} · {{ service.teacher?.fullName }}
+              </span>
+              <span
+                v-if="!isServiceListed(service)"
+                class="shrink-0 text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-text-mute/20 text-d-text-second"
+                >Скрыта</span
+              >
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[16px] font-bold tnum">{{ formatKopeks(service.price) }}</span>
@@ -305,11 +304,11 @@ onMounted(load)
                 {{
                   service.responses?.length
                     ? responsesCount(service.responses.length)
-                    : 'Пока без заявок'
+                    : 'Пока без записей'
                 }}
               </span>
             </div>
-          </div>
+          </button>
         </div>
       </template>
     </div>

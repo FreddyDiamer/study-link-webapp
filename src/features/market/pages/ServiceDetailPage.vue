@@ -1,30 +1,49 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useOrder, useService, useToast } from '@/shared/composables'
-import { reviewService } from '@/services/business'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
+import { useDealsBadge, useOrder, useService, useToast } from '@/shared/composables'
+import { reviewService } from '@/services/business'
+import { PATHS } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
-import { ActionButton } from '@/shared/components/ui'
+import { ActionButton, ActionsSheet, type SheetAction } from '@/shared/components/ui'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 import ReputationHero from '../components/ReputationHero.vue'
-import { formatKopeks } from '@/shared/utils'
-import type { Review, Service } from '@/shared/types'
+import IncomingBookingCard from '../components/IncomingBookingCard.vue'
+import { countWithWord, formatKopeks } from '@/shared/utils'
+import {
+  ResponseStatus,
+  ServiceStatus,
+  type Review,
+  type Service,
+  type ServiceResponse,
+} from '@/shared/types'
 
 const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 const telegramStore = useTelegramStore()
-const { getService } = useService()
-const { createServiceResponse } = useOrder()
+const { getService, activateService, deactivateService } = useService()
+const { createServiceResponse, getServiceResponses, acceptServiceResponse, rejectServiceResponse } =
+  useOrder()
 const { showToast } = useToast()
+const { refresh: refreshDealsBadge } = useDealsBadge()
 
 const id = route.params.id as string
 const loading = ref(true)
+const failed = ref(false)
 const booking = ref(false)
 const booked = ref(false)
+const deciding = ref(false)
 const service = ref<Service | null>(null)
 const reviews = ref<Review[]>([])
+const bookings = ref<ServiceResponse[]>([])
+const actionsSheet = ref(false)
+
+// роль — свойство объекта: на своей услуге вы исполнитель, на чужой — заказчик
+const isMine = computed(() => service.value?.tutorId === auth.user?.id)
+const isListed = computed(() => service.value?.status === ServiceStatus.ACTIVE)
 
 const rating = computed(() => service.value?.tutor?.rating ?? 0)
 const reviewsCount = computed(() => service.value?.tutor?.reviewsCount ?? reviews.value.length)
@@ -45,14 +64,40 @@ const responded = computed(
   () => booked.value || !!service.value?.responses?.some((r) => r.studentId === auth.user?.id),
 )
 
+const pendingCount = computed(
+  () => bookings.value.filter((b) => b.status === ResponseStatus.PENDING).length,
+)
+
+const headerSub = computed(() => {
+  if (!service.value) return ''
+  if (!isMine.value) return service.value.tutor?.name
+  if (!isListed.value) return 'Скрыта из ленты'
+  return pendingCount.value
+    ? `В ленте · ${countWithWord(pendingCount.value, 'новая запись', 'новые записи', 'новых записей')}`
+    : 'В ленте'
+})
+
+// все действия над своей услугой живут в одном меню
+const actions = computed<SheetAction[]>(() =>
+  isListed.value
+    ? [{ id: 'hide', label: 'Скрыть из ленты', icon: '✕', destructive: true }]
+    : [{ id: 'show', label: 'Вернуть в ленту', icon: '↻' }],
+)
+
 const load = async () => {
   loading.value = true
+  failed.value = false
   try {
     const s = await getService(id)
     service.value = s
-    if (s?.tutor?.id) reviews.value = await reviewService.getUserReviews(s.tutor.id)
+    if (s?.tutorId === auth.user?.id) {
+      bookings.value = await getServiceResponses(id)
+    } else if (s?.tutor?.id) {
+      reviews.value = await reviewService.getUserReviews(s.tutor.id)
+    }
   } catch (e) {
     console.error('Не удалось загрузить услугу:', e)
+    failed.value = true
   } finally {
     loading.value = false
   }
@@ -74,12 +119,66 @@ const book = async () => {
   }
 }
 
+// принятие записи и есть сделка: дальше — подтверждение и отзыв на экране «Сделки»
+const accept = async (responseId: string) => {
+  if (deciding.value) return
+  deciding.value = true
+  try {
+    await acceptServiceResponse(responseId)
+    showToast('Сделка создана')
+    bookings.value = await getServiceResponses(id)
+    await refreshDealsBadge()
+  } catch (e) {
+    console.error('Не удалось принять запись:', e)
+  } finally {
+    deciding.value = false
+  }
+}
+
+const reject = async (responseId: string) => {
+  if (deciding.value) return
+  deciding.value = true
+  try {
+    await rejectServiceResponse(responseId)
+    showToast('Студенту отправлен отказ')
+    bookings.value = await getServiceResponses(id)
+  } catch (e) {
+    console.error('Не удалось отказать:', e)
+  } finally {
+    deciding.value = false
+  }
+}
+
+const onAction = async (action: string) => {
+  try {
+    if (action === 'hide') {
+      service.value = await deactivateService(id)
+      showToast('Услуга скрыта из ленты')
+    } else if (action === 'show') {
+      service.value = await activateService(id)
+      showToast('Услуга вернулась в ленту')
+    }
+  } catch (e) {
+    console.error('Не удалось изменить услугу:', e)
+  }
+}
+
+const goDeals = () => router.push(PATHS.DEALS)
+
+const delay = (i: number) => `${i * 0.06}s`
+
 onMounted(load)
 </script>
 
 <template>
   <div class="flex flex-col h-full">
-    <AppHeader title="Услуга" :sub="service?.tutor?.name" back />
+    <AppHeader
+      :title="isMine ? 'Моя услуга' : 'Услуга'"
+      :sub="headerSub"
+      back
+      :menu="isMine"
+      @menu="actionsSheet = true"
+    />
 
     <div v-if="loading" class="flex-1 flex items-center justify-center">
       <span
@@ -87,7 +186,20 @@ onMounted(load)
       />
     </div>
 
-    <template v-else-if="service">
+    <div
+      v-else-if="failed || !service"
+      class="flex-1 flex flex-col items-center justify-center px-6"
+    >
+      <p class="text-subhead text-d-text-hint text-center mb-4">Не удалось загрузить услугу</p>
+      <button
+        class="press h-11 px-5 rounded-[12px] border border-d-border text-d-text-second text-[15px] font-semibold"
+        @click="load"
+      >
+        Повторить
+      </button>
+    </div>
+
+    <template v-else>
       <div class="flex-1 overflow-y-auto px-[18px] pt-4 pb-[18px]">
         <!-- репетитор -->
         <div class="reveal flex items-center gap-3 mb-4">
@@ -101,6 +213,7 @@ onMounted(load)
         </div>
 
         <ReputationHero
+          v-if="!isMine"
           class="mb-4"
           :rating="rating"
           :reviews-count="reviewsCount"
@@ -123,13 +236,44 @@ onMounted(load)
           >
             Описание
           </div>
-          <p class="reveal text-body text-d-text-bright" style="animation-delay: 0.12s">
+          <p
+            class="reveal text-body text-d-text-bright"
+            :class="isMine ? 'mb-[22px]' : ''"
+            style="animation-delay: 0.12s"
+          >
             {{ service.description }}
+          </p>
+        </template>
+
+        <!-- записи: принять или отказать может только владелец услуги -->
+        <template v-if="isMine">
+          <div class="text-overline uppercase text-d-text-hint mb-3">Записи · кого записать</div>
+          <div v-if="bookings.length" class="flex flex-col gap-3">
+            <IncomingBookingCard
+              v-for="(b, i) in bookings"
+              :key="b.id"
+              :booking="b"
+              :service-price="service.price"
+              :busy="deciding"
+              :delay="delay(i)"
+              @accept="accept"
+              @reject="reject"
+              @open-deal="goDeals"
+            />
+          </div>
+          <p v-else class="text-subhead text-d-text-hint">
+            {{
+              isListed
+                ? 'Пока никто не записался. Услуга видна в ленте — студенты найдут её по предмету.'
+                : 'Услуга скрыта из ленты, новых записей не будет.'
+            }}
           </p>
         </template>
       </div>
 
+      <!-- чужая услуга: запись в одно касание -->
       <div
+        v-if="!isMine"
         class="shrink-0 px-[18px] pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] bg-d-ink border-t border-d-border"
       >
         <div
@@ -141,5 +285,12 @@ onMounted(load)
         <ActionButton v-else :loading="booking" @click="book">Записаться</ActionButton>
       </div>
     </template>
+
+    <ActionsSheet
+      v-model="actionsSheet"
+      title="Действия с услугой"
+      :actions="actions"
+      @pick="onAction"
+    />
   </div>
 </template>

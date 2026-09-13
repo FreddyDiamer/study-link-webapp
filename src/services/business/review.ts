@@ -43,8 +43,6 @@ export class ReviewService {
 
       const review = await reviewsApi.createReview(data)
 
-      this.telegramStore.showAlert('Отзыв оставлен!')
-
       return review
     } catch (error) {
       this.handleError(error, 'Ошибка при создании отзыва')
@@ -60,8 +58,6 @@ export class ReviewService {
 
       const review = await reviewsApi.updateReview(id, data)
 
-      this.telegramStore.showAlert('Отзыв обновлен!')
-
       return review
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении отзыва')
@@ -74,8 +70,6 @@ export class ReviewService {
       this.telegramStore.hapticFeedback('medium')
 
       await reviewsApi.deleteReview(id)
-
-      this.telegramStore.showAlert('Отзыв удален!')
     } catch (error) {
       this.handleError(error, 'Ошибка при удалении отзыва')
       throw error

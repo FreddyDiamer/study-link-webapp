@@ -27,9 +27,6 @@ export class AuthService {
       this.authStore.setUser(response.user as any)
       this.authStore.setToken(response.accessToken)
 
-      // Показываем уведомление
-      this.telegramStore.showAlert('Успешная авторизация!')
-
       return response
     } catch (error) {
       this.handleAuthError(error)
@@ -88,9 +85,6 @@ export class AuthService {
 
     // Haptic feedback
     this.telegramStore.hapticFeedback('medium')
-
-    // Показываем уведомление
-    this.telegramStore.showAlert('Вы вышли из аккаунта')
   }
 
   isAuthenticated(): boolean {

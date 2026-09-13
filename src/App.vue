@@ -20,7 +20,8 @@ const initEducation = () => {
 
 const initializeApp = async () => {
   try {
-    const initData = window.Telegram?.WebApp?.initData || MOCK_INIT_DATA
+    // мок-initData — только для дев-сборки: в проде он открыл бы вход любому браузеру
+    const initData = window.Telegram?.WebApp?.initData || (isDev ? MOCK_INIT_DATA : '')
     if (initData) {
       // запуск внутри Telegram (или с mock initData)
       const { authService } = await import('@/services/business')

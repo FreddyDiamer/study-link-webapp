@@ -92,7 +92,7 @@ Pages / Components  →  composables (use*)  →  services/business  →  servic
 ```
 
 - **`services/api/*`** — thin axios wrappers over `apiClient`. `apiClient` injects the bearer token,
-  unwraps `ApiResponse<T>.data`, and on **401** clears auth and redirects to `/auth`. No business logic.
+  unwraps `ApiResponse<T>.data`, and on **401** clears auth and reloads the app root (`App.vue` re-authenticates from `initData`). No business logic.
 - **`services/business/*`** — singleton service classes (`authService`, `orderService`,
   `serviceService`, `tutorService`, `userService`, `educationService`, `reviewService`). They hold
   validation, kopeks↔rubles conversion, Telegram side effects (haptics/alerts), and translate errors

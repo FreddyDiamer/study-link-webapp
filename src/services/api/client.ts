@@ -38,8 +38,8 @@ class ApiClient {
           // Очищаем токен при 401
           localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
           localStorage.removeItem(STORAGE_KEYS.USER)
-          // Редирект на авторизацию
-          window.location.href = '/auth'
+          // экрана «/auth» нет: App.vue заново логинит по initData при загрузке
+          window.location.href = '/'
         }
         return Promise.reject(error)
       },

@@ -7,10 +7,12 @@ import type { Service } from '@/shared/types'
 
 interface Props {
   service: Service
+  /** услуга принадлежит текущему пользователю — в ленте помечена плашкой «Моя» */
+  mine?: boolean
   delay?: string
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), { mine: false })
 
 const rating = computed(() => props.service.tutor?.rating ?? null)
 
@@ -29,6 +31,11 @@ const reviewsLabel = computed(() => {
     <div class="flex items-center gap-2.5 mb-3">
       <AvatarChip :name="service.tutor?.name" size="md" />
       <span class="text-caption font-semibold">{{ service.tutor?.name || 'Репетитор' }}</span>
+      <span
+        v-if="mine"
+        class="text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-accent/[0.16] text-d-accent"
+        >Моя</span
+      >
       <RatingChip class="ml-auto" :rating="rating" />
     </div>
 

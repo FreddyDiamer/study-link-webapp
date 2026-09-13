@@ -71,8 +71,6 @@ export class OrderService {
 
       const request = await ordersApi.createRequest(requestData)
 
-      this.telegramStore.showAlert('Заявка создана!')
-
       return this.convertRequestToRubles(request)
     } catch (error) {
       this.handleError(error, 'Ошибка при создании заявки')
@@ -95,8 +93,6 @@ export class OrderService {
       this.telegramStore.hapticFeedback('light')
 
       const request = await ordersApi.updateRequest(id, updateData)
-
-      this.telegramStore.showAlert('Заявка обновлена!')
 
       return this.convertRequestToRubles(request)
     } catch (error) {
@@ -136,8 +132,6 @@ export class OrderService {
       this.telegramStore.hapticFeedback('medium')
 
       await ordersApi.deleteRequest(id)
-
-      this.telegramStore.showAlert('Заявка удалена!')
     } catch (error) {
       this.handleError(error, 'Ошибка при удалении заявки')
       throw error
@@ -185,7 +179,6 @@ export class OrderService {
     try {
       this.telegramStore.hapticFeedback('light')
       const deal = await ordersApi.updateDeal(id, data)
-      this.telegramStore.showAlert('Сделка обновлена!')
       return this.convertDealToRubles(deal)
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении сделки')
@@ -198,8 +191,6 @@ export class OrderService {
       this.telegramStore.hapticFeedback('light')
 
       const deal = await ordersApi.acceptDeal(id)
-
-      this.telegramStore.showAlert('Сделка принята!')
 
       return this.convertDealToRubles(deal)
     } catch (error) {
@@ -214,8 +205,6 @@ export class OrderService {
 
       const deal = await ordersApi.rejectDeal(id)
 
-      this.telegramStore.showAlert('Сделка отклонена!')
-
       return this.convertDealToRubles(deal)
     } catch (error) {
       this.handleError(error, 'Ошибка при отклонении сделки')
@@ -228,8 +217,6 @@ export class OrderService {
       this.telegramStore.hapticFeedback('success')
 
       const deal = await ordersApi.completeDeal(id)
-
-      this.telegramStore.showAlert('Сделка завершена!')
 
       return this.convertDealToRubles(deal)
     } catch (error) {
@@ -244,8 +231,6 @@ export class OrderService {
 
       const deal = await ordersApi.reopenDeal(id)
 
-      this.telegramStore.showAlert('Сделка снова в работе')
-
       return this.convertDealToRubles(deal)
     } catch (error) {
       this.handleError(error, 'Ошибка при возврате сделки в работу')
@@ -258,8 +243,6 @@ export class OrderService {
       this.telegramStore.hapticFeedback('medium')
 
       const deal = await ordersApi.cancelDeal(id, reason)
-
-      this.telegramStore.showAlert('Сделка отменена!')
 
       return this.convertDealToRubles(deal)
     } catch (error) {
@@ -274,8 +257,8 @@ export class OrderService {
 
   async getServiceResponses(serviceId: string): Promise<ServiceResponse[]> {
     try {
-      const responses = await ordersApi.getServiceResponses(serviceId)
-      return responses.map((response) => this.convertServiceResponseToRubles(response))
+      const response = await ordersApi.getServiceResponses(serviceId)
+      return (response?.items ?? []).map((item) => this.convertServiceResponseToRubles(item))
     } catch (error) {
       this.handleError(error, 'Ошибка при получении откликов на услугу')
       throw error
@@ -307,8 +290,6 @@ export class OrderService {
 
       const response = await ordersApi.createServiceResponse(responseData)
 
-      this.telegramStore.showAlert('Отклик отправлен!')
-
       return this.convertServiceResponseToRubles(response)
     } catch (error) {
       this.handleError(error, 'Ошибка при отправке отклика')
@@ -330,8 +311,6 @@ export class OrderService {
 
       const response = await ordersApi.updateServiceResponse(id, updateData)
 
-      this.telegramStore.showAlert('Отклик обновлен!')
-
       return this.convertServiceResponseToRubles(response)
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении отклика')
@@ -344,8 +323,6 @@ export class OrderService {
       this.telegramStore.hapticFeedback('success')
 
       const response = await ordersApi.acceptServiceResponse(id)
-
-      this.telegramStore.showAlert('Сделка создана!')
 
       return this.convertServiceResponseToRubles(response)
     } catch (error) {
@@ -372,8 +349,6 @@ export class OrderService {
       this.telegramStore.hapticFeedback('medium')
 
       await ordersApi.deleteServiceResponse(id)
-
-      this.telegramStore.showAlert('Отклик удален!')
     } catch (error) {
       this.handleError(error, 'Ошибка при удалении отклика')
       throw error
@@ -419,8 +394,6 @@ export class OrderService {
 
       const response = await ordersApi.createRequestResponse(responseData)
 
-      this.telegramStore.showAlert('Отклик отправлен!')
-
       return this.convertRequestResponseToRubles(response)
     } catch (error) {
       this.handleError(error, 'Ошибка при отправке отклика')
@@ -442,8 +415,6 @@ export class OrderService {
 
       const response = await ordersApi.updateRequestResponse(id, updateData)
 
-      this.telegramStore.showAlert('Отклик обновлен!')
-
       return this.convertRequestResponseToRubles(response)
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении отклика')
@@ -456,8 +427,6 @@ export class OrderService {
       this.telegramStore.hapticFeedback('success')
 
       const response = await ordersApi.acceptRequestResponse(id)
-
-      this.telegramStore.showAlert('Сделка создана!')
 
       return this.convertRequestResponseToRubles(response)
     } catch (error) {
@@ -484,8 +453,6 @@ export class OrderService {
       this.telegramStore.hapticFeedback('medium')
 
       await ordersApi.deleteRequestResponse(id)
-
-      this.telegramStore.showAlert('Отклик удален!')
     } catch (error) {
       this.handleError(error, 'Ошибка при удалении отклика')
       throw error
