@@ -191,12 +191,7 @@ onMounted(load)
       class="flex-1 flex flex-col items-center justify-center px-6"
     >
       <p class="text-subhead text-d-text-hint text-center mb-4">Не удалось загрузить услугу</p>
-      <button
-        class="press h-11 px-5 rounded-[12px] border border-d-border text-d-text-second text-[15px] font-semibold"
-        @click="load"
-      >
-        Повторить
-      </button>
+      <button class="press btn btn-secondary h-11 px-5 text-body" @click="load">Повторить</button>
     </div>
 
     <template v-else>
@@ -238,7 +233,7 @@ onMounted(load)
           </div>
           <p
             class="reveal text-body text-d-text-bright"
-            :class="isMine ? 'mb-[22px]' : ''"
+            :class="isMine ? 'mb-6' : ''"
             style="animation-delay: 0.12s"
           >
             {{ service.description }}

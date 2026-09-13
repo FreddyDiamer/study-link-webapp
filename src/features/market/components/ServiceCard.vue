@@ -31,11 +31,7 @@ const reviewsLabel = computed(() => {
     <div class="flex items-center gap-2.5 mb-3">
       <AvatarChip :name="service.tutor?.name" size="md" />
       <span class="text-caption font-semibold">{{ service.tutor?.name || 'Репетитор' }}</span>
-      <span
-        v-if="mine"
-        class="text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-accent/[0.16] text-d-accent"
-        >Моя</span
-      >
+      <span v-if="mine" class="badge badge-accent">Моя</span>
       <RatingChip class="ml-auto" :rating="rating" />
     </div>
 

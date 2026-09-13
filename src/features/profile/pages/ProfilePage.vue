@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 import ReviewItem from '@/shared/components/ReviewItem.vue'
-import { LoadError } from '@/shared/components/ui'
+import { LoadError, StatusBadge } from '@/shared/components/ui'
 import ReputationPair from '../components/ReputationPair.vue'
 import GroupSheet from '../components/GroupSheet.vue'
 import MyResponsesBlock from '../components/MyResponsesBlock.vue'
@@ -284,19 +284,19 @@ onMounted(load)
           <button
             v-for="service in myServices"
             :key="service.id"
-            class="press w-full text-left bg-d-panel border border-d-border rounded-[14px] p-[15px]"
-            :class="isServiceListed(service) ? '' : 'opacity-[0.72]'"
+            class="press card w-full text-left"
+            :class="isServiceListed(service) ? '' : 'opacity-70'"
             @click="router.push(serviceDetailPath(service.id))"
           >
             <div class="flex items-center gap-2 mb-1.5">
-              <span class="text-[16px] font-semibold">
+              <span class="text-title-m">
                 {{ service.subject?.name }} · {{ service.teacher?.fullName }}
               </span>
-              <span
+              <StatusBadge
                 v-if="!isServiceListed(service)"
-                class="shrink-0 text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-text-mute/20 text-d-text-second"
-                >Скрыта</span
-              >
+                class="shrink-0"
+                :service="service.status"
+              />
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[16px] font-bold tnum">{{ formatKopeks(service.price) }}</span>
