@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Main guidance for Claude Code working in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ---
 
@@ -11,8 +11,11 @@ They are the source of truth for how code must be written here and override gene
 
 - Frontend / Vue / styling work → **`.agents/rules/frontend-writing-patterns.md`** (read it first).
 - Treat every file in `.agents/rules/` as an active rule; if a new one is added, consult it too.
-- When a rule conflicts with existing code, the rule wins for **new** code (the repo is
-  mid-refactor — see "Current state" below). Don't change working code you weren't asked to touch.
+- When a rule conflicts with existing code, the rule wins for **new** code. Don't change working
+  code you weren't asked to touch.
+- The rule files' *source-map* snippets lag behind the code (they still mention
+  `features/<student|tutor|admin>`, an `app` store, `Button/Card/Input` primitives). For what
+  exists, trust this file and the code; for *how to write* code, trust the rules.
 
 ---
 
@@ -22,8 +25,9 @@ They are the source of truth for how code must be written here and override gene
 connects students with tutors (репетиторы), used inside Telegram. UI language is **Russian**.
 
 It is the **frontend** (Vue SPA) of a two-part system; the backend is a separate **NestJS** API
-(not in this repo) documented in `INTEGRATION.md`. The app runs inside Telegram's WebApp container,
-authenticates via Telegram `initData`, and is themed from Telegram's `themeParams`.
+(not in this repo); the endpoints the frontend uses are the ones in `src/services/api/`. The app
+runs inside Telegram's WebApp container and authenticates via Telegram `initData`. The look is the
+fixed `d-*` design system — it does **not** follow Telegram's `themeParams`.
 
 ### Product domains
 
@@ -70,6 +74,9 @@ authenticates via Telegram `initData`, and is themed from Telegram's `themeParam
 ```sh
 pnpm dev          # vite dev server (port 3050)
 pnpm test         # vitest run (unit tests for pure logic)
+pnpm test:watch   # vitest in watch mode
+pnpm vitest run src/shared/utils/__tests__/formatters.spec.ts   # a single spec file
+pnpm vitest run -t "formatKopeks"                               # tests matching a name
 pnpm build        # type-check (vue-tsc) + production build
 pnpm preview      # preview the production build
 pnpm type-check   # vue-tsc --build
@@ -80,12 +87,13 @@ pnpm format       # prettier --write src/
 
 - `VITE_API_BASE_URL` — backend base URL (default `http://localhost:3000/api`).
 - `VITE_MOCK_TELEGRAM_INIT_DATA` — fake Telegram `initData` for local dev outside Telegram.
+  Honoured **only in dev builds** (`import.meta.env.DEV`) — in production it would let any browser in.
 
 ---
 
 ## Architecture & layering
 
-Strict one-way dependency flow (see `ARCHITECTURE.md`, `INTEGRATION.md`):
+Strict one-way dependency flow:
 
 ```
 Pages / Components  →  composables (use*)  →  services/business  →  services/api  +  stores
@@ -94,41 +102,50 @@ Pages / Components  →  composables (use*)  →  services/business  →  servic
 - **`services/api/*`** — thin axios wrappers over `apiClient`. `apiClient` injects the bearer token,
   unwraps `ApiResponse<T>.data`, and on **401** clears auth and reloads the app root (`App.vue` re-authenticates from `initData`). No business logic.
 - **`services/business/*`** — singleton service classes (`authService`, `orderService`,
-  `serviceService`, `tutorService`, `userService`, `educationService`, `reviewService`). They hold
-  validation, kopeks↔rubles conversion, Telegram side effects (haptics/alerts), and translate errors
-  into user-facing Russian messages. Stores are resolved lazily inside getters.
-- **`composables/*`** (`useAuth`, `useTelegram`, `useEducation`, `useOrder`, `useTutor`,
-  `useService`) — the API surface components consume; own local `isLoading`/result refs and wrap the
-  business services.
+  `serviceService`, `userService`, `educationService`, `reviewService`). They hold validation
+  (money thresholds in kopeks), Telegram side effects (haptics/alerts), and translate errors into
+  user-facing Russian messages. Stores are resolved lazily inside private getters.
+- **`composables/*`** — the API surface components consume; own local `isLoading`/result refs and
+  wrap the business services: `useOrder` (requests, responses, deals), `useService`,
+  `useEducation`, `useMyResponses` (outgoing responses across both object kinds), `useDealsBadge`,
+  `useTelegram`, `useToast`, `usePullToRefresh`. Domains without a composable (`userService`,
+  `reviewService`, `authService`) are called from pages directly — that is the accepted pattern,
+  not a violation.
 - **`stores/*`** (Pinia setup-stores): `auth` (user/token, localStorage-backed, exposes `readonly`
   state), `education` (global catalog with `isInitialized` cache + `refresh`/`clear`), `telegram`
-  (WebApp bridge: haptics, alerts, main button), `app` (current flow + UI flags via
-  `useLocalStorage`).
-- **Components never import `services/api` directly** — always go through a composable/business service.
+  (WebApp bridge: haptics, alerts, main button). There is no `app` store.
+- **Components never import `services/api` directly** — always go through a composable/business
+  service (type-only imports, as in `DevLogin.vue`, are the one exception).
 
 ### Source map
 
 ```
 src/
   main.ts                  # app bootstrap: pinia, router, telegramService.init()
-  App.vue                  # shell: AppHeader + <RouterView> + BottomNav; runs initializeApp()
-  features/<student|tutor|admin>/
+  App.vue                  # shell: AppToast + <RouterView> + BottomNav; runs initializeApp()
+  features/<market|deals|profile>/   # one folder per tab
     pages/                 # one component per route
     components/            # feature-local components
+  features/auth/DevLogin.vue   # dev-only web login (pick a seeded backend user)
   shared/
-    components/ui/         # design-system primitives: Button, Card, Input, Select, Modal, Loader, Rating
-    components/icons/       # SVG icon components (barrel: icons/index.ts)
-    components/layout/      # AppHeader, BottomNav
+    components/ui/         # d-* primitives: ActionButton, BottomSheet, ActionsSheet, ConfirmSheet,
+                           #   SegmentControl, StatusBadge, RatingChip, MoneyInput, DateField,
+                           #   ToggleRow, LoadError, AppToast (barrel: ui/index.ts)
+    components/layout/      # AppHeader (rendered by each page, not by App.vue), BottomNav
+    components/             # AvatarChip, ReviewItem
     composables/            # use*() (barrel: composables/index.ts)
     utils/                  # formatters, validation, storage, common (pure functions)
     types/                  # all shared interfaces/enums (single index.ts barrel)
-    constants/              # APP_*, API_BASE_URL, STORAGE_KEYS, VALIDATION, *_STATUS maps
+    constants/              # index.ts (API_BASE_URL, STORAGE_KEYS, VALIDATION…) + status.ts (*_STATUS_META)
   services/{api,business,integrations}/
-  stores/                  # auth, education, telegram, app (barrel: stores/index.ts)
-  router/                  # index.ts (routes) + paths.ts (PATHS)
-  views/                   # WelcomeView (entry/role pick), TestView
+  stores/                  # auth, education, telegram (barrel: stores/index.ts)
+  router/                  # index.ts (routes) + paths.ts (PATHS + *Path(id) helpers)
   assets/                  # main.css (@tailwind + @layer), base.css
 ```
+
+Icons come from `lucide-vue-next`; there is no local icons folder. Routes are flat and lazy-loaded;
+`REQUEST_CREATE` and `REQUEST_EDIT` share `CreateRequestPage.vue`. Build parameterised links with
+the helpers in `paths.ts` (`serviceDetailPath(id)`, `requestDetailPath(id)`, …), not string concat.
 
 ### Path aliases (vite + tsconfig)
 
@@ -139,8 +156,16 @@ Prefer importing through barrels (`@/shared/types`, `@/shared/components/ui`, `@
 ### App startup sequence
 
 `main.ts` mounts the app and calls `telegramService.init()`. `App.vue` then runs `initializeApp()`:
-read Telegram `initData` (or `MOCK_INIT_DATA`) → `authService.loginWithTelegram()` →
-`educationStore.initialize()` (loads subjects/teachers/links once, in parallel).
+
+- **Inside Telegram** (or dev with `MOCK_INIT_DATA`): `initData` →
+  `authService.loginWithTelegram()`.
+- **No `initData`**: restore the saved session from localStorage (`authStore.initializeAuth()`).
+  If still unauthenticated, a dev build shows `DevLogin` (backend `/auth/dev/users` +
+  `/auth/dev/login`); a production build shows «Откройте приложение в Telegram».
+- Once authenticated: `educationStore.initialize()` (subjects/teachers/links, once, in parallel).
+
+Routes and `BottomNav` render only when authenticated — there is no `/auth` route and no router
+guard; a 401 sends the browser to `/`, where this sequence runs again.
 
 ---
 
@@ -186,8 +211,18 @@ on `allowedHosts: true`. The previous architecture (two role flows) is preserved
 ## Reference docs
 
 - `.agents/rules/frontend-writing-patterns.md` — **the** frontend coding rules (read first).
-- `ARCHITECTURE.md` — API/services/stores layering and conventions.
-- `ARCHITECTURE_REFACTOR.md` — rationale for the global education store.
-- `INTEGRATION.md` — backend API endpoints, auth flow, price-conversion contract.
 - `.agents/rules/frontend-design/` — design-system token reference + senior-dev styling rules.
 - `claude-design/` — design-system source: `tokens.css`, `main-ds.html` (the Defiant `d-*` look).
+- `docs/product/TODO-garant.md` — product roadmap for the «Гарант» (escrow) direction.
+- `docs/UI_INVENTORY.md` — screen-by-screen inventory taken **before** the `d-*` redesign; history,
+  not a description of today's UI.
+- `docs/conventions/ARCHITECTURE.md`, `docs/API_INTEGRATION.md` — layering and auth-flow/response-
+  envelope background. ⚠️ **Predate the current code**: together with `docs/INDEX.md` and
+  `docs/conventions/STYLES.md` they still say "rubles everywhere, no kopeks" and prescribe
+  `telegram-*` tokens, a `flow-student/flow-tutor` theme and a `Button/Card/Input` kit. All of that
+  is wrong now — money is kopeks and styling is `d-*`, as described above. Where those docs
+  disagree with this file or `.agents/rules/`, they lose.
+- `.cursor/rules/front-end-cursor-rules.mdc` — older Cursor rules. Still applicable: SFC order
+  `<script>` → `<template>` → `<style>`, early returns, `handle*` names for event handlers, arrow
+  `const` functions, conventional-commit prefixes (`feat:`, `fix:`, `refactor:`…) with a short
+  present-tense subject.
