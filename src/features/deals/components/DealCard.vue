@@ -4,6 +4,7 @@ import { formatDayMonth, formatKopeks } from '@/shared/utils'
 import { DealStatus, type Deal } from '@/shared/types'
 import DealChecklist from './DealChecklist.vue'
 import ContactButton from './ContactButton.vue'
+import DealReviews from './DealReviews.vue'
 
 export type DealRole = 'customer' | 'worker'
 
@@ -22,6 +23,7 @@ const emit = defineEmits<{
   cancel: [deal: Deal]
   contact: [deal: Deal]
   reopen: [deal: Deal]
+  reviewed: []
 }>()
 
 const isCustomer = computed(() => props.role === 'customer')
@@ -208,6 +210,15 @@ const cancelledBy = computed(() => {
       <div v-else-if="needsContact" class="mt-4 text-caption text-d-text-hint">
         Время и место занятия обсуждаются в Telegram. {{ confirmLabel }} можно будет после занятия.
       </div>
+
+      <!-- завершённая сделка и отзывы о ней — одна карточка -->
+      <DealReviews
+        v-if="isDone"
+        class="border-t border-d-border mt-4 pt-4"
+        :deal="deal"
+        :role="role"
+        @submitted="emit('reviewed')"
+      />
     </template>
   </div>
 

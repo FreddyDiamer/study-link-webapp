@@ -134,6 +134,8 @@ export interface Service {
   subject: Subject
   teacher: Teacher
   responses?: ServiceResponse[]
+  /** лента: текущий пользователь уже записался на эту услугу */
+  currentUserResponded?: boolean
 }
 
 export enum RequestStatus {
@@ -158,6 +160,8 @@ export interface Request {
   subject: Subject
   teacher: Teacher
   responses?: RequestResponse[]
+  /** лента: текущий пользователь уже откликнулся на эту заявку */
+  currentUserResponded?: boolean
 }
 
 export interface Deal {

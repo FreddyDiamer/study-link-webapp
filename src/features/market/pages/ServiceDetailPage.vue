@@ -3,9 +3,9 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
-import { useDealsBadge, useOrder, useService, useToast } from '@/shared/composables'
+import { useDealsBadge, useInboxBadge, useOrder, useService, useToast } from '@/shared/composables'
 import { reviewService } from '@/services/business'
-import { PATHS } from '@/router/paths'
+import { dealsPath } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ActionButton, ActionsSheet, type SheetAction } from '@/shared/components/ui'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
@@ -29,6 +29,7 @@ const { createServiceResponse, getServiceResponses, acceptServiceResponse, rejec
   useOrder()
 const { showToast } = useToast()
 const { refresh: refreshDealsBadge } = useDealsBadge()
+const { refresh: refreshInboxBadge } = useInboxBadge()
 
 const id = route.params.id as string
 const loading = ref(true)
@@ -127,7 +128,7 @@ const accept = async (responseId: string) => {
     await acceptServiceResponse(responseId)
     showToast('Сделка создана')
     bookings.value = await getServiceResponses(id)
-    await refreshDealsBadge()
+    await Promise.all([refreshDealsBadge(), refreshInboxBadge()])
   } catch (e) {
     console.error('Не удалось принять запись:', e)
   } finally {
@@ -142,6 +143,7 @@ const reject = async (responseId: string) => {
     await rejectServiceResponse(responseId)
     showToast('Студенту отправлен отказ')
     bookings.value = await getServiceResponses(id)
+    await refreshInboxBadge()
   } catch (e) {
     console.error('Не удалось отказать:', e)
   } finally {
@@ -163,7 +165,8 @@ const onAction = async (action: string) => {
   }
 }
 
-const goDeals = () => router.push(PATHS.DEALS)
+// записи принимает владелец услуги — в этой сделке он исполнитель
+const goDeals = () => router.push(dealsPath('worker'))
 
 const delay = (i: number) => `${i * 0.06}s`
 

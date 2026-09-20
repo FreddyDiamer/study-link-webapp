@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useEducation, useOrder, useToast } from '@/shared/composables'
+import { useRoute } from 'vue-router'
+import { useEducation, useFormExit, useOrder, useToast } from '@/shared/composables'
 import { useAuthStore, useEducationStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS, requestDetailPath } from '@/router/paths'
@@ -9,7 +9,7 @@ import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ActionButton, DateField, MoneyInput } from '@/shared/components/ui'
 
 const route = useRoute()
-const router = useRouter()
+const { exitTo } = useFormExit()
 const auth = useAuthStore()
 const edu = useEducationStore()
 const telegramStore = useTelegramStore()
@@ -62,7 +62,7 @@ const submit = async () => {
       })
       telegramStore.hapticFeedback('success')
       showToast('Заявка обновлена')
-      router.push(requestDetailPath(editingId.value))
+      exitTo(requestDetailPath(editingId.value))
     } else {
       const created = await createRequest({
         studentId: auth.user.id,
@@ -74,7 +74,7 @@ const submit = async () => {
       })
       telegramStore.hapticFeedback('success')
       showToast('Заявка опубликована')
-      router.push(created?.id ? requestDetailPath(created.id) : PATHS.MARKET)
+      exitTo(created?.id ? requestDetailPath(created.id) : PATHS.MARKET)
     }
   } catch (e) {
     console.error('Не удалось сохранить заявку:', e)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BottomNav from '@/shared/components/layout/BottomNav.vue'
 import DevLogin from '@/features/auth/DevLogin.vue'
 import { AppToast } from '@/shared/components/ui'
@@ -9,6 +9,9 @@ import { MOCK_INIT_DATA } from './shared/constants'
 
 const authStore = useAuthStore()
 const educationStore = useEducationStore()
+
+// экраны-списки живут между переходами: возврат «назад» и смена таба не теряют позицию
+const KEPT_PAGES = ['MarketPage', 'DealsPage', 'ProfilePage', 'MyResponsesPage']
 
 const ready = ref(false)
 const isDev = import.meta.env.DEV
@@ -30,7 +33,6 @@ const initializeApp = async () => {
       // веб: подхватываем сохранённую сессию (dev-логин и т.п.)
       authStore.initializeAuth()
     }
-    if (authStore.isAuthenticated) initEducation()
   } catch (error) {
     console.error('Ошибка инициализации приложения:', error)
   } finally {
@@ -38,9 +40,10 @@ const initializeApp = async () => {
   }
 }
 
-const onDevAuthed = () => {
-  initEducation()
-}
+// справочник нужен любому вошедшему, каким бы путём он ни вошёл: Telegram, сохранённая
+// сессия или дев-вход. Событием из DevLogin это не сделать — вход размонтирует его раньше,
+// чем он успеет что-то отправить, а emit размонтированного компонента молча теряется
+watch(isAuthed, (authed) => authed && initEducation(), { immediate: true })
 
 onMounted(initializeApp)
 </script>
@@ -60,12 +63,14 @@ onMounted(initializeApp)
       <!-- приложение -->
       <RouterView v-else-if="isAuthed" v-slot="{ Component: Page }">
         <Transition name="route" mode="out-in">
-          <component :is="Page" />
+          <KeepAlive :include="KEPT_PAGES">
+            <component :is="Page" />
+          </KeepAlive>
         </Transition>
       </RouterView>
 
       <!-- веб-вход (только дев-окружение) -->
-      <DevLogin v-else-if="isDev" @authed="onDevAuthed" />
+      <DevLogin v-else-if="isDev" />
 
       <!-- прод вне Telegram -->
       <div v-else class="flex items-center justify-center h-full px-8 text-center">

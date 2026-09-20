@@ -16,6 +16,9 @@ const props = withDefaults(defineProps<Props>(), { mine: false })
 
 const rating = computed(() => props.service.tutor?.rating ?? null)
 
+// на эту услугу уже записались: карточка уступает внимание тем, где решение ещё впереди
+const responded = computed(() => !!props.service.currentUserResponded)
+
 // пока оценок нет, строка отзывов должна называть это словами, а не нулём
 const reviewsLabel = computed(() => {
   const count = props.service.tutor?.reviewsCount ?? 0
@@ -26,12 +29,16 @@ const reviewsLabel = computed(() => {
 <template>
   <article
     class="press reveal bg-d-panel border border-d-border rounded-card p-4 cursor-pointer hover:border-d-border-hover"
+    :class="responded ? 'opacity-[0.72]' : ''"
     :style="delay ? { animationDelay: delay } : undefined"
   >
     <div class="flex items-center gap-2.5 mb-3">
       <AvatarChip :name="service.tutor?.name" size="md" />
-      <span class="text-caption font-semibold">{{ service.tutor?.name || 'Репетитор' }}</span>
+      <span class="text-caption font-semibold truncate">{{
+        service.tutor?.name || 'Репетитор'
+      }}</span>
       <span v-if="mine" class="badge badge-accent">Моя</span>
+      <span v-else-if="responded" class="badge badge-accent shrink-0">Вы записались</span>
       <RatingChip class="ml-auto" :rating="rating" />
     </div>
 

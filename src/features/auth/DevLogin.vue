@@ -4,8 +4,6 @@ import { authService } from '@/services/business'
 import type { DevUser } from '@/services/api/auth'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 
-const emit = defineEmits<{ authed: [] }>()
-
 const users = ref<DevUser[]>([])
 const loadingUsers = ref(true)
 const busy = ref(false)
@@ -29,8 +27,8 @@ const login = async (userId?: string) => {
   busy.value = true
   error.value = ''
   try {
+    // успешный вход сам убирает этот экран: App.vue следит за авторизацией
     await authService.devLogin(userId)
-    emit('authed')
   } catch (e) {
     console.error(e)
     error.value = 'Не удалось войти'

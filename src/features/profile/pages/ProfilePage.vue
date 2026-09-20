@@ -2,7 +2,17 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { reviewService, userService } from '@/services/business'
-import { useMyResponses, useOrder, useService, useToast } from '@/shared/composables'
+import {
+  pendingLabel,
+  pendingOnRequest,
+  pendingOnService,
+  useInboxBadge,
+  useKeptScroll,
+  useMyResponses,
+  useOrder,
+  useService,
+  useToast,
+} from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
@@ -30,6 +40,7 @@ const { getMyRequests } = useOrder()
 const { getMyServices } = useService()
 const myResponses = useMyResponses()
 const { showToast } = useToast()
+const { sync: syncInboxBadge } = useInboxBadge()
 
 const loading = ref(true)
 const groupSheet = ref(false)
@@ -47,8 +58,9 @@ const reputation = ref<Reputation>({
 
 const recentReviews = computed(() => reviews.value.slice(0, 3))
 
-const load = async () => {
-  loading.value = true
+// silent — возврат на экран: профиль остаётся на месте, данные подменяются под ним
+const load = async (silent = false) => {
+  if (!silent) loading.value = true
   try {
     const me = await userService.getProfile()
     profile.value = me
@@ -73,6 +85,7 @@ const load = async () => {
     ])
     myRequests.value = requests?.items ?? []
     myServices.value = services?.items ?? []
+    syncInboxBadge(myRequests.value, myServices.value)
   } catch (e) {
     console.error('Не удалось загрузить профиль:', e)
     profile.value = (auth.user as User) ?? null
@@ -103,11 +116,14 @@ const roleOf = (review: Review) => (review.targetRole === 'TUTOR' ? 'tutor' : 's
 const isRequestOpen = (request: Request) => request.status === RequestStatus.OPEN
 const isServiceListed = (service: Service) => service.status === ServiceStatus.ACTIVE
 
-onMounted(load)
+const scroller = ref<HTMLElement | null>(null)
+const { revisited } = useKeptScroll(scroller, () => load(true))
+
+onMounted(() => load())
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full" :class="{ 'no-reveal': revisited }">
     <AppHeader title="Профиль" />
 
     <div v-if="loading" class="flex-1 flex items-center justify-center">
@@ -116,7 +132,7 @@ onMounted(load)
       />
     </div>
 
-    <div v-else-if="profile" class="flex-1 overflow-y-auto px-[18px] pt-4 pb-[18px]">
+    <div v-else-if="profile" ref="scroller" class="flex-1 overflow-y-auto px-[18px] pt-4 pb-[18px]">
       <!-- кто вы -->
       <div class="reveal flex items-center gap-3.5 mb-[18px]">
         <AvatarChip :name="profile.name" size="xl" />
@@ -174,7 +190,7 @@ onMounted(load)
         class="bg-d-panel border border-d-border rounded-sheet mb-3.5"
         title="Рейтинг и отзывы не загрузились"
         text="Это сбой связи, а не сброс репутации."
-        @retry="load"
+        @retry="load()"
       />
 
       <ReputationPair
@@ -261,7 +277,11 @@ onMounted(load)
             >
               {{ isRequestOpen(request) ? 'Активна' : 'Закрыта' }}
             </span>
-            <span class="ml-auto text-[12px] text-d-text-hint">
+            <!-- есть отклики без решения: это действие, а не статистика — акцент вместо серого -->
+            <span v-if="pendingOnRequest(request)" class="badge badge-accent ml-auto tnum">
+              {{ pendingLabel(pendingOnRequest(request)) }}
+            </span>
+            <span v-else class="ml-auto text-[12px] text-d-text-hint">
               {{
                 isRequestOpen(request)
                   ? responsesLabel(request)
@@ -300,7 +320,10 @@ onMounted(load)
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[16px] font-bold tnum">{{ formatKopeks(service.price) }}</span>
-              <span class="text-[12px] text-d-text-hint">
+              <span v-if="pendingOnService(service)" class="badge badge-accent tnum">
+                {{ pendingLabel(pendingOnService(service)) }}
+              </span>
+              <span v-else class="text-[12px] text-d-text-hint">
                 {{
                   service.responses?.length
                     ? responsesCount(service.responses.length)

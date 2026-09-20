@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useDealsBadge, useOrder, useToast } from '@/shared/composables'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useDealsBadge, useKeptScroll, useOrder, useToast } from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { LoadError, SegmentControl } from '@/shared/components/ui'
 import DealCard, { type DealRole } from '../components/DealCard.vue'
-import DealReviews from '../components/DealReviews.vue'
 import CancelSheet from '../components/CancelSheet.vue'
 import { DealStatus, type Deal } from '@/shared/types'
 
+const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 const telegramStore = useTelegramStore()
 const { getDeals, completeDeal, cancelDeal, reopenDeal } = useOrder()
@@ -33,6 +35,7 @@ const dealToCancel = ref<Deal | null>(null)
 // сделки, по которым уже открывали переписку: после этого главным становится
 // подтверждение, а не кнопка «Написать»
 const contacted = ref<string[]>([])
+const scroller = ref<HTMLElement | null>(null)
 
 // роль в сделке определяется самой сделкой, а не режимом человека
 const visibleDeals = computed(() =>
@@ -136,6 +139,23 @@ const cancel = async (reason: string) => {
   }
 }
 
+// список не мигает при обновлении (см. шаблон), поэтому возврат просто перезагружает его
+const { revisited, resetScroll } = useKeptScroll(scroller, load)
+
+// «Сделка создана →» называет сторону в адресе: сделка с моей услуги лежит в «Я исполнитель»,
+// а экран живёт под KeepAlive и сам помнит только последний выбранный сегмент
+watch(
+  () => (route.name === 'deals' ? route.query.role : undefined),
+  (value) => {
+    if (value !== 'customer' && value !== 'worker') return
+    role.value = value
+    resetScroll()
+    // роль применена — из адреса убираем, иначе «назад» сбрасывал бы ручной выбор сегмента
+    router.replace({ query: {} })
+  },
+  { immediate: true },
+)
+
 onMounted(() => {
   readContacted()
   load()
@@ -143,14 +163,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full" :class="{ 'no-reveal': revisited }">
     <AppHeader title="Сделки" sub="Ваши активные занятия" />
 
     <div class="shrink-0 px-[18px] pt-3.5 pb-2.5">
       <SegmentControl v-model="role" :items="ROLES" />
     </div>
 
-    <div class="flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px]">
+    <div ref="scroller" class="flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px]">
       <!-- смена роли: список догоняет пилюлю сегмента -->
       <Transition name="swap" mode="out-in">
         <div :key="role">
@@ -181,13 +201,7 @@ onMounted(() => {
                 @cancel="askCancel"
                 @contact="markContacted"
                 @reopen="reopen"
-              />
-              <DealReviews
-                v-if="deal.status === DealStatus.COMPLETED"
-                class="mb-3.5"
-                :deal="deal"
-                :role="role"
-                @submitted="load"
+                @reviewed="load"
               />
             </div>
 

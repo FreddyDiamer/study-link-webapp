@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useDealsBadge, useOrder, useToast } from '@/shared/composables'
+import { useDealsBadge, useInboxBadge, useOrder, useToast } from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
-import { PATHS, requestDetailPath, requestEditPath, requestRespondPath } from '@/router/paths'
+import { dealsPath, requestDetailPath, requestEditPath, requestRespondPath } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ActionsSheet, ConfirmSheet, type SheetAction } from '@/shared/components/ui'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
@@ -20,6 +20,7 @@ const { getRequest, getRequestResponses, acceptRequestResponse, closeRequest, re
   useOrder()
 const { showToast } = useToast()
 const { refresh: refreshDealsBadge } = useDealsBadge()
+const { refresh: refreshInboxBadge } = useInboxBadge()
 
 const id = route.params.id as string
 const loading = ref(true)
@@ -91,7 +92,7 @@ const accept = async (responseId: string) => {
     await acceptRequestResponse(responseId)
     showToast('Сделка создана')
     responses.value = await getRequestResponses(id)
-    await refreshDealsBadge()
+    await Promise.all([refreshDealsBadge(), refreshInboxBadge()])
   } catch (e) {
     console.error('Не удалось принять отклик:', e)
   } finally {
@@ -109,7 +110,8 @@ const goEdit = () => {
   router.push(requestEditPath(id))
 }
 
-const goDeals = () => router.push(PATHS.DEALS)
+// отклики принимает автор заявки — в этой сделке он заказчик
+const goDeals = () => router.push(dealsPath('customer'))
 
 const onAction = (id: string) => {
   if (id === 'edit' || id === 'deadline') goEdit()
@@ -123,6 +125,7 @@ const close = async () => {
     await closeRequest(id)
     showToast('Заявка закрыта')
     await load()
+    await refreshInboxBadge()
   } catch (e) {
     console.error('Не удалось закрыть заявку:', e)
   }

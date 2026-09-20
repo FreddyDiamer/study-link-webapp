@@ -2,13 +2,14 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
-import { useDealsBadge } from '@/shared/composables'
+import { scrollActiveToTop, useDealsBadge, useInboxBadge } from '@/shared/composables'
 import { PATHS } from '@/router/paths'
 
 const route = useRoute()
 const router = useRouter()
 const telegramStore = useTelegramStore()
-const { activeCount, refresh } = useDealsBadge()
+const { activeCount, refresh: refreshDeals } = useDealsBadge()
+const { pendingCount, refresh: refreshInbox } = useInboxBadge()
 
 type Tab = 'market' | 'deals' | 'profile'
 
@@ -31,10 +32,22 @@ const activeTab = computed<Tab>(() => {
 
 const navigateTo = (path: string) => {
   telegramStore.hapticFeedback('light')
+  // повторный тап по активному табу — наверх, как в самом Telegram
+  if (route.path === path) {
+    scrollActiveToTop()
+    return
+  }
   router.push(path)
 }
 
-onMounted(refresh)
+// сколько показать на табе: активные сделки и отклики, ждущие моего решения
+const badgeOf = (tab: Tab) =>
+  tab === 'deals' ? activeCount.value : tab === 'profile' ? pendingCount.value : 0
+
+onMounted(() => {
+  refreshDeals()
+  refreshInbox()
+})
 </script>
 
 <template>
@@ -97,10 +110,10 @@ onMounted(refresh)
       <span class="text-[11px] font-semibold tracking-[0.01em]">{{ tab.label }}</span>
 
       <span
-        v-if="tab.id === 'deals' && activeCount > 0"
+        v-if="badgeOf(tab.id) > 0"
         class="absolute top-1 right-[22px] min-w-[18px] h-[18px] px-1.5 rounded-full bg-d-coral text-white text-[10px] font-bold flex items-center justify-center animate-d-pop"
       >
-        {{ activeCount }}
+        {{ badgeOf(tab.id) }}
       </span>
     </button>
   </nav>

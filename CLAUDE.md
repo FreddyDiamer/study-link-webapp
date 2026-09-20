@@ -107,8 +107,10 @@ Pages / Components  →  composables (use*)  →  services/business  →  servic
   user-facing Russian messages. Stores are resolved lazily inside private getters.
 - **`composables/*`** — the API surface components consume; own local `isLoading`/result refs and
   wrap the business services: `useOrder` (requests, responses, deals), `useService`,
-  `useEducation`, `useMyResponses` (outgoing responses across both object kinds), `useDealsBadge`,
-  `useTelegram`, `useToast`, `usePullToRefresh`. Domains without a composable (`userService`,
+  `useEducation`, `useMyResponses` (outgoing responses across both object kinds), `useDealsBadge`
+  and `useInboxBadge` (module-level counters behind the tab badges: active deals / incoming
+  responses still `PENDING`), `useTelegram`, `useToast`, `usePullToRefresh`, `useFormExit`,
+  `useKeptScroll`. Domains without a composable (`userService`,
   `reviewService`, `authService`) are called from pages directly — that is the accepted pattern,
   not a violation.
 - **`stores/*`** (Pinia setup-stores): `auth` (user/token, localStorage-backed, exposes `readonly`
@@ -142,6 +144,19 @@ src/
   router/                  # index.ts (routes) + paths.ts (PATHS + *Path(id) helpers)
   assets/                  # main.css (@tailwind + @layer), base.css
 ```
+
+### Navigation conventions
+
+- **List screens are kept alive.** `App.vue` wraps the route in `<KeepAlive>` for `MarketPage`,
+  `DealsPage`, `ProfilePage`, `MyResponsesPage` (matched by file name). Pages scroll inside an inner
+  `overflow-y-auto` block, so the router's `scrollBehavior` does not apply — each kept page calls
+  `useKeptScroll(scroller, onReturn)`, which restores `scrollTop` on return and runs a **silent**
+  reload (`load(true)` — no skeleton, the list must not jump). A kept page's `onMounted` runs once;
+  anything that must refresh on return belongs in that `onReturn` callback. Re-tapping the active
+  tab scrolls to top.
+- **Forms leave no history entry.** After a successful submit call `useFormExit().exitTo(path)`
+  (goes `back()` when `path` is the previous entry, otherwise `replace`) — never `router.push`, or
+  «назад» from the result screen lands in the already-submitted form.
 
 Icons come from `lucide-vue-next`; there is no local icons folder. Routes are flat and lazy-loaded;
 `REQUEST_CREATE` and `REQUEST_EDIT` share `CreateRequestPage.vue`. Build parameterised links with

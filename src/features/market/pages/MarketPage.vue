@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { usePullToRefresh, useOrder, useService } from '@/shared/composables'
+import { useKeptScroll, usePullToRefresh, useOrder, useService } from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS, requestDetailPath, serviceDetailPath } from '@/router/paths'
@@ -103,8 +103,9 @@ const emptyTitle = computed(() =>
       : 'Услуг пока нет',
 )
 
-const load = async () => {
-  loading.value = true
+// silent — возврат на экран: лента остаётся на месте, данные подменяются под ней
+const load = async (silent = false) => {
+  if (!silent) loading.value = true
   try {
     const [svc, req] = await Promise.all([getActiveServices(), getRequests()])
     services.value = svc?.items ?? []
@@ -124,7 +125,8 @@ const load = async () => {
 }
 
 const scroller = ref<HTMLElement | null>(null)
-const { pull, refreshing, bind } = usePullToRefresh(scroller, load)
+const { pull, refreshing, bind } = usePullToRefresh(scroller, () => load())
+const { revisited } = useKeptScroll(scroller, () => load(true))
 
 const isMine = (request: Request) => request.studentId === auth.user?.id
 const isMyService = (service: Service) => service.tutorId === auth.user?.id
@@ -146,11 +148,11 @@ const resetFilter = () => {
 
 const delay = (i: number) => `${i * 0.07}s`
 
-onMounted(load)
+onMounted(() => load())
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full" :class="{ 'no-reveal': revisited }">
     <AppHeader title="Лента" :sub="headerSub" add @add="intentSheet = true" />
 
     <div class="shrink-0 px-[18px] pt-3.5 pb-2.5">
@@ -208,7 +210,7 @@ onMounted(load)
             :code="errorCode"
             :at="lastTry"
             :loading="loading"
-            @retry="load"
+            @retry="load()"
           />
 
           <!-- фильтр ничего не нашёл -->

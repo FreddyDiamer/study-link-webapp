@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useOrder, useToast } from '@/shared/composables'
+import { useRoute } from 'vue-router'
+import { useFormExit, useOrder, useToast } from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { requestDetailPath } from '@/router/paths'
@@ -11,7 +11,7 @@ import { formatKopeks } from '@/shared/utils'
 import type { Request } from '@/shared/types'
 
 const route = useRoute()
-const router = useRouter()
+const { exitTo } = useFormExit()
 const auth = useAuthStore()
 const telegramStore = useTelegramStore()
 const { getRequest, createRequestResponse } = useOrder()
@@ -44,7 +44,7 @@ const submit = async () => {
     })
     telegramStore.hapticFeedback('medium')
     showToast('Отклик отправлен')
-    router.push(requestDetailPath(id))
+    exitTo(requestDetailPath(id))
   } catch (e) {
     console.error('Не удалось отправить отклик:', e)
     submitting.value = false

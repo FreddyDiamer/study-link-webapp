@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useMyResponses } from '@/shared/composables'
-import { PATHS } from '@/router/paths'
+import { useKeptScroll, useMyResponses } from '@/shared/composables'
+import { PATHS, dealsPath } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { formatDayMonth, formatKopeks } from '@/shared/utils'
 
@@ -24,13 +24,18 @@ const visible = computed(() => {
   return items.value
 })
 
-const goDeals = () => router.push(PATHS.DEALS)
+// на заявку откликаются исполнителем, на услугу записываются заказчиком
+const goDeals = (kind: 'request' | 'service') =>
+  router.push(dealsPath(kind === 'request' ? 'worker' : 'customer'))
+
+const scroller = ref<HTMLElement | null>(null)
+const { revisited } = useKeptScroll(scroller, load)
 
 onMounted(load)
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full" :class="{ 'no-reveal': revisited }">
     <AppHeader title="Мои отклики" sub="Куда я откликался" back :back-to="PATHS.PROFILE" />
 
     <div v-if="items.length" class="shrink-0 flex gap-2 px-[18px] pt-3.5 pb-2.5 overflow-x-auto">
@@ -45,8 +50,12 @@ onMounted(load)
       </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px] flex flex-col gap-3">
-      <div v-if="isLoading" class="flex items-center justify-center py-16">
+    <div
+      ref="scroller"
+      class="flex-1 overflow-y-auto px-[18px] pt-1.5 pb-[18px] flex flex-col gap-3"
+    >
+      <!-- при обновлении список остаётся на месте: спиннер только пока показать нечего -->
+      <div v-if="isLoading && !items.length" class="flex items-center justify-center py-16">
         <span
           class="w-6 h-6 rounded-full border-2 border-d-border-soft border-t-d-accent animate-d-spin"
         />
@@ -101,7 +110,7 @@ onMounted(load)
           <button
             v-if="item.state === 'accepted'"
             class="press w-full h-11 rounded-[12px] bg-d-teal/[0.12] text-d-teal text-[15px] font-bold mt-3"
-            @click="goDeals"
+            @click="goDeals(item.kind)"
           >
             Открыть сделку
           </button>

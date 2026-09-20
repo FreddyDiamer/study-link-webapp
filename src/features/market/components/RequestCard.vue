@@ -30,28 +30,40 @@ const isOpen = computed(() => props.request.status === RequestStatus.OPEN)
 const statusLabel = computed(() =>
   props.request.status === RequestStatus.MATCHED ? 'Репетитор найден' : 'Закрыта',
 )
+
+// на эту заявку уже откликнулись: карточка уступает внимание тем, где решение ещё впереди
+const responded = computed(() => isOpen.value && !!props.request.currentUserResponded)
 </script>
 
 <template>
   <article
     class="press reveal bg-d-panel border border-d-border rounded-card p-4 cursor-pointer hover:border-d-border-hover"
-    :class="isOpen ? '' : 'opacity-[0.72]'"
+    :class="isOpen && !responded ? '' : 'opacity-[0.72]'"
     :style="delay ? { animationDelay: delay } : undefined"
   >
     <div class="flex items-center gap-2.5 mb-3">
       <AvatarChip :name="request.student?.name" size="md" />
-      <span class="text-caption font-semibold">{{ request.student?.name || 'Студент' }}</span>
+      <span class="text-caption font-semibold truncate">{{
+        request.student?.name || 'Студент'
+      }}</span>
       <span
         v-if="mine && isOpen"
         class="text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-accent/[0.16] text-d-accent"
         >Моя</span
       >
       <span
+        v-else-if="responded"
+        class="shrink-0 text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-accent/[0.16] text-d-accent whitespace-nowrap"
+        >Вы откликнулись</span
+      >
+      <span
         v-else-if="!isOpen"
         class="text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-text-mute/20 text-d-text-second"
         >{{ statusLabel }}</span
       >
-      <span v-if="isOpen" class="ml-auto text-[12px] text-d-text-hint">{{ responsesLabel }}</span>
+      <span v-if="isOpen" class="ml-auto shrink-0 text-[12px] text-d-text-hint">{{
+        responsesLabel
+      }}</span>
     </div>
 
     <h3 class="text-title-m mb-1.5">

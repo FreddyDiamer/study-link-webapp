@@ -24,3 +24,6 @@ export const serviceDetailPath = (id: string) => `/market/services/${id}`
 export const requestDetailPath = (id: string) => `/market/requests/${id}`
 export const requestEditPath = (id: string) => `/market/requests/${id}/edit`
 export const requestRespondPath = (id: string) => `/market/requests/${id}/respond`
+
+// сделки открываются на стороне, с которой пришли: с услуги — исполнитель, с заявки — заказчик
+export const dealsPath = (role: 'customer' | 'worker') => `${PATHS.DEALS}?role=${role}`

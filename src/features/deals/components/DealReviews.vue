@@ -64,8 +64,9 @@ const submit = async () => {
 </script>
 
 <template>
+  <!-- секция живёт внутри карточки сделки: отзыв — её продолжение, а не отдельный объект -->
   <!-- отзыва ещё нет: форма -->
-  <div v-if="!myReview" class="reveal bg-d-panel border border-d-border rounded-sheet p-[18px]">
+  <div v-if="!myReview">
     <div class="text-[15px] font-semibold mb-1">Как прошло с {{ theirName }}?</div>
     <div class="text-caption text-d-text-hint mb-4">
       Отзыв формирует рейтинг {{ isCustomer ? 'исполнителя' : 'заказчика' }}
@@ -102,7 +103,7 @@ const submit = async () => {
   </div>
 
   <!-- мой отзыв есть -->
-  <div v-else class="reveal bg-d-panel border border-d-border rounded-sheet p-[18px]">
+  <div v-else>
     <div class="text-overline uppercase text-d-text-hint mb-2">Ваш отзыв о {{ theirName }}</div>
     <div class="text-d-rating text-[15px] tracking-[2px] mb-1.5">{{ stars(myReview.rating) }}</div>
     <p v-if="myReview.comment" class="text-review text-d-text-bright">{{ myReview.comment }}</p>

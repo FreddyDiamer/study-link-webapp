@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useService, useToast } from '@/shared/composables'
+import { useFormExit, useService, useToast } from '@/shared/composables'
 import { useEducationStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ActionButton } from '@/shared/components/ui'
 
-const router = useRouter()
+const { exitTo } = useFormExit()
 const edu = useEducationStore()
 const telegramStore = useTelegramStore()
 const { createService } = useService()
@@ -48,7 +47,7 @@ const submit = async () => {
     })
     telegramStore.hapticFeedback('success')
     showToast('Услуга опубликована')
-    router.push(PATHS.MARKET)
+    exitTo(PATHS.MARKET)
   } catch (e) {
     console.error('Не удалось создать услугу:', e)
     error.value = 'Не удалось создать услугу. Попробуйте ещё раз.'
