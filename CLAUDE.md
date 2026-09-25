@@ -77,7 +77,7 @@ pnpm test         # vitest run (unit tests for pure logic)
 pnpm test:watch   # vitest in watch mode
 pnpm vitest run src/shared/utils/__tests__/formatters.spec.ts   # a single spec file
 pnpm vitest run -t "formatKopeks"                               # tests matching a name
-pnpm build        # type-check (vue-tsc) + production build
+pnpm build        # type-check (vue-tsc) and production build, run in parallel (run-p)
 pnpm preview      # preview the production build
 pnpm type-check   # vue-tsc --build
 pnpm format       # prettier --write src/
@@ -139,7 +139,8 @@ src/
     utils/                  # formatters, validation, storage, common (pure functions)
     types/                  # all shared interfaces/enums (single index.ts barrel)
     constants/              # index.ts (API_BASE_URL, STORAGE_KEYS, VALIDATION…) + status.ts (*_STATUS_META)
-  services/{api,business,integrations}/
+  services/{api,business}/
+  services/integrations/telegram.ts   # telegramService (WebApp init), started from main.ts
   stores/                  # auth, education, telegram (barrel: stores/index.ts)
   router/                  # index.ts (routes) + paths.ts (PATHS + *Path(id) helpers)
   assets/                  # main.css (@tailwind + @layer), base.css
@@ -188,7 +189,10 @@ guard; a 401 sends the browser to `/`, where this sequence runs again.
 
 `pnpm test` runs vitest over the pure logic: money formatting and pluralisation
 (`shared/utils/__tests__`), the money thresholds in the business layer, and the mapping of
-outgoing responses (`shared/composables/__tests__`). Components are not tested. The backend has
+outgoing responses and the tab-badge counters (`shared/composables/__tests__`). Components are
+not tested. Specs live in `__tests__/*.spec.ts` next to the code; vitest reads `vite.config.ts`
+(there is no separate vitest config). `tsconfig.app.json` excludes `__tests__`, so `pnpm type-check`
+does **not** type-check specs. There is no ESLint — Prettier is the only formatter/linter. The backend has
 its own Jest unit suite and e2e over a real database — see that repository.
 
 ## Current state (important context)
@@ -206,7 +210,8 @@ The frontend is **fully migrated to the "Defiant" `d-*` design system** (cool sl
   via `<StatusBadge>` (`@/shared/components/ui`) off `src/shared/constants/status.ts`.
 
 **Write new frontend code against the `d-*` system** — full token reference + component anatomy in
-`.agents/rules/frontend-design/design-system.md`; coding rules in
+`.agents/rules/frontend-design/design-system.md` (check it before adding any style —
+`tokens-first.md` in the same folder); coding rules in
 `.agents/rules/frontend-writing-patterns.md`.
 
 `pnpm build` and `pnpm type-check` are green.
