@@ -85,7 +85,7 @@ pnpm format       # prettier --write src/
 
 ### Environment (`.env`, see `.env.example`)
 
-- `VITE_API_BASE_URL` — backend base URL (default `http://localhost:3000/api`).
+- `VITE_API_BASE_URL` — backend base URL (default `/api`).
 - `VITE_MOCK_TELEGRAM_INIT_DATA` — fake Telegram `initData` for local dev outside Telegram.
   Honoured **only in dev builds** (`import.meta.env.DEV`) — in production it would let any browser in.
 

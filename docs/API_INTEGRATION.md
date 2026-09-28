@@ -9,7 +9,7 @@ The frontend talks to the backend exclusively through `src/services/api/` (see [
 `.env` (see `.env.example`):
 
 ```env
-VITE_API_BASE_URL=http://localhost:3000/api
+VITE_API_BASE_URL=/api
 VITE_MOCK_TELEGRAM_INIT_DATA=<initData string for browser dev outside Telegram>
 ```
 

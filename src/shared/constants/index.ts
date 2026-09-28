@@ -3,7 +3,7 @@ export const APP_NAME = 'Kai Repetitor'
 export const APP_VERSION = '1.0.0'
 
 // API endpoints
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 export const MOCK_INIT_DATA = import.meta.env.VITE_MOCK_TELEGRAM_INIT_DATA || ''
 
