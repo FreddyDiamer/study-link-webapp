@@ -5,9 +5,8 @@ WORKDIR /app
 RUN corepack enable
 
 COPY package.json pnpm-lock.yaml ./
-COPY tsconfig*.json ./
 
-RUN pnpm install --frozen-lock
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
@@ -16,4 +15,5 @@ RUN pnpm build
 
 FROM caddy:2-alpine AS webapp
 
-COPY --from=builder /app/dist /usr/share/caddy/
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=builder /app/dist /srv/www

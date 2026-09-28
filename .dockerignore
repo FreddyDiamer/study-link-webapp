@@ -1,0 +1,61 @@
+# Управляет build-контекстом. Отсев src/**/*.ts из финального образа делает
+# multi-stage (runtime копирует лишь src/data), а не этот файл — src целиком
+# нужен builder-стадии для tsc. Главное здесь — выкинуть .git (1.1 ГБ).
+
+# ── Git & CI ────────────────────────────────────────────────
+.git
+.gitignore
+.gitattributes
+.githooks
+.github
+.gitlab-ci.yml
+
+# ── Локальные модули/сборка (пересобираются в builder) ──────
+node_modules
+dist
+.pnpm-store
+
+# ── Документация и планы ────────────────────────────────────
+docs
+WorkPlans
+dev
+grafana
+readme.txt
+
+# ── Секреты хоста / локалка (НЕ трогает src/data/*, нужные рантайму) ──
+.secrets
+.env
+.env.*
+
+# ── Тулинг / IDE / AI ───────────────────────────────────────
+.claude
+.vscode
+.idea
+.cursorrules
+.mcp.json
+.dependency-cruiser.cjs
+eslint.config.js
+eslint-suppressions.json
+.eslintcache
+
+# ── Тесты и coverage ────────────────────────────────────────
+coverage
+.nyc_output
+jest.config.ts
+**/__tests__
+**/*.test.ts
+**/*.spec.ts
+src/test
+
+# ── Мёртвый в prod debug-view (portalsGifts* оставлены — регистрируются безусловно) ──
+view/page/debug/admin
+view/page/debug/chest_simulation.eta
+view/page/debug/collection_simulation.eta
+view/page/debug/egg_simulation.eta
+view/page/debug/legal_roulette_emulator.eta
+view/page/debug/roulette_v2_simulation.eta
+view/page/debug/layout.eta
+
+# ── Прочее ──────────────────────────────────────────────────
+.DS_Store
+*.log
