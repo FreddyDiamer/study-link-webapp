@@ -20,7 +20,7 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     environment: production
     permissions:
