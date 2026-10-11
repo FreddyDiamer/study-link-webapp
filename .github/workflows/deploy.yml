@@ -16,7 +16,7 @@ on:
       ]
 
 env:
-  IMAGE_NAME: ghcr.io/freddydiamer/study-link-api
+  IMAGE_NAME: ghcr.io/freddydiamer/study-link-webapp
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
