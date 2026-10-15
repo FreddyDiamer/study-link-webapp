@@ -241,6 +241,16 @@ export class OrderService {
     }
   }
 
+  /**
+   * Моя запись на услугу или null. Без алерта: это подпись к кнопке, а не данные экрана —
+   * при сбое экран просто покажет «Записаться», а повтор бэкенд всё равно не пропустит.
+   */
+  async getMyServiceResponse(serviceId: string): Promise<ServiceResponse | null> {
+    const response = await ordersApi.getMyServiceResponses(serviceId)
+    const mine = response?.items?.[0]
+    return mine ? this.convertServiceResponseToRubles(mine) : null
+  }
+
   async getMyServiceResponses(): Promise<PaginatedResponse<ServiceResponse>> {
     try {
       const response = await ordersApi.getMyServiceResponses()

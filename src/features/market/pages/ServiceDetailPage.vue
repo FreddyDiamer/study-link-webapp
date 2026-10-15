@@ -25,8 +25,13 @@ const router = useRouter()
 const auth = useAuthStore()
 const telegramStore = useTelegramStore()
 const { getService, activateService, deactivateService } = useService()
-const { createServiceResponse, getServiceResponses, acceptServiceResponse, rejectServiceResponse } =
-  useOrder()
+const {
+  createServiceResponse,
+  getMyServiceResponse,
+  getServiceResponses,
+  acceptServiceResponse,
+  rejectServiceResponse,
+} = useOrder()
 const { showToast } = useToast()
 const { refresh: refreshDealsBadge } = useDealsBadge()
 const { refresh: refreshInboxBadge } = useInboxBadge()
@@ -40,6 +45,8 @@ const deciding = ref(false)
 const service = ref<Service | null>(null)
 const reviews = ref<Review[]>([])
 const bookings = ref<ServiceResponse[]>([])
+// моя запись на чужую услугу: в самой услуге бэкенд отдаёт только их число
+const myBooking = ref<ServiceResponse | null>(null)
 const actionsSheet = ref(false)
 
 // роль — свойство объекта: на своей услуге вы исполнитель, на чужой — заказчик
@@ -61,8 +68,20 @@ const distribution = computed<number[] | undefined>(() => {
   return buckets.map((c) => Math.round((c / max) * 100))
 })
 
-const responded = computed(
-  () => booked.value || !!service.value?.responses?.some((r) => r.studentId === auth.user?.id),
+// записаться второй раз бэкенд не даст — вместо кнопки показываем, чем кончилась запись
+const bookingStatus = computed<ResponseStatus | null>(() =>
+  booked.value ? ResponseStatus.PENDING : (myBooking.value?.status ?? null),
+)
+const bookingLabel = computed(() => {
+  if (bookingStatus.value === ResponseStatus.ACCEPTED) return '✓ Вас записали'
+  if (bookingStatus.value === ResponseStatus.REJECTED) return 'Репетитор отказал'
+  if (bookingStatus.value === ResponseStatus.EXPIRED) return 'Запись истекла'
+  return '✓ Заявка отправлена'
+})
+const bookingDeclined = computed(
+  () =>
+    bookingStatus.value === ResponseStatus.REJECTED ||
+    bookingStatus.value === ResponseStatus.EXPIRED,
 )
 
 const pendingCount = computed(
@@ -94,7 +113,12 @@ const load = async () => {
     if (s?.tutorId === auth.user?.id) {
       bookings.value = await getServiceResponses(id)
     } else if (s?.tutor?.id) {
-      reviews.value = await reviewService.getUserReviews(s.tutor.id)
+      const [tutorReviews, mine] = await Promise.all([
+        reviewService.getUserReviews(s.tutor.id),
+        getMyServiceResponse(id).catch(() => null),
+      ])
+      reviews.value = tutorReviews
+      myBooking.value = mine
     }
   } catch (e) {
     console.error('Не удалось загрузить услугу:', e)
@@ -151,16 +175,22 @@ const reject = async (responseId: string) => {
   }
 }
 
+// из ответа берём только статус: PATCH отдаёт услугу без рейтинга репетитора
+const applyStatus = (updated: Service) => {
+  if (service.value) service.value = { ...service.value, status: updated.status }
+}
+
 const onAction = async (action: string) => {
   try {
     if (action === 'hide') {
-      service.value = await deactivateService(id)
+      applyStatus(await deactivateService(id))
       showToast('Услуга скрыта из ленты')
     } else if (action === 'show') {
-      service.value = await activateService(id)
+      applyStatus(await activateService(id))
       showToast('Услуга вернулась в ленту')
     }
   } catch (e) {
+    // сбой уже показан алертом бизнес-слоя
     console.error('Не удалось изменить услугу:', e)
   }
 }
@@ -275,10 +305,13 @@ onMounted(load)
         class="shrink-0 px-[18px] pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] bg-d-ink border-t border-d-border"
       >
         <div
-          v-if="responded"
-          class="h-[52px] rounded-[13px] border-[1.5px] border-d-accent text-d-accent flex items-center justify-center gap-2 text-[15px] font-semibold"
+          v-if="bookingStatus"
+          class="h-[52px] rounded-[13px] border-[1.5px] flex items-center justify-center gap-2 text-[15px] font-semibold"
+          :class="
+            bookingDeclined ? 'border-d-border text-d-text-second' : 'border-d-accent text-d-accent'
+          "
         >
-          ✓ Заявка отправлена
+          {{ bookingLabel }}
         </div>
         <ActionButton v-else :loading="booking" @click="book">Записаться</ActionButton>
       </div>

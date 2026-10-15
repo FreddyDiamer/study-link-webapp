@@ -1,12 +1,6 @@
 import { tutorsApi } from '@/services/api'
 import { useTelegramStore } from '@/stores'
-import type {
-  Service,
-  ServiceFilterDto,
-  CreateServiceDto,
-  UpdateServiceDto,
-  PaginatedResponse,
-} from '@/shared/types'
+import type { Service, CreateServiceDto, UpdateServiceDto, PaginatedResponse } from '@/shared/types'
 
 /** Минимальная цена услуги в копейках (100 ₽). */
 const MIN_PRICE_KOPEKS = 10_000
@@ -16,59 +10,12 @@ export class ServiceService {
     return useTelegramStore()
   }
 
-  async getServices(filters?: ServiceFilterDto): Promise<PaginatedResponse<Service>> {
-    try {
-      // Конвертируем цены в копейки для фильтров
-      const apiFilters = this.convertFiltersToKopeks(filters)
-
-      const response = await tutorsApi.getServices(apiFilters)
-
-      // Конвертируем цены обратно в рубли для отображения
-      const servicesWithRubles = this.convertServicesToRubles(response)
-
-      return servicesWithRubles
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении услуг')
-      throw error
-    }
-  }
-
-  async getActiveServices(): Promise<PaginatedResponse<Service>> {
-    try {
-      const response = await tutorsApi.getActiveServices()
-      return this.convertServicesToRubles(response)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении активных услуг')
-      throw error
-    }
-  }
-
-  async getPopularServices(limit?: number): Promise<PaginatedResponse<Service>> {
-    try {
-      const response = await tutorsApi.getPopularServices(limit)
-      return this.convertServicesToRubles(response)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении популярных услуг')
-      throw error
-    }
-  }
-
   async getMyServices(): Promise<PaginatedResponse<Service>> {
     try {
       const response = await tutorsApi.getMyServices()
       return this.convertServicesToRubles(response)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении ваших услуг')
-      throw error
-    }
-  }
-
-  async getService(id: string): Promise<Service> {
-    try {
-      const service = await tutorsApi.getService(id)
-      return this.convertServiceToRubles(service)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении услуги')
       throw error
     }
   }
@@ -179,13 +126,12 @@ export class ServiceService {
     }
   }
 
-  private convertFiltersToKopeks(filters?: ServiceFilterDto): ServiceFilterDto | undefined {
-    if (!filters) return filters
-
+  private convertServicesToRubles(
+    response: PaginatedResponse<Service>,
+  ): PaginatedResponse<Service> {
     return {
-      ...filters,
-      minPrice: filters.minPrice,
-      maxPrice: filters.maxPrice,
+      ...response,
+      items: response.items.map((service) => this.convertServiceToRubles(service)),
     }
   }
 
@@ -193,15 +139,6 @@ export class ServiceService {
     return {
       ...service,
       price: service.price,
-    }
-  }
-
-  private convertServicesToRubles(
-    response: PaginatedResponse<Service>,
-  ): PaginatedResponse<Service> {
-    return {
-      ...response,
-      items: response.items.map((service) => this.convertServiceToRubles(service)),
     }
   }
 

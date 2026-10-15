@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
 import { userService } from '@/services/business'
-import { useToast } from '@/shared/composables'
 import { PATHS } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ToggleRow } from '@/shared/components/ui'
 import type { NotificationPreferences } from '@/shared/types'
-
-const { showToast } = useToast()
 
 const loading = ref(true)
 const saving = ref(false)
@@ -48,8 +45,8 @@ const save = async () => {
       notificationPreferences: { ...prefs },
     })
   } catch (e) {
+    // причину уже показал алерт бизнес-слоя — тост поверх был бы дублем
     console.error('Не удалось сохранить настройки уведомлений:', e)
-    showToast('Не удалось сохранить настройки')
   } finally {
     saving.value = false
   }

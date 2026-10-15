@@ -26,7 +26,6 @@ const budget = ref('')
 const deadline = ref('')
 const description = ref('')
 const submitting = ref(false)
-const error = ref('')
 
 const teachersForSubject = computed(() => {
   const list = subjectId.value ? edu.getTeachersBySubject(subjectId.value) : []
@@ -52,7 +51,6 @@ const budgetKopeks = computed(() =>
 const submit = async () => {
   if (!canSubmit.value || !auth.user?.id) return
   submitting.value = true
-  error.value = ''
   try {
     if (isEditing.value) {
       await updateRequest(editingId.value, {
@@ -77,8 +75,8 @@ const submit = async () => {
       exitTo(created?.id ? requestDetailPath(created.id) : PATHS.MARKET)
     }
   } catch (e) {
+    // причину уже показал алерт бизнес-слоя — второй текст здесь был бы дублем
     console.error('Не удалось сохранить заявку:', e)
-    error.value = 'Не удалось сохранить заявку. Попробуйте ещё раз.'
     submitting.value = false
   }
 }
@@ -160,8 +158,6 @@ onMounted(async () => {
         placeholder="Опишите, с чем нужна помощь"
         class="w-full min-h-[88px] rounded-[12px] bg-d-panel border border-d-border-soft focus:border-d-accent focus:outline-none px-4 py-3.5 text-body leading-[1.45] resize-none transition-colors"
       />
-
-      <p v-if="error" class="text-caption text-d-coral mt-3">{{ error }}</p>
     </div>
 
     <div

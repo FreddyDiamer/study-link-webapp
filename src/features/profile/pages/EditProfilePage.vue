@@ -26,7 +26,6 @@ const groupId = ref('')
 const groupSheet = ref(false)
 const groupFieldId = useId()
 const saving = ref(false)
-const error = ref('')
 
 // группа сохраняется вместе с остальным профилем, по кнопке «Сохранить»
 const groupNumber = computed(() => edu.groups.find((g) => g.id === groupId.value)?.number ?? '')
@@ -42,7 +41,6 @@ const canSave = computed(
 const save = async () => {
   if (!canSave.value) return
   saving.value = true
-  error.value = ''
   try {
     await userService.updateProfile({
       name: name.value.trim(),
@@ -55,8 +53,8 @@ const save = async () => {
     showToast('Профиль сохранён')
     exitTo(PATHS.PROFILE)
   } catch (e) {
+    // причину уже показал алерт бизнес-слоя — второй текст здесь был бы дублем
     console.error('Не удалось сохранить профиль:', e)
-    error.value = 'Не удалось сохранить. Попробуйте ещё раз.'
     saving.value = false
   }
 }
@@ -150,8 +148,6 @@ onMounted(async () => {
       <p class="text-caption text-d-text-hint mt-2">
         Имя и username берутся из Telegram при первом входе.
       </p>
-
-      <p v-if="error" class="text-caption text-d-coral mt-3">{{ error }}</p>
     </div>
 
     <div

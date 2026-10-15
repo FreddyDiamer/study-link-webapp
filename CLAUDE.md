@@ -121,6 +121,11 @@ Pages / Components  →  composables (use*)  →  services/business  →  servic
   (WebApp bridge: haptics, alerts, main button). There is no `app` store.
 - **Components never import `services/api` directly** — always go through a composable/business
   service (type-only imports, as in `DevLogin.vue`, are the one exception).
+- **Who shows an error.** A failed user action (submit, accept, hide…) is reported once, by the
+  business layer's Telegram alert — pages only log it and re-enable their buttons; don't add a
+  second generic text or toast. A failed *load* is the page's job: it renders `LoadError` (or its
+  own failure state), so reads that feed such a state may call the API without the business
+  alert (see `useService`).
 
 ### Source map
 
@@ -176,7 +181,8 @@ Prefer importing through barrels (`@/shared/types`, `@/shared/components/ui`, `@
 
 `main.ts` mounts the app and calls `telegramService.init()`. `App.vue` then runs `initializeApp()`:
 
-- **Inside Telegram**: real `initData` → `authService.loginWithTelegram()` on every launch.
+- **Inside Telegram**: real `initData` → `authService.loginWithTelegram()` on every launch. If that
+  fails, `App.vue` shows «Не получилось войти» with a retry instead of the out-of-Telegram stub.
 - **No `initData`** (web): restore the saved session from localStorage first
   (`authStore.initializeAuth()`), so a web session survives reloads like a real user's. Only
   without one does a dev build try `MOCK_INIT_DATA`. Still unauthenticated → a dev build shows

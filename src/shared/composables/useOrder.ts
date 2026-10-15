@@ -193,6 +193,8 @@ export const useOrder = () => {
     }
   }
 
+  const getMyServiceResponse = (serviceId: string) => orderService.getMyServiceResponse(serviceId)
+
   const getMyServiceResponses = async () => {
     isLoading.value = true
     try {
@@ -371,6 +373,7 @@ export const useOrder = () => {
 
     // Service Responses
     getServiceResponses,
+    getMyServiceResponse,
     getMyServiceResponses,
     createServiceResponse,
     updateServiceResponse,

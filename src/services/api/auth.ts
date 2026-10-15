@@ -13,10 +13,6 @@ export type DevLoginTarget = { userId: string } | { telegramUsername: string }
 export const authApi = {
   telegramAuth: (initData: string) => apiClient.post<AuthResponse>('/auth/telegram', { initData }),
 
-  getProfile: () => apiClient.get<AuthResponse>('/auth/profile'),
-
-  refreshToken: () => apiClient.get<AuthResponse>('/auth/refresh'),
-
   // --- DEV ONLY (бэкенд отдаёт эти эндпоинты только не в проде) ---
   devUsers: () => apiClient.get<DevUser[]>('/auth/dev/users'),
   devLogin: (target?: DevLoginTarget) =>

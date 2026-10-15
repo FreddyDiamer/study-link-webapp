@@ -31,16 +31,6 @@ export interface Tutor extends User {
   isFavorite?: boolean
 }
 
-export interface TutorSearchParams {
-  search?: string
-  subject?: string
-  minPrice?: number
-  maxPrice?: number
-  minRating?: number
-  page?: number
-  limit?: number
-}
-
 export interface AuthResponse {
   accessToken: string
   user: {

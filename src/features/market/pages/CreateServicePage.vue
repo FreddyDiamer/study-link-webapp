@@ -18,7 +18,6 @@ const teacherId = ref('')
 const price = ref('')
 const description = ref('')
 const submitting = ref(false)
-const error = ref('')
 
 const teachersForSubject = computed(() => {
   const list = subjectId.value ? edu.getTeachersBySubject(subjectId.value) : []
@@ -37,7 +36,6 @@ const canSubmit = computed(
 const submit = async () => {
   if (!canSubmit.value) return
   submitting.value = true
-  error.value = ''
   try {
     await createService({
       subjectId: subjectId.value,
@@ -49,8 +47,8 @@ const submit = async () => {
     showToast('Услуга опубликована')
     exitTo(PATHS.MARKET)
   } catch (e) {
+    // причину уже показал алерт бизнес-слоя — второй текст здесь был бы дублем
     console.error('Не удалось создать услугу:', e)
-    error.value = 'Не удалось создать услугу. Попробуйте ещё раз.'
     submitting.value = false
   }
 }
@@ -135,8 +133,6 @@ onMounted(() => {
           class="w-full min-h-[94px] rounded-[12px] bg-d-panel border border-d-border-soft focus:border-d-accent focus:outline-none px-4 py-3.5 text-body leading-[1.45] resize-none transition-colors"
         />
       </div>
-
-      <p v-if="error" class="text-caption text-d-coral">{{ error }}</p>
     </div>
 
     <div

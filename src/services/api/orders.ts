@@ -86,9 +86,11 @@ export const ordersApi = {
     }),
 
   // Получить мои отклики на услуги
-  getMyServiceResponses: () =>
+  // serviceId — только моя запись на эту услугу (бэкенд держит не больше одной)
+  getMyServiceResponses: (serviceId?: string) =>
     apiClient.get<PaginatedResponse<ServiceResponse>>('/marketplace/service-responses', {
       role: 'student',
+      serviceId,
       limit: 100,
     }),
 

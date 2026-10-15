@@ -57,8 +57,14 @@ const pendingTutors = computed(() =>
     .map((r) => ({ id: r.id, name: r.tutor?.name || 'Репетитор' })),
 )
 
+// полный список откликов бэкенд отдаёт только автору заявки; чужим он лежит в самой заявке —
+// этого хватает для счётчика и отметки «вы откликнулись»
+const visibleResponses = computed(() =>
+  isMine.value ? responses.value : (request.value?.responses ?? []),
+)
+
 const responsesLabel = computed(() =>
-  countWithWord(responses.value.length, 'отклик', 'отклика', 'откликов'),
+  countWithWord(visibleResponses.value.length, 'отклик', 'отклика', 'откликов'),
 )
 
 const budgetShort = computed(() =>
@@ -71,13 +77,17 @@ const deadlineShort = computed(() =>
 // сделка уже создана — остальные отклики закрыты
 const decided = computed(() => responses.value.some((r) => r.status === ResponseStatus.ACCEPTED))
 
-const myResponse = computed(() => responses.value.find((r) => r.tutorId === auth.user?.id))
+// в заявке у отклика есть только tutor.id, без плоского tutorId
+const myResponse = computed(() =>
+  visibleResponses.value.find((r) => (r.tutorId ?? r.tutor?.id) === auth.user?.id),
+)
 
 const load = async () => {
   loading.value = true
   try {
     request.value = await getRequest(id)
-    responses.value = await getRequestResponses(id)
+    responses.value =
+      request.value?.studentId === auth.user?.id ? await getRequestResponses(id) : []
   } catch (e) {
     console.error('Не удалось загрузить заявку:', e)
   } finally {

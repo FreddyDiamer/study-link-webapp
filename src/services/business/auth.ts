@@ -54,36 +54,6 @@ export class AuthService {
     }
   }
 
-  async refreshProfile(): Promise<AuthResponse> {
-    try {
-      const response = await authApi.getProfile()
-
-      // Обновляем данные пользователя
-      this.authStore.setUser(response.user as any)
-      this.authStore.setToken(response.accessToken)
-
-      return response
-    } catch (error) {
-      this.handleAuthError(error)
-      throw error
-    }
-  }
-
-  async refreshToken(): Promise<AuthResponse> {
-    try {
-      const response = await authApi.refreshToken()
-
-      // Обновляем токен
-      this.authStore.setToken(response.accessToken)
-      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.accessToken)
-
-      return response
-    } catch (error) {
-      this.handleAuthError(error)
-      throw error
-    }
-  }
-
   logout(): void {
     // Очищаем данные
     this.authStore.clearAuth()
@@ -92,10 +62,6 @@ export class AuthService {
 
     // Haptic feedback
     this.telegramStore.hapticFeedback('medium')
-  }
-
-  isAuthenticated(): boolean {
-    return !!this.authStore.token && !!this.authStore.user
   }
 
   private parseTelegramInitData(initData: string): TelegramAuthDto {

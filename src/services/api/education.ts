@@ -63,12 +63,4 @@ export const educationApi = {
   getGroup(id: string): Promise<Group> {
     return apiClient.get(`/education/groups/${id}`)
   },
-
-  createGroup(data: { number: string }): Promise<Group> {
-    return apiClient.post('/education/groups', data)
-  },
-
-  deleteGroup(id: string): Promise<void> {
-    return apiClient.delete(`/education/groups/${id}`)
-  },
 }

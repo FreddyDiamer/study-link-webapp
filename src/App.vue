@@ -3,7 +3,7 @@ import { RouterView } from 'vue-router'
 import { computed, onMounted, ref, watch } from 'vue'
 import BottomNav from '@/shared/components/layout/BottomNav.vue'
 import DevLogin from '@/features/auth/DevLogin.vue'
-import { AppToast } from '@/shared/components/ui'
+import { AppToast, LoadError } from '@/shared/components/ui'
 import { useAuthStore, useEducationStore } from '@/stores'
 import { MOCK_INIT_DATA } from './shared/constants'
 
@@ -14,6 +14,8 @@ const educationStore = useEducationStore()
 const KEPT_PAGES = ['MarketPage', 'DealsPage', 'ProfilePage', 'MyResponsesPage']
 
 const ready = ref(false)
+// вход по initData не удался: пользователь в Telegram, звать его «открыть в Telegram» — ложь
+const loginFailed = ref(false)
 const isDev = import.meta.env.DEV
 const isAuthed = computed(() => authStore.isAuthenticated)
 
@@ -27,7 +29,12 @@ const initializeApp = async () => {
     if (telegramInitData) {
       // внутри Telegram личность задаёт сам Telegram — при каждом запуске
       const { authService } = await import('@/services/business')
-      await authService.loginWithTelegram(telegramInitData)
+      try {
+        await authService.loginWithTelegram(telegramInitData)
+      } catch (error) {
+        loginFailed.value = true
+        throw error
+      }
       return
     }
 
@@ -50,6 +57,12 @@ const initializeApp = async () => {
 // сессия или дев-вход. Событием из DevLogin это не сделать — вход размонтирует его раньше,
 // чем он успеет что-то отправить, а emit размонтированного компонента молча теряется
 watch(isAuthed, (authed) => authed && initEducation(), { immediate: true })
+
+const retryLogin = () => {
+  loginFailed.value = false
+  ready.value = false
+  initializeApp()
+}
 
 onMounted(initializeApp)
 </script>
@@ -74,6 +87,14 @@ onMounted(initializeApp)
           </KeepAlive>
         </Transition>
       </RouterView>
+
+      <!-- Telegram не пустил: бэкенд недоступен или отверг initData — даём повторить -->
+      <LoadError
+        v-else-if="loginFailed"
+        title="Не получилось войти"
+        text="Заявки и сделки на месте — до них не дошёл ответ сервера. Проверьте соединение и попробуйте ещё раз."
+        @retry="retryLogin"
+      />
 
       <!-- веб-вход (только дев-окружение) -->
       <DevLogin v-else-if="isDev" />
