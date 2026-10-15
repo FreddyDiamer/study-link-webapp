@@ -122,35 +122,12 @@ export const useOrder = () => {
     }
   }
 
-  const getMyTutorDeals = async () => {
-    try {
-      const response = await orderService.getMyTutorDeals()
-      return response
-    } catch (error) {
-      console.error('Ошибка получения сделок репетитора:', error)
-      throw error
-    }
-  }
-
   const getDeal = async (id: string) => {
     isLoading.value = true
     try {
       return await orderService.getDeal(id)
     } finally {
       isLoading.value = false
-    }
-  }
-
-  const updateDeal = async (
-    id: string,
-    data: Partial<Pick<Deal, 'status' | 'price' | 'deadline'>>,
-  ) => {
-    try {
-      const response = await orderService.updateDeal(id, data)
-      return response
-    } catch (error) {
-      console.error('Ошибка обновления сделки:', error)
-      throw error
     }
   }
 
@@ -385,9 +362,7 @@ export const useOrder = () => {
 
     // Deals
     getDeals,
-    getMyTutorDeals,
     getDeal,
-    updateDeal,
     acceptDeal,
     rejectDeal,
     completeDeal,

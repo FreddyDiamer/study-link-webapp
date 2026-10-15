@@ -46,18 +46,13 @@ export const ordersApi = {
   // DEALS (Сделки)
   // =============================================================================
 
-  // Получить все сделки
-  getDeals: (params?: any) => apiClient.get<PaginatedResponse<Deal>>('/marketplace/deals', params),
-
-  // Получить мои сделки как репетитор
-  getMyTutorDeals: () => apiClient.get<PaginatedResponse<Deal>>('/marketplace/deals/my-tutor'),
+  // Список сделок постраничный, а экран «Сделки» и бейдж таба считают их целиком —
+  // берём максимальную страницу (limit=100), а не дефолтные 10
+  getDeals: (params?: any) =>
+    apiClient.get<PaginatedResponse<Deal>>('/marketplace/deals', { limit: 100, ...params }),
 
   // Получить сделку по ID
   getDeal: (id: string) => apiClient.get<Deal>(`/marketplace/deals/${id}`),
-
-  // Обновить сделку (статус, цена, дедлайн)
-  updateDeal: (id: string, data: Partial<Deal>) =>
-    apiClient.patch<Deal>(`/marketplace/deals/${id}`, data),
 
   // Принять сделку
   acceptDeal: (id: string) => apiClient.patch<Deal>(`/marketplace/deals/${id}/accept`),
@@ -79,16 +74,23 @@ export const ordersApi = {
   // SERVICE RESPONSES (Отклики студентов на услуги)
   // =============================================================================
 
-  // Получить отклики на услугу
-  // бэкенд отдаёт { items, total }, а не массив, как у откликов на заявки
+  // Списки откликов постраничные; экраны показывают их целиком, поэтому
+  // берём максимальную страницу (limit=100), а не дефолтные 10
+
+  // Получить отклики на мою услугу (видит только владелец услуги)
   getServiceResponses: (serviceId: string) =>
-    apiClient.get<PaginatedResponse<ServiceResponse>>(
-      `/marketplace/service-responses/by-service/${serviceId}`,
-    ),
+    apiClient.get<PaginatedResponse<ServiceResponse>>('/marketplace/service-responses', {
+      role: 'tutor',
+      serviceId,
+      limit: 100,
+    }),
 
   // Получить мои отклики на услуги
   getMyServiceResponses: () =>
-    apiClient.get<PaginatedResponse<ServiceResponse>>('/marketplace/service-responses/my'),
+    apiClient.get<PaginatedResponse<ServiceResponse>>('/marketplace/service-responses', {
+      role: 'student',
+      limit: 100,
+    }),
 
   // Создать отклик на услугу
   createServiceResponse: (data: CreateServiceResponseDto) =>
@@ -113,13 +115,20 @@ export const ordersApi = {
   // REQUEST RESPONSES (Отклики репетиторов на заявки)
   // =============================================================================
 
-  // Получить отклики на заявку
+  // Получить отклики на мою заявку (видит только автор заявки)
   getRequestResponses: (requestId: string) =>
-    apiClient.get<RequestResponse[]>(`/marketplace/request-responses`, { requestId }),
+    apiClient.get<PaginatedResponse<RequestResponse>>('/marketplace/request-responses', {
+      role: 'student',
+      requestId,
+      limit: 100,
+    }),
 
   // Получить мои отклики на заявки
   getMyRequestResponses: () =>
-    apiClient.get<PaginatedResponse<RequestResponse>>('/marketplace/request-responses/my'),
+    apiClient.get<PaginatedResponse<RequestResponse>>('/marketplace/request-responses', {
+      role: 'tutor',
+      limit: 100,
+    }),
 
   // Создать отклик на заявку
   createRequestResponse: (data: CreateRequestResponseDto) =>

@@ -85,7 +85,10 @@ pnpm format       # prettier --write src/
 
 ### Environment (`.env`, see `.env.example`)
 
-- `VITE_API_BASE_URL` — backend base URL (default `/api`).
+- `VITE_API_BASE_URL` — backend base URL (default `/api`). In production Caddy serves `/api` on the
+  same domain; under `pnpm dev` the Vite `server.proxy` forwards `/api` to the backend.
+- `API_PROXY_TARGET` — where that dev proxy points (default `http://localhost:3000`). No `VITE_`
+  prefix, so it never reaches the client bundle; set it when port 3000 is taken by something else.
 - `VITE_MOCK_TELEGRAM_INIT_DATA` — fake Telegram `initData` for local dev outside Telegram.
   Honoured **only in dev builds** (`import.meta.env.DEV`) — in production it would let any browser in.
 
@@ -132,7 +135,7 @@ src/
   shared/
     components/ui/         # d-* primitives: ActionButton, BottomSheet, ActionsSheet, ConfirmSheet,
                            #   SegmentControl, StatusBadge, RatingChip, MoneyInput, DateField,
-                           #   ToggleRow, LoadError, AppToast (barrel: ui/index.ts)
+                           #   ToggleRow, LoadError, AppToast, SearchField (barrel: ui/index.ts)
     components/layout/      # AppHeader (rendered by each page, not by App.vue), BottomNav
     components/             # AvatarChip, ReviewItem
     composables/            # use*() (barrel: composables/index.ts)
@@ -173,11 +176,13 @@ Prefer importing through barrels (`@/shared/types`, `@/shared/components/ui`, `@
 
 `main.ts` mounts the app and calls `telegramService.init()`. `App.vue` then runs `initializeApp()`:
 
-- **Inside Telegram** (or dev with `MOCK_INIT_DATA`): `initData` →
-  `authService.loginWithTelegram()`.
-- **No `initData`**: restore the saved session from localStorage (`authStore.initializeAuth()`).
-  If still unauthenticated, a dev build shows `DevLogin` (backend `/auth/dev/users` +
-  `/auth/dev/login`); a production build shows «Откройте приложение в Telegram».
+- **Inside Telegram**: real `initData` → `authService.loginWithTelegram()` on every launch.
+- **No `initData`** (web): restore the saved session from localStorage first
+  (`authStore.initializeAuth()`), so a web session survives reloads like a real user's. Only
+  without one does a dev build try `MOCK_INIT_DATA`. Still unauthenticated → a dev build shows
+  `DevLogin` (backend `/auth/dev/users` + `/auth/dev/login` by `userId`, by `telegramUsername`, or
+  `{}` for `dev_user`); a production build shows «Откройте приложение в Telegram». In dev builds
+  outside Telegram the profile has «Сменить пользователя · dev» (`authService.logout()`).
 - Once authenticated: `educationStore.initialize()` (subjects/teachers/links, once, in parallel).
 
 Routes and `BottomNav` render only when authenticated — there is no `/auth` route and no router

@@ -23,15 +23,21 @@ const initEducation = () => {
 
 const initializeApp = async () => {
   try {
-    // мок-initData — только для дев-сборки: в проде он открыл бы вход любому браузеру
-    const initData = window.Telegram?.WebApp?.initData || (isDev ? MOCK_INIT_DATA : '')
-    if (initData) {
-      // запуск внутри Telegram (или с mock initData)
+    const telegramInitData = window.Telegram?.WebApp?.initData
+    if (telegramInitData) {
+      // внутри Telegram личность задаёт сам Telegram — при каждом запуске
       const { authService } = await import('@/services/business')
-      await authService.loginWithTelegram(initData)
-    } else {
-      // веб: подхватываем сохранённую сессию (dev-логин и т.п.)
-      authStore.initializeAuth()
+      await authService.loginWithTelegram(telegramInitData)
+      return
+    }
+
+    // веб: сессия переживает перезагрузку, как у настоящего пользователя
+    authStore.initializeAuth()
+    // мок-initData — только в дев-сборке (в проде он открыл бы вход любому браузеру) и только
+    // без сохранённой сессии: иначе он перебивал бы пользователя, выбранного на DevLogin
+    if (!authStore.isAuthenticated && isDev && MOCK_INIT_DATA) {
+      const { authService } = await import('@/services/business')
+      await authService.loginWithTelegram(MOCK_INIT_DATA)
     }
   } catch (error) {
     console.error('Ошибка инициализации приложения:', error)

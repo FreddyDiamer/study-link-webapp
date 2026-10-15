@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { reviewService, userService } from '@/services/business'
+import { authService, reviewService, userService } from '@/services/business'
 import {
   pendingLabel,
   pendingOnRequest,
@@ -13,7 +13,7 @@ import {
   useService,
   useToast,
 } from '@/shared/composables'
-import { useAuthStore } from '@/stores'
+import { useAuthStore, useTelegramStore } from '@/stores'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 import ReviewItem from '@/shared/components/ReviewItem.vue'
@@ -35,6 +35,7 @@ import {
 } from '@/shared/types'
 
 const router = useRouter()
+const telegramStore = useTelegramStore()
 const auth = useAuthStore()
 const { getMyRequests } = useOrder()
 const { getMyServices } = useService()
@@ -118,6 +119,15 @@ const isServiceListed = (service: Service) => service.status === ServiceStatus.A
 
 const scroller = ref<HTMLElement | null>(null)
 const { revisited } = useKeptScroll(scroller, () => load(true))
+
+// веб-сессия в деве переживает перезагрузку — сменить пользователя можно только явно.
+// Внутри Telegram выход бессмыслен: следующий запуск снова войдёт по initData
+const canSwitchUser = computed(() => import.meta.env.DEV && !telegramStore.initData)
+
+const handleSwitchUser = () => {
+  // App.vue увидит выход и покажет DevLogin вместо экранов
+  authService.logout()
+}
 
 onMounted(() => load())
 </script>
@@ -334,6 +344,14 @@ onMounted(() => load())
           </button>
         </div>
       </template>
+
+      <button
+        v-if="canSwitchUser"
+        class="press btn-ghost w-full mt-8 py-3 text-subhead font-semibold"
+        @click="handleSwitchUser"
+      >
+        Сменить пользователя · dev
+      </button>
     </div>
 
     <GroupSheet v-model="groupSheet" :current-id="profile?.groupId" @pick="pickGroup" />

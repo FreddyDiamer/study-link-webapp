@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, useId } from 'vue'
 import { userService } from '@/services/business'
 import { useEducation, useFormExit, useToast } from '@/shared/composables'
 import { useAuthStore, useEducationStore } from '@/stores'
@@ -7,6 +7,7 @@ import { useTelegramStore } from '@/stores/telegram'
 import { PATHS } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ActionButton } from '@/shared/components/ui'
+import GroupSheet from '../components/GroupSheet.vue'
 import type { User } from '@/shared/types'
 
 const { exitTo } = useFormExit()
@@ -22,8 +23,13 @@ const profile = ref<User | null>(null)
 const name = ref('')
 const description = ref('')
 const groupId = ref('')
+const groupSheet = ref(false)
+const groupFieldId = useId()
 const saving = ref(false)
 const error = ref('')
+
+// группа сохраняется вместе с остальным профилем, по кнопке «Сохранить»
+const groupNumber = computed(() => edu.groups.find((g) => g.id === groupId.value)?.number ?? '')
 
 const descriptionLength = computed(() => description.value.length)
 const hasReviews = computed(() => (profile.value?.reviewsCount ?? 0) > 0)
@@ -118,22 +124,22 @@ onMounted(async () => {
       </div>
       <div v-else class="mb-[18px]" />
 
-      <label class="block text-overline uppercase text-d-text-second mb-2.5">Группа</label>
-      <div class="relative mb-[18px]">
-        <select
-          v-model="groupId"
-          class="d-select w-full h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 pr-10 text-body appearance-none focus:border-d-accent focus:outline-none transition-colors"
-          :class="groupId ? 'text-d-text' : 'text-d-text-hint'"
-        >
-          <option value="" disabled>Выберите группу</option>
-          <option v-for="group in edu.groups" :key="group.id" :value="group.id">
-            {{ group.number }}
-          </option>
-        </select>
-        <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-d-text-hint"
-          >▾</span
-        >
-      </div>
+      <label :for="groupFieldId" class="block text-overline uppercase text-d-text-second mb-2.5"
+        >Группа</label
+      >
+      <!-- нативный select не умеет искать, а групп в университете сотни: открываем лист с поиском -->
+      <button
+        :id="groupFieldId"
+        type="button"
+        aria-haspopup="dialog"
+        class="press w-full flex items-center h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 mb-[18px] text-body text-left focus:border-d-accent focus:outline-none transition-colors"
+        @click="groupSheet = true"
+      >
+        <span :class="groupNumber ? 'text-d-text' : 'text-d-text-hint'">
+          {{ groupNumber || 'Выберите группу' }}
+        </span>
+        <span class="ml-auto text-d-text-hint" aria-hidden="true">▾</span>
+      </button>
 
       <label class="block text-overline uppercase text-d-text-second mb-2.5">Telegram</label>
       <div
@@ -153,11 +159,7 @@ onMounted(async () => {
     >
       <ActionButton :loading="saving" :disabled="!canSave" @click="save">Сохранить</ActionButton>
     </div>
+
+    <GroupSheet v-model="groupSheet" :current-id="groupId" @pick="groupId = $event" />
   </div>
 </template>
-
-<style scoped>
-.d-select {
-  color-scheme: dark;
-}
-</style>

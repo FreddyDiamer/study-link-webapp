@@ -7,6 +7,9 @@ export interface DevUser {
   telegramUsername?: string
 }
 
+/** Под кем войти: пусто — тестовый dev_user, создаётся бэкендом при первом входе. */
+export type DevLoginTarget = { userId: string } | { telegramUsername: string }
+
 export const authApi = {
   telegramAuth: (initData: string) => apiClient.post<AuthResponse>('/auth/telegram', { initData }),
 
@@ -16,6 +19,6 @@ export const authApi = {
 
   // --- DEV ONLY (бэкенд отдаёт эти эндпоинты только не в проде) ---
   devUsers: () => apiClient.get<DevUser[]>('/auth/dev/users'),
-  devLogin: (userId?: string) =>
-    apiClient.post<AuthResponse>('/auth/dev/login', userId ? { userId } : {}),
+  devLogin: (target?: DevLoginTarget) =>
+    apiClient.post<AuthResponse>('/auth/dev/login', target ?? {}),
 }

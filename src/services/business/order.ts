@@ -152,36 +152,12 @@ export class OrderService {
     }
   }
 
-  async getMyTutorDeals(): Promise<PaginatedResponse<Deal>> {
-    try {
-      const response = await ordersApi.getMyTutorDeals()
-      return this.convertDealsToRubles(response)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении ваших сделок как репетитора')
-      throw error
-    }
-  }
-
   async getDeal(id: string): Promise<Deal> {
     try {
       const deal = await ordersApi.getDeal(id)
       return this.convertDealToRubles(deal)
     } catch (error) {
       this.handleError(error, 'Ошибка при получении сделки')
-      throw error
-    }
-  }
-
-  async updateDeal(
-    id: string,
-    data: Partial<Pick<Deal, 'status' | 'price' | 'deadline'>>,
-  ): Promise<Deal> {
-    try {
-      this.telegramStore.hapticFeedback('light')
-      const deal = await ordersApi.updateDeal(id, data)
-      return this.convertDealToRubles(deal)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при обновлении сделки')
       throw error
     }
   }
@@ -361,8 +337,8 @@ export class OrderService {
 
   async getRequestResponses(requestId: string): Promise<RequestResponse[]> {
     try {
-      const responses = await ordersApi.getRequestResponses(requestId)
-      return responses.map((response) => this.convertRequestResponseToRubles(response))
+      const response = await ordersApi.getRequestResponses(requestId)
+      return (response?.items ?? []).map((item) => this.convertRequestResponseToRubles(item))
     } catch (error) {
       this.handleError(error, 'Ошибка при получении откликов на заявку')
       throw error
