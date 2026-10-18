@@ -1,43 +1,33 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEducation, useFormExit, useOrder, useToast } from '@/shared/composables'
-import { useAuthStore, useEducationStore } from '@/stores'
+import { useFormExit, useOrder, useToast } from '@/shared/composables'
+import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS, requestDetailPath } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ActionButton, DateField, MoneyInput } from '@/shared/components/ui'
+import SubjectTeacherFields from '../components/SubjectTeacherFields.vue'
+import type { SubjectOption, TeacherOption } from '@/shared/types'
 
 const route = useRoute()
 const { exitTo } = useFormExit()
 const auth = useAuthStore()
-const edu = useEducationStore()
 const telegramStore = useTelegramStore()
-const { initialize, isInitialized } = useEducation()
 const { getRequest, createRequest, updateRequest } = useOrder()
 const { showToast } = useToast()
 
 const editingId = computed(() => (route.name === 'request-edit' ? (route.params.id as string) : ''))
 const isEditing = computed(() => !!editingId.value)
 
-const subjectId = ref('')
-const teacherId = ref('')
+const subject = ref<SubjectOption | null>(null)
+const teacher = ref<TeacherOption | null>(null)
 const budget = ref('')
 const deadline = ref('')
 const description = ref('')
 const submitting = ref(false)
 
-const teachersForSubject = computed(() => {
-  const list = subjectId.value ? edu.getTeachersBySubject(subjectId.value) : []
-  return list.length ? list : edu.teachers
-})
-
-// при смене предмета сбрасываем преподавателя, если он больше не подходит
-watch(subjectId, () => {
-  if (!teachersForSubject.value.some((t) => t.id === teacherId.value)) teacherId.value = ''
-})
-
-const canSubmit = computed(() => !!subjectId.value && !!teacherId.value && !submitting.value)
+const canSubmit = computed(() => !!subject.value && !!teacher.value && !submitting.value)
 
 const title = computed(() => (isEditing.value ? 'Изменить заявку' : 'Новая заявка'))
 const submitLabel = computed(() =>
@@ -49,7 +39,7 @@ const budgetKopeks = computed(() =>
 )
 
 const submit = async () => {
-  if (!canSubmit.value || !auth.user?.id) return
+  if (!canSubmit.value || !auth.user?.id || !subject.value || !teacher.value) return
   submitting.value = true
   try {
     if (isEditing.value) {
@@ -64,8 +54,8 @@ const submit = async () => {
     } else {
       const created = await createRequest({
         studentId: auth.user.id,
-        subjectId: subjectId.value,
-        teacherId: teacherId.value,
+        subjectId: subject.value.id,
+        teacherId: teacher.value.id,
         description: description.value || undefined,
         budget: budgetKopeks.value,
         deadline: deadline.value || undefined,
@@ -82,12 +72,12 @@ const submit = async () => {
 }
 
 onMounted(async () => {
-  if (!isInitialized.value) initialize().catch((e) => console.error(e))
   if (!isEditing.value) return
   try {
     const request = await getRequest(editingId.value)
-    subjectId.value = request.subjectId
-    teacherId.value = request.teacherId
+    // справочник целиком не грузим — названия берём из самой заявки
+    subject.value = { id: request.subjectId, name: request.subject?.name ?? 'Предмет' }
+    teacher.value = { id: request.teacherId, fullName: request.teacher?.fullName ?? '—' }
     budget.value = request.budget ? String(Math.round(request.budget / 100)) : ''
     deadline.value = request.deadline ? request.deadline.slice(0, 10) : ''
     description.value = request.description ?? ''
@@ -102,45 +92,12 @@ onMounted(async () => {
     <AppHeader :title="title" :sub="isEditing ? '' : 'Вы заказчик'" back />
 
     <div class="flex-1 overflow-y-auto px-[18px] py-4">
-      <!-- предмет -->
-      <label class="block text-overline uppercase text-d-text-second mb-2.5">
-        Предмет <span class="text-d-accent">*</span>
-      </label>
-      <div class="relative mb-[18px]">
-        <select
-          v-model="subjectId"
-          :disabled="isEditing"
-          class="d-select w-full h-[54px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 pr-10 text-body appearance-none focus:border-d-accent focus:outline-none transition-colors disabled:opacity-60"
-          :class="subjectId ? 'text-d-text' : 'text-d-text-hint'"
-        >
-          <option value="" disabled>Выберите предмет</option>
-          <option v-for="s in edu.activeSubjects" :key="s.id" :value="s.id">{{ s.name }}</option>
-        </select>
-        <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-d-text-hint"
-          >›</span
-        >
-      </div>
-
-      <!-- преподаватель -->
-      <label class="block text-overline uppercase text-d-text-second mb-2.5">
-        Преподаватель <span class="text-d-accent">*</span>
-      </label>
-      <div class="relative mb-[18px]">
-        <select
-          v-model="teacherId"
-          :disabled="!subjectId || isEditing"
-          class="d-select w-full h-[54px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 pr-10 text-body appearance-none focus:border-d-accent focus:outline-none transition-colors disabled:opacity-60"
-          :class="teacherId ? 'text-d-text' : 'text-d-text-hint'"
-        >
-          <option value="" disabled>Сначала выберите предмет</option>
-          <option v-for="t in teachersForSubject" :key="t.id" :value="t.id">
-            {{ t.fullName }}
-          </option>
-        </select>
-        <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-d-text-hint"
-          >›</span
-        >
-      </div>
+      <SubjectTeacherFields
+        v-model:subject="subject"
+        v-model:teacher="teacher"
+        :disabled="isEditing"
+        class="mb-[18px]"
+      />
 
       <!-- бюджет -->
       <label class="block text-overline uppercase text-d-text-second mb-2.5">Бюджет</label>
@@ -169,10 +126,3 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* тёмная нативная выпадашка */
-.d-select {
-  color-scheme: dark;
-}
-</style>

@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { BottomSheet, SearchField } from '@/shared/components/ui'
 import { useTelegramStore } from '@/stores/telegram'
 import { useEducation } from '@/shared/composables'
+import { filterByQuery } from '@/shared/utils'
 
 interface Props {
   /** id текущей группы пользователя */
@@ -19,20 +20,8 @@ const { groups } = useEducation()
 
 const query = ref('')
 
-// «ивт21» находит «ИВТ-21-1»: дефисы, пробелы и регистр при поиске не важны
-const normalize = (value: string) => value.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '')
-
-const visibleGroups = computed(() => {
-  const q = normalize(query.value)
-  if (!q) return groups.value
-  const matches = groups.value.filter((group) => normalize(group.number).includes(q))
-  // набирают номер с начала: «43» — это 4312 и 4333, а 4432 ниже. sort стабилен,
-  // так что внутри каждой половины остаётся алфавитный порядок с бэкенда
-  return matches.sort(
-    (a, b) =>
-      Number(!normalize(a.number).startsWith(q)) - Number(!normalize(b.number).startsWith(q)),
-  )
-})
+// набирают номер с начала: «43» — это 4312 и 4333, а 4432 ниже
+const visibleGroups = computed(() => filterByQuery(groups.value, query.value, (g) => g.number))
 
 // лист открывают заново — прошлый поиск к новому выбору не относится
 watch(open, (isOpen) => {

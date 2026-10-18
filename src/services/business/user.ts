@@ -1,5 +1,5 @@
 import { usersApi } from '@/services/api'
-import { useTelegramStore } from '@/stores'
+import { useAuthStore, useTelegramStore } from '@/stores'
 import type { User } from '@/shared/types'
 
 export class UserService {
@@ -7,10 +7,20 @@ export class UserService {
     return useTelegramStore()
   }
 
+  private get authStore() {
+    return useAuthStore()
+  }
+
+  // свежий профиль — в стор: от groupId в нём зависят «предметы вашей группы»
+  private remember(user: User): User {
+    if (user?.id && user.id === this.authStore.user?.id) this.authStore.setUser(user)
+    return user
+  }
+
   async getProfile(): Promise<User> {
     try {
       const user = await usersApi.getProfile()
-      return this.convertUserToRubles(user)
+      return this.remember(this.convertUserToRubles(user))
     } catch (error) {
       this.handleError(error, 'Ошибка при получении профиля')
       throw error
@@ -25,7 +35,7 @@ export class UserService {
 
       const user = await usersApi.updateProfile(data)
 
-      return this.convertUserToRubles(user)
+      return this.remember(this.convertUserToRubles(user))
     } catch (error) {
       this.handleError(error, 'Ошибка при обновлении профиля')
       throw error
@@ -38,7 +48,7 @@ export class UserService {
 
       const user = await usersApi.updateGroup(groupId)
 
-      return this.convertUserToRubles(user)
+      return this.remember(this.convertUserToRubles(user))
     } catch (error) {
       this.handleError(error, 'Ошибка при смене группы')
       throw error

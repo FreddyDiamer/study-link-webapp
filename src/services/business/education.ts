@@ -1,90 +1,15 @@
 import { educationApi } from '@/services/api'
 import { useTelegramStore } from '@/stores'
-import type { Group, Subject, Teacher, TeacherSubject } from '@/shared/types'
+import type { Group, GroupSubject, SubjectOption, TeacherOption } from '@/shared/types'
 
+/**
+ * Справочник. Методы выбора предмета и преподавателя — без алерта: их сбой лист выбора
+ * показывает сам, у своего поля, а модальный алерт поверх был бы дублем.
+ */
 export class EducationService {
   private get telegramStore() {
     return useTelegramStore()
   }
-
-  // =============================================================================
-  // SUBJECTS
-  // =============================================================================
-
-  async getSubjects(): Promise<Subject[]> {
-    try {
-      return await educationApi.getSubjects()
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении предметов')
-      throw error
-    }
-  }
-
-  async getSubject(id: string): Promise<Subject> {
-    try {
-      return await educationApi.getSubject(id)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении предмета')
-      throw error
-    }
-  }
-
-  // =============================================================================
-  // TEACHERS
-  // =============================================================================
-
-  async getTeachers(): Promise<Teacher[]> {
-    try {
-      return await educationApi.getTeachers()
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении преподавателей')
-      throw error
-    }
-  }
-
-  async getTeacher(id: string): Promise<Teacher> {
-    try {
-      return await educationApi.getTeacher(id)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении преподавателя')
-      throw error
-    }
-  }
-
-  // =============================================================================
-  // TEACHER SUBJECTS
-  // =============================================================================
-
-  async getTeacherSubjects(): Promise<TeacherSubject[]> {
-    try {
-      return await educationApi.getTeacherSubjects()
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении связей преподаватель-предмет')
-      throw error
-    }
-  }
-
-  async getTeacherSubjectsByTeacher(teacherId: string): Promise<TeacherSubject[]> {
-    try {
-      return await educationApi.getTeacherSubjectsByTeacher(teacherId)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении предметов преподавателя')
-      throw error
-    }
-  }
-
-  async getTeacherSubjectsBySubject(subjectId: string): Promise<TeacherSubject[]> {
-    try {
-      return await educationApi.getTeacherSubjectsBySubject(subjectId)
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении преподавателей предмета')
-      throw error
-    }
-  }
-
-  // =============================================================================
-  // GROUPS
-  // =============================================================================
 
   async getGroups(): Promise<Group[]> {
     try {
@@ -95,52 +20,27 @@ export class EducationService {
     }
   }
 
-  // =============================================================================
-  // UTILITY METHODS
-  // =============================================================================
-
-  async getSubjectsWithTeachers(): Promise<Array<Subject & { teachers: Teacher[] }>> {
-    try {
-      const [allSubjects, teacherSubjects] = await Promise.all([
-        this.getSubjects(),
-        this.getTeacherSubjects(),
-      ])
-      const subjects = allSubjects.filter((subject) => subject.isActive)
-
-      return subjects.map((subject) => ({
-        ...subject,
-        teachers: teacherSubjects
-          .filter((ts) => ts.subjectId === subject.id && ts.isActive)
-          .map((ts) => ts.teacher),
-      }))
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении предметов с преподавателями')
-      throw error
-    }
+  getGroupSubjects(groupId: string): Promise<GroupSubject[]> {
+    return educationApi.getGroupSubjects(groupId)
   }
 
-  async getTeachersWithSubjects(): Promise<Array<Teacher & { subjects: Subject[] }>> {
-    try {
-      const [teachers, teacherSubjects] = await Promise.all([
-        this.getTeachers(),
-        this.getTeacherSubjects(),
-      ])
-
-      return teachers.map((teacher) => ({
-        ...teacher,
-        subjects: teacherSubjects
-          .filter((ts) => ts.teacherId === teacher.id && ts.isActive)
-          .map((ts) => ts.subject),
-      }))
-    } catch (error) {
-      this.handleError(error, 'Ошибка при получении преподавателей с предметами')
-      throw error
-    }
+  searchSubjects(search: string): Promise<SubjectOption[]> {
+    return educationApi.searchSubjects(search)
   }
 
-  // =============================================================================
-  // ERROR HANDLING
-  // =============================================================================
+  searchTeachers(search: string): Promise<TeacherOption[]> {
+    return educationApi.searchTeachers(search)
+  }
+
+  async getTeachersBySubject(subjectId: string): Promise<TeacherOption[]> {
+    const response = await educationApi.getTeachersBySubject(subjectId)
+    return response?.items ?? []
+  }
+
+  async getSubjectsByTeacher(teacherId: string): Promise<SubjectOption[]> {
+    const response = await educationApi.getSubjectsByTeacher(teacherId)
+    return (response?.items ?? []).map((link) => link.subject)
+  }
 
   private handleError(error: any, defaultMessage: string): void {
     let message = defaultMessage

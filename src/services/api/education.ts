@@ -1,66 +1,36 @@
 import { apiClient } from './client'
-import type { Subject, Teacher, TeacherSubject, Group } from '@/shared/types'
+import type { Group, GroupSubject, SubjectOption, TeacherOption } from '@/shared/types'
 
+// Справочник большой (≈1400 предметов и столько же преподавателей), целиком его не грузим:
+// выбор строится из расписания группы и серверного поиска.
 export const educationApi = {
-  // =============================================================================
-  // SUBJECTS
-  // =============================================================================
-
-  getSubjects(): Promise<Subject[]> {
-    return apiClient.get('/education/subjects')
-  },
-
-  getSubject(id: string): Promise<Subject> {
-    return apiClient.get(`/education/subjects/${id}`)
-  },
-
-  // =============================================================================
-  // TEACHERS
-  // =============================================================================
-
-  getTeachers(): Promise<Teacher[]> {
-    return apiClient.get('/education/teachers')
-  },
-
-  getTeacher(id: string): Promise<Teacher> {
-    return apiClient.get(`/education/teachers/${id}`)
-  },
-
-  // =============================================================================
-  // TEACHER SUBJECTS
-  // =============================================================================
-
-  // `/education/teacher-subjects` отдаёт страницу (по умолчанию 10 связей), а фильтру
-  // «преподаватели по предмету» нужны все. У `/subjects/active` связи вложены целиком
-  // и без пагинации — разворачиваем их, подставляя предмет-родителя.
-  async getTeacherSubjects(): Promise<TeacherSubject[]> {
-    const subjects = await apiClient.get<{
-      items: (Subject & {
-        teacherSubjects?: (Omit<TeacherSubject, 'subject'> & { teacher: Teacher })[]
-      })[]
-    }>('/education/subjects/active')
-    return (subjects.items ?? []).flatMap((subject) =>
-      (subject.teacherSubjects ?? []).map((ts) => ({ ...ts, subject })),
-    )
-  },
-
-  getTeacherSubjectsByTeacher(teacherId: string): Promise<TeacherSubject[]> {
-    return apiClient.get(`/education/teacher-subjects/teacher/${teacherId}`)
-  },
-
-  getTeacherSubjectsBySubject(subjectId: string): Promise<TeacherSubject[]> {
-    return apiClient.get(`/education/teacher-subjects/subject/${subjectId}`)
-  },
-
-  // =============================================================================
-  // GROUPS
-  // =============================================================================
-
   getGroups(): Promise<Group[]> {
     return apiClient.get('/education/groups')
   },
 
-  getGroup(id: string): Promise<Group> {
-    return apiClient.get(`/education/groups/${id}`)
+  // предметы расписания группы, у каждого — преподаватели именно этой группы
+  getGroupSubjects(groupId: string): Promise<GroupSubject[]> {
+    return apiClient.get(`/education/groups/${groupId}/subjects`)
+  },
+
+  // поиск: сначала названия, начинающиеся с запроса, потом содержащие его
+  searchSubjects(search: string, limit = 20): Promise<SubjectOption[]> {
+    return apiClient.get('/education/subjects', { search, limit })
+  },
+
+  searchTeachers(search: string, limit = 20): Promise<TeacherOption[]> {
+    return apiClient.get('/education/teachers', { search, limit })
+  },
+
+  // все преподаватели предмета по университету, без пагинации
+  getTeachersBySubject(subjectId: string): Promise<{ items: TeacherOption[]; total: number }> {
+    return apiClient.get(`/education/teachers/by-subject/${subjectId}`)
+  },
+
+  // все активные предметы преподавателя; id элемента — id связи, предмет лежит в subject
+  getSubjectsByTeacher(
+    teacherId: string,
+  ): Promise<{ items: { id: string; subject: SubjectOption }[]; total: number }> {
+    return apiClient.get(`/education/teacher-subjects/teacher/${teacherId}`)
   },
 }

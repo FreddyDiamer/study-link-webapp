@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useKeptScroll, usePullToRefresh, useOrder, useService } from '@/shared/composables'
+import {
+  useKeptScroll,
+  useMyGroupSubjects,
+  usePullToRefresh,
+  useOrder,
+  useService,
+} from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS, requestDetailPath, serviceDetailPath } from '@/router/paths'
@@ -15,7 +21,7 @@ import EmptyFeed from '../components/EmptyFeed.vue'
 import EmptyMarket from '../components/EmptyMarket.vue'
 import FeedEnd from '../components/FeedEnd.vue'
 import CreateIntentSheet from '../components/CreateIntentSheet.vue'
-import type { Request, Service } from '@/shared/types'
+import type { Request, Service, SubjectOption } from '@/shared/types'
 
 type MarketSeg = 'requests' | 'services'
 
@@ -45,6 +51,37 @@ const services = ref<Service[]>([])
 const requests = ref<Request[]>([])
 
 const isRequests = computed(() => segment.value === 'requests')
+
+const { subjects: mySubjects } = useMyGroupSubjects()
+
+// чипы: сначала предметы вашей группы (даже если по ним пока пусто), потом остальные,
+// по которым в текущем сегменте что-то есть — самые частые первыми
+const chipSubjects = computed<SubjectOption[]>(() => {
+  const mine = mySubjects.value.map((s) => ({ id: s.id, name: s.name }))
+  const mineIds = new Set(mine.map((s) => s.id))
+  const items: { subject?: { id: string; name: string } }[] = isRequests.value
+    ? requests.value
+    : services.value
+  const counts = new Map<string, { subject: SubjectOption; count: number }>()
+  for (const item of items) {
+    if (!item.subject || mineIds.has(item.subject.id)) continue
+    const entry = counts.get(item.subject.id) ?? {
+      subject: { id: item.subject.id, name: item.subject.name },
+      count: 0,
+    }
+    entry.count++
+    counts.set(item.subject.id, entry)
+  }
+  const others = [...counts.values()]
+    .sort((a, b) => b.count - a.count || a.subject.name.localeCompare(b.subject.name, 'ru'))
+    .map((e) => e.subject)
+  return [...mine, ...others]
+})
+
+// сменили сегмент, а выбранного предмета в нём нет — фильтр не должен висеть невидимым
+watch(chipSubjects, (list) => {
+  if (subjectId.value && !list.some((s) => s.id === subjectId.value)) subjectId.value = ''
+})
 
 const matches = (haystack: (string | undefined)[]) => {
   const q = query.value.trim().toLowerCase()
@@ -167,7 +204,7 @@ onMounted(() => load())
       </div>
 
       <SearchField v-model="query" :placeholder="searchHint" class="mb-3" />
-      <SubjectChips v-model="subjectId" />
+      <SubjectChips v-model="subjectId" :subjects="chipSubjects" />
     </div>
 
     <div

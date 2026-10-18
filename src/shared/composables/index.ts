@@ -1,5 +1,7 @@
 export { useTelegram } from './useTelegram'
 export { useEducation } from './useEducation'
+export { useMyGroupSubjects } from './useMyGroupSubjects'
+export { useSubjectTeacherPicker, shortName } from './useSubjectTeacherPicker'
 export { useOrder } from './useOrder'
 export { useService } from './useService'
 export { useToast } from './useToast'

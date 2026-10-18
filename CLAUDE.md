@@ -35,8 +35,14 @@ fixed `d-*` design system — it does **not** follow Telegram's `themeParams`.
   `/student/*` / `/tutor/*` namespaces: one feed with a `Заявки / Услуги` segment, one set of
   screens, three tabs (`/market`, `/deals`, `/profile`). You are the customer on a request you
   posted and the worker on a service you published — the object says which.
-- **Education catalog:** subjects, teachers, teacher↔subject links. Loaded **once** at startup into
-  a global store (`useEducationStore`) and consumed everywhere via `useEducation()`.
+- **Education catalog:** ≈1400 subjects and ≈1400 teachers parsed from the university — far too
+  many to load up front, and the list endpoints are paged (default 10). Only **groups** live in the
+  global store (`useEducationStore` / `useEducation()`), loaded once at startup. Subjects and
+  teachers come from the user's group timetable (`useMyGroupSubjects` →
+  `/education/groups/:id/subjects`, subjects with that group's teachers) plus server search;
+  the subject/teacher pair is picked with `SubjectTeacherFields` (`useSubjectTeacherPicker`):
+  either field first, the chosen one narrows the other, so an invalid pair can't be built — the
+  backend rejects one with 400.
 - **Marketplace:**
   - **Services** — offers created by tutors.
   - **Requests** (заявки) — needs posted by students.
@@ -103,7 +109,9 @@ Pages / Components  →  composables (use*)  →  services/business  →  servic
 ```
 
 - **`services/api/*`** — thin axios wrappers over `apiClient`. `apiClient` injects the bearer token,
-  unwraps `ApiResponse<T>.data`, and on **401** clears auth and reloads the app root (`App.vue` re-authenticates from `initData`). No business logic.
+  unwraps `ApiResponse<T>.data`, and on **401** clears auth and reloads the app root (`App.vue` re-authenticates from `initData`). It also rewrites `error.message` to the backend's
+  own (Russian) `message` from the response body, so business-layer alerts show the real reason.
+  No business logic.
 - **`services/business/*`** — singleton service classes (`authService`, `orderService`,
   `serviceService`, `userService`, `educationService`, `reviewService`). They hold validation
   (money thresholds in kopeks), Telegram side effects (haptics/alerts), and translate errors into
@@ -113,7 +121,7 @@ Pages / Components  →  composables (use*)  →  services/business  →  servic
   `useEducation`, `useMyResponses` (outgoing responses across both object kinds), `useDealsBadge`
   and `useInboxBadge` (module-level counters behind the tab badges: active deals / incoming
   responses still `PENDING`), `useTelegram`, `useToast`, `usePullToRefresh`, `useFormExit`,
-  `useKeptScroll`. Domains without a composable (`userService`,
+  `useKeptScroll`, `useMyGroupSubjects`, `useSubjectTeacherPicker`. Domains without a composable (`userService`,
   `reviewService`, `authService`) are called from pages directly — that is the accepted pattern,
   not a violation.
 - **`stores/*`** (Pinia setup-stores): `auth` (user/token, localStorage-backed, exposes `readonly`
@@ -140,7 +148,8 @@ src/
   shared/
     components/ui/         # d-* primitives: ActionButton, BottomSheet, ActionsSheet, ConfirmSheet,
                            #   SegmentControl, StatusBadge, RatingChip, MoneyInput, DateField,
-                           #   ToggleRow, LoadError, AppToast, SearchField (barrel: ui/index.ts)
+                           #   ToggleRow, LoadError, AppToast, SearchField, PickerField,
+                           #   PickerSheet (barrel: ui/index.ts)
     components/layout/      # AppHeader (rendered by each page, not by App.vue), BottomNav
     components/             # AvatarChip, ReviewItem
     composables/            # use*() (barrel: composables/index.ts)
@@ -198,8 +207,8 @@ guard; a 401 sends the browser to `/`, where this sequence runs again.
 
 ## Testing
 
-`pnpm test` runs vitest over the pure logic: money formatting and pluralisation
-(`shared/utils/__tests__`), the money thresholds in the business layer, and the mapping of
+`pnpm test` runs vitest over the pure logic: money formatting, pluralisation and search
+normalisation (`shared/utils/__tests__`), the API error-message mapping (`services/api/__tests__`), the money thresholds in the business layer, and the mapping of
 outgoing responses and the tab-badge counters (`shared/composables/__tests__`). Components are
 not tested. Specs live in `__tests__/*.spec.ts` next to the code; vitest reads `vite.config.ts`
 (there is no separate vitest config). `tsconfig.app.json` excludes `__tests__`, so `pnpm type-check`

@@ -67,6 +67,22 @@ export interface Group {
   updatedAt: string
 }
 
+/** Предмет в выборе: списки справочника лёгкие — только то, что показывают. */
+export interface SubjectOption {
+  id: string
+  name: string
+}
+
+export interface TeacherOption {
+  id: string
+  fullName: string
+}
+
+/** Предмет из расписания группы — сразу с преподавателями именно этой группы. */
+export interface GroupSubject extends SubjectOption {
+  teachers: TeacherOption[]
+}
+
 export interface TeacherSubject {
   id: string
   teacherId: string

@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useEducation } from '@/shared/composables'
 import { useTelegramStore } from '@/stores/telegram'
+import type { SubjectOption } from '@/shared/types'
+
+interface Props {
+  /** по порядку: предметы вашей группы, потом те, по которым что-то есть в ленте */
+  subjects: readonly SubjectOption[]
+}
+const props = defineProps<Props>()
 
 /** '' — «Все»; иначе id предмета */
 const model = defineModel<string>({ required: true })
 
-const { activeSubjects } = useEducation()
 const telegramStore = useTelegramStore()
 
 const pick = (id: string) => {
@@ -17,7 +22,7 @@ const pick = (id: string) => {
 
 const chips = computed(() => [
   { id: '', name: 'Все' },
-  ...activeSubjects.value.map((s) => ({ id: s.id, name: s.name })),
+  ...props.subjects.map((s) => ({ id: s.id, name: s.name })),
 ])
 </script>
 

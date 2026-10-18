@@ -1,45 +1,35 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useFormExit, useService, useToast } from '@/shared/composables'
-import { useEducationStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ActionButton } from '@/shared/components/ui'
+import SubjectTeacherFields from '../components/SubjectTeacherFields.vue'
+import type { SubjectOption, TeacherOption } from '@/shared/types'
 
 const { exitTo } = useFormExit()
-const edu = useEducationStore()
 const telegramStore = useTelegramStore()
 const { createService } = useService()
 const { showToast } = useToast()
 
-const subjectId = ref('')
-const teacherId = ref('')
+const subject = ref<SubjectOption | null>(null)
+const teacher = ref<TeacherOption | null>(null)
 const price = ref('')
 const description = ref('')
 const submitting = ref(false)
 
-const teachersForSubject = computed(() => {
-  const list = subjectId.value ? edu.getTeachersBySubject(subjectId.value) : []
-  return list.length ? list : edu.teachers
-})
-
-// при смене предмета сбрасываем выбранного преподавателя
-watch(subjectId, () => {
-  if (!teachersForSubject.value.some((t) => t.id === teacherId.value)) teacherId.value = ''
-})
-
 const canSubmit = computed(
-  () => !!subjectId.value && !!teacherId.value && Number(price.value) > 0 && !submitting.value,
+  () => !!subject.value && !!teacher.value && Number(price.value) > 0 && !submitting.value,
 )
 
 const submit = async () => {
-  if (!canSubmit.value) return
+  if (!canSubmit.value || !subject.value || !teacher.value) return
   submitting.value = true
   try {
     await createService({
-      subjectId: subjectId.value,
-      teacherId: teacherId.value,
+      subjectId: subject.value.id,
+      teacherId: teacher.value.id,
       price: Math.round(Number(price.value) * 100), // рубли → копейки
       description: description.value || undefined,
     })
@@ -52,10 +42,6 @@ const submit = async () => {
     submitting.value = false
   }
 }
-
-onMounted(() => {
-  if (!edu.isInitialized) edu.initialize().catch((e) => console.error(e))
-})
 </script>
 
 <template>
@@ -63,46 +49,7 @@ onMounted(() => {
     <AppHeader title="Новая услуга" sub="Вы исполнитель" back />
 
     <div class="flex-1 overflow-y-auto px-[18px] py-4 flex flex-col gap-5">
-      <!-- предмет -->
-      <div>
-        <label class="block text-overline uppercase text-d-text-second mb-2.5">Предмет</label>
-        <div class="relative">
-          <select
-            v-model="subjectId"
-            class="d-select w-full h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 pr-10 text-body appearance-none focus:border-d-accent focus:outline-none transition-colors"
-            :class="subjectId ? 'text-d-text' : 'text-d-text-hint'"
-          >
-            <option value="" disabled>Выберите предмет</option>
-            <option v-for="s in edu.activeSubjects" :key="s.id" :value="s.id">{{ s.name }}</option>
-          </select>
-          <span
-            class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-d-text-hint"
-            >▾</span
-          >
-        </div>
-      </div>
-
-      <!-- преподаватель -->
-      <div>
-        <label class="block text-overline uppercase text-d-text-second mb-2.5">Преподаватель</label>
-        <div class="relative">
-          <select
-            v-model="teacherId"
-            :disabled="!subjectId"
-            class="d-select w-full h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 pr-10 text-body appearance-none focus:border-d-accent focus:outline-none transition-colors disabled:opacity-40"
-            :class="teacherId ? 'text-d-text' : 'text-d-text-hint'"
-          >
-            <option value="" disabled>Выберите преподавателя</option>
-            <option v-for="t in teachersForSubject" :key="t.id" :value="t.id">
-              {{ t.fullName }}
-            </option>
-          </select>
-          <span
-            class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-d-text-hint"
-            >▾</span
-          >
-        </div>
-      </div>
+      <SubjectTeacherFields v-model:subject="subject" v-model:teacher="teacher" />
 
       <!-- цена -->
       <div>
@@ -144,10 +91,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* тёмная нативная выпадашка/календарь */
-.d-select {
-  color-scheme: dark;
-}
-</style>

@@ -2,6 +2,23 @@ import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
 import { API_BASE_URL, STORAGE_KEYS } from '@/shared/constants'
 import type { ApiResponse } from '@/shared/types'
 
+/**
+ * Текст ошибки для человека. Бизнес-слой показывает error.message в алерте, а axios кладёт туда
+ * «Request failed with status code 400». Русская причина от бэкенда («Вы уже откликнулись…»,
+ * «Преподаватель не ведёт этот предмет») лежит в теле ответа — поднимаем её наверх.
+ */
+export const userFacingMessage = (error: {
+  message?: string
+  response?: { data?: { message?: unknown } }
+}): string => {
+  if (!error.response) return 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз'
+  const message = error.response.data?.message
+  if (typeof message === 'string' && message.trim()) return message
+  // массив — это сообщения валидации полей, они английские и техничные
+  if (Array.isArray(message)) return 'Проверьте введённые данные'
+  return error.message ?? 'Что-то пошло не так'
+}
+
 class ApiClient {
   private instance: AxiosInstance
 
@@ -34,6 +51,7 @@ class ApiClient {
     this.instance.interceptors.response.use(
       (response: AxiosResponse<ApiResponse<any>>) => response,
       (error) => {
+        error.message = userFacingMessage(error)
         if (error.response?.status === 401) {
           // Очищаем токен при 401
           localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
