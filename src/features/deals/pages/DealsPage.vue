@@ -9,6 +9,7 @@ import { LoadError, SegmentControl } from '@/shared/components/ui'
 import DealCard, { type DealRole } from '../components/DealCard.vue'
 import CancelSheet from '../components/CancelSheet.vue'
 import { DealStatus, type Deal } from '@/shared/types'
+import { ROLE_META } from '@/shared/constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -19,8 +20,8 @@ const { showToast } = useToast()
 const { refresh: refreshDealsBadge } = useDealsBadge()
 
 const ROLES = [
-  { id: 'customer', label: 'Я заказчик' },
-  { id: 'worker', label: 'Я исполнитель' },
+  { id: 'customer', label: 'Я заказчик', role: 'customer' },
+  { id: 'worker', label: 'Я исполнитель', role: 'worker' },
 ] as const
 
 const CONTACTED_KEY = 'sl:contacted-deals'
@@ -163,7 +164,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full" :class="{ 'no-reveal': revisited }">
+  <div class="flex flex-col h-full" :class="[ROLE_META[role].scope, { 'no-reveal': revisited }]">
     <AppHeader title="Сделки" sub="Ваши активные занятия" />
 
     <div class="shrink-0 px-[18px] pt-3.5 pb-2.5">

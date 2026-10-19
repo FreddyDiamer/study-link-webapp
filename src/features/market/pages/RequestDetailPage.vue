@@ -5,6 +5,7 @@ import { useDealsBadge, useInboxBadge, useOrder, useToast } from '@/shared/compo
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { dealsPath, requestDetailPath, requestEditPath, requestRespondPath } from '@/router/paths'
+import { ROLE_META } from '@/shared/constants'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ActionsSheet, ConfirmSheet, type SheetAction } from '@/shared/components/ui'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
@@ -157,9 +158,13 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div
+    class="flex flex-col h-full"
+    :class="request ? ROLE_META[isMine ? 'customer' : 'worker'].scope : ''"
+  >
     <AppHeader
       :title="isMine ? 'Моя заявка' : 'Заявка'"
+      :role="request ? (isMine ? 'customer' : 'worker') : undefined"
       :sub="headerSub"
       back
       :menu="isMine"
@@ -249,13 +254,13 @@ onMounted(load)
         </p>
         <div
           v-else-if="myResponse"
-          class="h-[52px] rounded-[13px] border-[1.5px] border-d-accent text-d-accent flex items-center justify-center gap-2 text-[15px] font-semibold"
+          class="h-[52px] rounded-[13px] border-[1.5px] border-d-act text-d-act flex items-center justify-center gap-2 text-[15px] font-semibold"
         >
           ✓ Вы откликнулись
         </div>
         <button
           v-else
-          class="press w-full h-[52px] rounded-[13px] bg-d-accent text-d-ink text-body font-bold"
+          class="press w-full h-[52px] rounded-[13px] bg-d-act text-d-ink text-body font-bold"
           @click="goRespond"
         >
           Откликнуться

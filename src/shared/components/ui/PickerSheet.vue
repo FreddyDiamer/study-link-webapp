@@ -75,7 +75,7 @@ const handlePick = (option: PickerOption) => {
         <span class="min-w-0 flex-1">
           <span
             class="block text-[16px] font-semibold"
-            :class="option.id === currentId ? 'text-d-accent' : ''"
+            :class="option.id === currentId ? 'text-d-act' : ''"
           >
             {{ option.label }}
           </span>
@@ -85,7 +85,7 @@ const handlePick = (option: PickerOption) => {
         </span>
         <span
           v-if="option.id === currentId"
-          class="shrink-0 text-d-accent text-[17px] font-bold"
+          class="shrink-0 text-d-act text-[17px] font-bold"
           aria-hidden="true"
           >✓</span
         >
@@ -102,7 +102,7 @@ const handlePick = (option: PickerOption) => {
       <p class="text-subhead text-d-text-hint">Не получилось загрузить список</p>
       <button
         type="button"
-        class="press px-4 py-2 rounded-[12px] bg-d-surface border border-d-border text-d-accent text-subhead font-semibold"
+        class="press px-4 py-2 rounded-[12px] bg-d-surface border border-d-border text-d-act text-subhead font-semibold"
         @click="emit('retry')"
       >
         ↻ Повторить

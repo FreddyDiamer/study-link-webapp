@@ -19,7 +19,7 @@ const emit = defineEmits<{ click: [] }>()
     class="press relative w-full h-[52px] rounded-[13px] text-body font-bold transition-opacity disabled:opacity-40"
     :class="
       variant === 'primary'
-        ? 'bg-d-accent text-d-ink'
+        ? 'bg-d-act text-d-ink'
         : 'bg-d-surface border border-d-border-soft text-d-text'
     "
     :disabled="disabled || loading"

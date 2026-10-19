@@ -4,6 +4,7 @@ import AvatarChip from '@/shared/components/AvatarChip.vue'
 import { RatingChip } from '@/shared/components/ui'
 import { countWithWord, formatKopeks } from '@/shared/utils'
 import type { Service } from '@/shared/types'
+import { ROLE_META } from '@/shared/constants'
 
 interface Props {
   service: Service
@@ -37,8 +38,11 @@ const reviewsLabel = computed(() => {
       <span class="text-caption font-semibold truncate">{{
         service.tutor?.name || 'Репетитор'
       }}</span>
-      <span v-if="mine" class="badge badge-accent">Моя</span>
-      <span v-else-if="responded" class="badge badge-accent shrink-0">Вы записались</span>
+      <!-- своя услуга — вы исполнитель, запись на чужую — заказчик -->
+      <span v-if="mine" class="badge" :class="ROLE_META.worker.soft">Моя</span>
+      <span v-else-if="responded" class="badge shrink-0" :class="ROLE_META.customer.soft"
+        >Вы записались</span
+      >
       <RatingChip class="ml-auto" :rating="rating" />
     </div>
 

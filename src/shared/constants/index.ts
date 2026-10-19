@@ -53,3 +53,5 @@ export const STORAGE_KEYS = {
   AUTH_TOKEN: 'kai_auth_token',
   THEME: 'kai_theme',
 } as const
+
+export { ROLE_META, type Role, type RoleMeta } from './roles'

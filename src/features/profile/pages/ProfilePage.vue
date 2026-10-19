@@ -23,6 +23,7 @@ import GroupSheet from '../components/GroupSheet.vue'
 import MyResponsesBlock from '../components/MyResponsesBlock.vue'
 import { countWithWord, formatDayMonth, formatJoined, formatKopeks } from '@/shared/utils'
 import { requestDetailPath, serviceDetailPath } from '@/router/paths'
+import { ROLE_META } from '@/shared/constants'
 import { PATHS } from '@/router/paths'
 import {
   RequestStatus,
@@ -239,7 +240,8 @@ onMounted(() => load())
             нарисовать себе самому.
           </p>
           <button
-            class="press w-full h-11 rounded-[12px] bg-d-accent text-d-ink text-subhead font-bold"
+            class="press w-full h-11 rounded-[12px] bg-d-act text-d-ink text-subhead font-bold"
+            :class="ROLE_META.worker.scope"
             @click="router.push(PATHS.MARKET)"
           >
             Найти первую заявку
@@ -262,7 +264,8 @@ onMounted(() => load())
 
       <!-- мои заявки -->
       <div
-        class="reveal text-overline uppercase text-d-text-hint mb-2.5"
+        class="reveal text-overline uppercase mb-2.5"
+        :class="ROLE_META.customer.text"
         style="animation-delay: 0.1s"
       >
         Мои заявки
@@ -308,7 +311,9 @@ onMounted(() => load())
       <p v-else class="text-subhead text-d-text-hint">Вы ещё не создавали заявок</p>
 
       <template v-if="myServices.length">
-        <div class="text-overline uppercase text-d-text-hint mt-5 mb-2.5">Мои услуги</div>
+        <div class="text-overline uppercase mt-5 mb-2.5" :class="ROLE_META.worker.text">
+          Мои услуги
+        </div>
         <div class="flex flex-col gap-2.5">
           <!-- записи принимаются на экране услуги: карточка ведёт туда -->
           <button

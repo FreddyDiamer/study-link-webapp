@@ -56,6 +56,16 @@ fixed `d-*` design system — it does **not** follow Telegram's `themeParams`.
   - **Requests have a lifecycle**: `OPEN → MATCHED` (a tutor was chosen) or `CLOSED` (the author
     closed it). The feed shows only `OPEN`; a closed request stays visible to its author and by
     direct link. Reopening publishes a new request — old responses are not resurrected.
+- **Role colours:** исполнитель = `d-role-worker` (indigo), заказчик = `d-role-customer` (lime),
+  by *your* role on the object. Labels use `ROLE_META[role].text/.soft/.solid`; **actions**
+  (buttons, focus, picker selection, ticks) use the action colour `d-act` (`bg-d-act`,
+  `focus:border-d-act`, `ActionButton`, `.btn-primary`), which switches inside a
+  `ROLE_META[role].scope` wrapper. Wrap each screen by your role on it; wrap a single control when
+  its action belongs to the other role. Neutral chrome (tab bar, `+`, settings links, statuses)
+  stays `d-accent`. Details: `.agents/rules/frontend-design/design-system.md`, principle 7.
+- **Dates:** `<input type="date">` gives `YYYY-MM-DD`, the backend stores date-time and wants full
+  ISO — send `dateInputToIso()` (end of that local day) and prefill with `isoToDateInput()`
+  (`@/shared/utils`). Never send the raw input value.
 - **Money:** amounts are **kopeks** everywhere, including through the business-service layer.
   Format for display with `formatKopeks()` from `@/shared/utils` — never divide by 100 by hand.
   Form inputs are in rubles and multiply by 100 on submit.
@@ -129,9 +139,13 @@ Pages / Components  →  composables (use*)  →  services/business  →  servic
   (WebApp bridge: haptics, alerts, main button). There is no `app` store.
 - **Components never import `services/api` directly** — always go through a composable/business
   service (type-only imports, as in `DevLogin.vue`, are the one exception).
-- **Who shows an error.** A failed user action (submit, accept, hide…) is reported once, by the
-  business layer's Telegram alert — pages only log it and re-enable their buttons; don't add a
-  second generic text or toast. A failed *load* is the page's job: it renders `LoadError` (or its
+- **Who shows an error.** A failed **form submit** (create request/service, respond, edit
+  profile) is shown by the form itself: the business method throws `formError(…)`
+  (`services/business/errors.ts`, Russian reason, no alert) and the page renders `<FormError>` above
+  the submit button, keeping everything typed; the message clears on the next edit. Field
+  problems we can see in advance are caught at the field before submit (e.g. `DateField :min`
+  + a past-date error). A failed **one-tap action** (accept, hide, confirm…) is reported once by
+  the business layer's Telegram alert — pages only log it; don't add a second text or toast. A failed *load* is the page's job: it renders `LoadError` (or its
   own failure state), so reads that feed such a state may call the API without the business
   alert (see `useService`).
 

@@ -82,7 +82,7 @@ const trustLine = computed(() =>
 
     <button
       v-if="isPending"
-      class="press w-full h-11 rounded-[12px] bg-d-accent text-d-ink text-[15px] font-bold disabled:opacity-40"
+      class="press w-full h-11 rounded-[12px] bg-d-act text-d-ink text-[15px] font-bold disabled:opacity-40"
       :disabled="busy"
       @click="emit('accept', response.id)"
     >

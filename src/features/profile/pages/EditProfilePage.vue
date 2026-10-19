@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useId } from 'vue'
+import { computed, onMounted, ref, useId, watch } from 'vue'
 import { userService } from '@/services/business'
 import { useEducation, useFormExit, useToast } from '@/shared/composables'
 import { useAuthStore, useEducationStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
-import { ActionButton } from '@/shared/components/ui'
+import { ActionButton, FormError } from '@/shared/components/ui'
 import GroupSheet from '../components/GroupSheet.vue'
 import type { User } from '@/shared/types'
 
@@ -26,6 +26,12 @@ const groupId = ref('')
 const groupSheet = ref(false)
 const groupFieldId = useId()
 const saving = ref(false)
+// причина, по которой профиль не сохранился — у кнопки, а не модальным алертом
+const formError = ref('')
+
+watch([name, description, groupId], () => {
+  formError.value = ''
+})
 
 // группа сохраняется вместе с остальным профилем, по кнопке «Сохранить»
 const groupNumber = computed(() => edu.groups.find((g) => g.id === groupId.value)?.number ?? '')
@@ -47,14 +53,14 @@ const save = async () => {
       description: description.value.trim() || undefined,
     })
     if (groupId.value && groupId.value !== profile.value?.groupId) {
-      await userService.updateGroup(groupId.value)
+      await userService.updateGroup(groupId.value, true)
     }
     telegramStore.hapticFeedback('success')
     showToast('Профиль сохранён')
     exitTo(PATHS.PROFILE)
   } catch (e) {
-    // причину уже показал алерт бизнес-слоя — второй текст здесь был бы дублем
     console.error('Не удалось сохранить профиль:', e)
+    formError.value = e instanceof Error ? e.message : 'Не получилось сохранить профиль'
     saving.value = false
   }
 }
@@ -89,7 +95,7 @@ onMounted(async () => {
       <input
         v-model="name"
         type="text"
-        class="w-full h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 text-body focus:border-d-accent focus:outline-none transition-colors mb-[18px]"
+        class="w-full h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 text-body focus:border-d-act focus:outline-none transition-colors mb-[18px]"
       />
 
       <div class="flex items-baseline mb-2.5">
@@ -106,7 +112,7 @@ onMounted(async () => {
         rows="6"
         autofocus
         placeholder="Какие темы ведёте и как проходит занятие"
-        class="w-full min-h-[150px] rounded-[12px] bg-d-panel border border-d-border-soft focus:border-d-accent focus:outline-none px-4 py-3.5 text-body leading-[1.45] resize-none transition-colors"
+        class="w-full min-h-[150px] rounded-[12px] bg-d-panel border border-d-border-soft focus:border-d-act focus:outline-none px-4 py-3.5 text-body leading-[1.45] resize-none transition-colors"
       />
 
       <!-- пока отзывов нет, выбирают именно по этому тексту -->
@@ -130,7 +136,7 @@ onMounted(async () => {
         :id="groupFieldId"
         type="button"
         aria-haspopup="dialog"
-        class="press w-full flex items-center h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 mb-[18px] text-body text-left focus:border-d-accent focus:outline-none transition-colors"
+        class="press w-full flex items-center h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 mb-[18px] text-body text-left focus:border-d-act focus:outline-none transition-colors"
         @click="groupSheet = true"
       >
         <span :class="groupNumber ? 'text-d-text' : 'text-d-text-hint'">
@@ -153,6 +159,7 @@ onMounted(async () => {
     <div
       class="shrink-0 px-[18px] pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] bg-d-ink border-t border-d-border"
     >
+      <FormError :message="formError" />
       <ActionButton :loading="saving" :disabled="!canSave" @click="save">Сохранить</ActionButton>
     </div>
 

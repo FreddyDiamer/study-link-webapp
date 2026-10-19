@@ -6,6 +6,7 @@ import { useTelegramStore } from '@/stores/telegram'
 import { useDealsBadge, useInboxBadge, useOrder, useService, useToast } from '@/shared/composables'
 import { reviewService } from '@/services/business'
 import { dealsPath } from '@/router/paths'
+import { ROLE_META } from '@/shared/constants'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { ActionButton, ActionsSheet, type SheetAction } from '@/shared/components/ui'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
@@ -204,9 +205,13 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div
+    class="flex flex-col h-full"
+    :class="service ? ROLE_META[isMine ? 'worker' : 'customer'].scope : ''"
+  >
     <AppHeader
       :title="isMine ? 'Моя услуга' : 'Услуга'"
+      :role="service ? (isMine ? 'worker' : 'customer') : undefined"
       :sub="headerSub"
       back
       :menu="isMine"
@@ -308,7 +313,7 @@ onMounted(load)
           v-if="bookingStatus"
           class="h-[52px] rounded-[13px] border-[1.5px] flex items-center justify-center gap-2 text-[15px] font-semibold"
           :class="
-            bookingDeclined ? 'border-d-border text-d-text-second' : 'border-d-accent text-d-accent'
+            bookingDeclined ? 'border-d-border text-d-text-second' : 'border-d-act text-d-act'
           "
         >
           {{ bookingLabel }}

@@ -1,4 +1,5 @@
 import { ordersApi } from '@/services/api'
+import { formError } from './errors'
 import { useTelegramStore } from '@/stores'
 import type {
   Request,
@@ -73,8 +74,13 @@ export class OrderService {
 
       return this.convertRequestToRubles(request)
     } catch (error) {
-      this.handleError(error, 'Ошибка при создании заявки')
-      throw error
+      // форма показывает причину у кнопки — модальный алерт здесь лишний
+      this.telegramStore.hapticFeedback('error')
+      throw formError(
+        error,
+        'Не получилось опубликовать заявку',
+        'Предмет или преподаватель не найдены',
+      )
     }
   }
 
@@ -96,8 +102,9 @@ export class OrderService {
 
       return this.convertRequestToRubles(request)
     } catch (error) {
-      this.handleError(error, 'Ошибка при обновлении заявки')
-      throw error
+      // форма показывает причину у кнопки — модальный алерт здесь лишний
+      this.telegramStore.hapticFeedback('error')
+      throw formError(error, 'Не получилось сохранить заявку', 'Заявка не найдена')
     }
   }
 
@@ -382,8 +389,9 @@ export class OrderService {
 
       return this.convertRequestResponseToRubles(response)
     } catch (error) {
-      this.handleError(error, 'Ошибка при отправке отклика')
-      throw error
+      // форма показывает причину у кнопки — модальный алерт здесь лишний
+      this.telegramStore.hapticFeedback('error')
+      throw formError(error, 'Не получилось отправить отклик', 'Заявка не найдена')
     }
   }
 

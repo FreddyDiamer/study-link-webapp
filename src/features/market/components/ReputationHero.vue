@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { countWithWord } from '@/shared/utils'
 
 interface Props {
   rating: number
@@ -30,7 +31,9 @@ const bars = computed(() =>
       <template v-if="reviewsCount > 0">
         <div class="text-rating-hero text-d-rating tnum leading-none">{{ rating.toFixed(1) }}</div>
         <div class="text-d-rating text-caption tracking-[2px] mt-1.5">{{ stars }}</div>
-        <div class="text-[12px] text-d-text-hint mt-1.5">{{ reviewsCount }} отзывов</div>
+        <div class="text-[12px] text-d-text-hint mt-1.5">
+          {{ countWithWord(reviewsCount, 'отзыв', 'отзыва', 'отзывов') }}
+        </div>
       </template>
       <!-- оценок нет: называем это словом «новый», а не нулём -->
       <template v-else>

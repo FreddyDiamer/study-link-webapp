@@ -32,7 +32,7 @@ const chips = computed(() => [
       v-for="chip in chips"
       :key="chip.id || 'all'"
       class="press shrink-0 px-3.5 py-2 rounded-full text-caption font-semibold whitespace-nowrap transition-colors duration-200"
-      :class="model === chip.id ? 'bg-d-accent text-d-ink' : 'bg-d-panel text-d-text-second'"
+      :class="model === chip.id ? 'bg-d-act text-d-ink' : 'bg-d-panel text-d-text-second'"
       @click="pick(chip.id)"
     >
       {{ chip.name }}

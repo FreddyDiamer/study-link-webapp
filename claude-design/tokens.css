@@ -24,6 +24,8 @@ colors: {
     'accent-hi':    '#9AA6FF',  // акцент активного шага
     rating:         '#FFC247',  // ТОЛЬКО рейтинг и отзывы
     'rating-dim':   '#A8843C',  // мета рядом с рейтингом
+    'role-worker':   '#7C8CFF', // роль «исполнитель» — метки и акценты
+    'role-customer': '#A8D96B', // роль «заказчик» — метки и акценты
     teal:           '#3FB5A8',  // завершено / успех
     coral:          '#E97A6B',  // аватар-чип
     'sk-base':      '#1A1D24',  // скелетон — база
@@ -67,6 +69,8 @@ transitionTimingFunction: { 'd-spring':'cubic-bezier(.3,.8,.3,1)', 'd-out':'cubi
   --d-rating-soft:    rgba(255,194,71,.12);
 
   /* ---- semantic / avatar chips ---- */
+  --d-role-worker:    #7C8CFF;  /* роль «исполнитель» */
+  --d-role-customer:  #A8D96B;  /* роль «заказчик» */
   --d-teal:           #3FB5A8;
   --d-teal-soft:      rgba(63,181,168,.16);
   --d-coral:          #E97A6B;

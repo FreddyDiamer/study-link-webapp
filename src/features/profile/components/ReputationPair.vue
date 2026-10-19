@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ROLE_META } from '@/shared/constants'
 interface Reputation {
   rating: number
   count: number
@@ -29,7 +30,7 @@ const reviewsWord = (n: number) => {
 <template>
   <div class="flex gap-2.5">
     <div class="flex-1 bg-d-panel border border-d-border rounded-[14px] p-[15px]">
-      <div class="text-micro uppercase text-d-accent mb-2.5">Исполнитель</div>
+      <div class="text-micro uppercase mb-2.5" :class="ROLE_META.worker.text">Исполнитель</div>
       <template v-if="tutor.count > 0">
         <div class="text-[28px] font-bold text-d-rating leading-none tnum">
           {{ tutor.rating.toFixed(1) }}
@@ -41,7 +42,8 @@ const reviewsWord = (n: number) => {
       </template>
       <template v-else>
         <span
-          class="inline-block px-2.5 py-1 rounded-full bg-d-accent/[0.16] text-d-accent text-[12px] font-bold"
+          class="inline-block px-2.5 py-1 rounded-full text-[12px] font-bold"
+          :class="ROLE_META.worker.soft"
           >Новый</span
         >
         <div class="text-[11px] text-d-text-hint mt-2">Ещё нет оценок</div>
@@ -49,7 +51,7 @@ const reviewsWord = (n: number) => {
     </div>
 
     <div class="flex-1 bg-d-panel border border-d-border rounded-[14px] p-[15px]">
-      <div class="text-micro uppercase text-d-teal mb-2.5">Заказчик</div>
+      <div class="text-micro uppercase mb-2.5" :class="ROLE_META.customer.text">Заказчик</div>
       <template v-if="student.count > 0">
         <div class="text-[28px] font-bold text-d-rating leading-none tnum">
           {{ student.rating.toFixed(1) }}
@@ -63,7 +65,8 @@ const reviewsWord = (n: number) => {
       </template>
       <template v-else>
         <span
-          class="inline-block px-2.5 py-1 rounded-full bg-d-teal/[0.16] text-d-teal text-[12px] font-bold"
+          class="inline-block px-2.5 py-1 rounded-full text-[12px] font-bold"
+          :class="ROLE_META.customer.soft"
           >Новый</span
         >
         <div class="text-[11px] text-d-text-hint mt-2">Ещё нет оценок</div>

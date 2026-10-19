@@ -95,7 +95,12 @@ class TelegramService {
 
   // UI Methods
   showAlert(message: string) {
-    this.webapp?.showAlert(message)
+    // вне Telegram (веб-дев) мостика нет — иначе ошибка молча пропадала бы
+    if (!this.webapp) {
+      window.alert(message)
+      return
+    }
+    this.webapp.showAlert(message)
   }
 
   showConfirm(message: string): Promise<boolean> {

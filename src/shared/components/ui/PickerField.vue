@@ -26,14 +26,14 @@ const id = useId()
 <template>
   <div>
     <label :for="id" class="block text-overline uppercase text-d-text-second mb-2.5">
-      {{ label }} <span v-if="required" class="text-d-accent">*</span>
+      {{ label }} <span v-if="required" class="text-d-act">*</span>
     </label>
     <div class="relative">
       <button
         :id="id"
         type="button"
         aria-haspopup="dialog"
-        class="press w-full flex items-center h-[54px] rounded-[12px] bg-d-panel border border-d-border-soft pl-4 pr-11 text-body text-left focus:border-d-accent focus:outline-none transition-colors disabled:opacity-60"
+        class="press w-full flex items-center h-[54px] rounded-[12px] bg-d-panel border border-d-border-soft pl-4 pr-11 text-body text-left focus:border-d-act focus:outline-none transition-colors disabled:opacity-60"
         :disabled="disabled"
         @click="emit('open')"
       >

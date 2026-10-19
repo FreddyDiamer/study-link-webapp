@@ -23,7 +23,7 @@ const url = computed(() => (props.username ? `https://t.me/${props.username}` : 
     class="press flex items-center justify-center gap-2 rounded-[13px] font-bold"
     :class="
       primary
-        ? 'h-[50px] bg-d-accent text-d-ink text-[15px]'
+        ? 'h-[50px] bg-d-act text-d-ink text-[15px]'
         : 'h-11 bg-d-surface border border-d-border-soft text-d-text text-subhead'
     "
     @click="emit('open')"
@@ -33,7 +33,7 @@ const url = computed(() => (props.username ? `https://t.me/${props.username}` : 
       height="17"
       viewBox="0 0 24 24"
       fill="currentColor"
-      :class="primary ? '' : 'text-d-accent'"
+      :class="primary ? '' : 'text-d-act'"
     >
       <path
         d="M21.9 5.1 18.9 19c-.2 1-.8 1.2-1.7.8l-4.6-3.4-2.2 2.1c-.3.3-.5.5-.9.5l.3-4.6L18.2 7c.4-.3-.1-.5-.6-.2L7.3 13.3l-4.5-1.4c-1-.3-1-1 .2-1.5l17.6-6.8c.8-.3 1.5.2 1.3 1.5Z"

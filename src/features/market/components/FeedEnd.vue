@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ROLE_META } from '@/shared/constants'
 interface Props {
   /** «Это все заявки на сегодня» / «Это все услуги на сегодня» */
   label: string
@@ -22,7 +23,8 @@ const emit = defineEmits<{ createService: [] }>()
       Новые заявки появляются каждый день. Пока можно опубликовать свою услугу — её увидят первой.
     </p>
     <button
-      class="press w-full h-11 rounded-[12px] bg-d-accent text-d-ink text-[15px] font-bold"
+      class="press w-full h-11 rounded-[12px] bg-d-act text-d-ink text-[15px] font-bold"
+      :class="ROLE_META.worker.scope"
       @click="emit('createService')"
     >
       Предложить услугу

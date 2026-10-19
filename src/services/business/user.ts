@@ -1,4 +1,5 @@
 import { usersApi } from '@/services/api'
+import { formError } from './errors'
 import { useAuthStore, useTelegramStore } from '@/stores'
 import type { User } from '@/shared/types'
 
@@ -37,12 +38,14 @@ export class UserService {
 
       return this.remember(this.convertUserToRubles(user))
     } catch (error) {
-      this.handleError(error, 'Ошибка при обновлении профиля')
-      throw error
+      // форма показывает причину у кнопки — модальный алерт здесь лишний
+      this.telegramStore.hapticFeedback('error')
+      throw formError(error, 'Не получилось сохранить профиль')
     }
   }
 
-  async updateGroup(groupId: string): Promise<User> {
+  /** inForm — смена группы внутри формы профиля: причину сбоя покажет форма, без алерта */
+  async updateGroup(groupId: string, inForm = false): Promise<User> {
     try {
       this.telegramStore.hapticFeedback('light')
 
@@ -50,6 +53,7 @@ export class UserService {
 
       return this.remember(this.convertUserToRubles(user))
     } catch (error) {
+      if (inForm) throw formError(error, 'Не получилось сменить группу')
       this.handleError(error, 'Ошибка при смене группы')
       throw error
     }

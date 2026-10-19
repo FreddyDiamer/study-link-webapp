@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 import type { Deal, Review } from '@/shared/types'
+import { ROLE_META } from '@/shared/constants'
 import type { DealRole } from './DealCard.vue'
 
 interface Props {
@@ -69,7 +70,10 @@ const submit = async () => {
   <div v-if="!myReview">
     <div class="text-[15px] font-semibold mb-1">Как прошло с {{ theirName }}?</div>
     <div class="text-caption text-d-text-hint mb-4">
-      Отзыв формирует рейтинг {{ isCustomer ? 'исполнителя' : 'заказчика' }}
+      Отзыв формирует рейтинг
+      <span :class="ROLE_META[isCustomer ? 'worker' : 'customer'].text">{{
+        isCustomer ? 'исполнителя' : 'заказчика'
+      }}</span>
     </div>
 
     <div class="flex gap-2.5 justify-center mb-4">
@@ -89,12 +93,12 @@ const submit = async () => {
       v-model="comment"
       rows="2"
       placeholder="Комментарий · необязательно"
-      class="w-full min-h-[70px] rounded-[12px] bg-d-ink border border-d-border focus:border-d-accent focus:outline-none px-[15px] py-3 text-[15px] leading-[1.45] resize-none mb-3.5 transition-colors"
+      class="w-full min-h-[70px] rounded-[12px] bg-d-ink border border-d-border focus:border-d-act focus:outline-none px-[15px] py-3 text-[15px] leading-[1.45] resize-none mb-3.5 transition-colors"
     />
 
     <button
       class="press w-full h-12 rounded-[12px] text-[15px] font-bold transition-colors disabled:cursor-default"
-      :class="rating ? 'bg-d-accent text-d-ink' : 'bg-d-surface text-d-text-hint'"
+      :class="rating ? 'bg-d-act text-d-ink' : 'bg-d-surface text-d-text-hint'"
       :disabled="!rating || submitting"
       @click="submit"
     >

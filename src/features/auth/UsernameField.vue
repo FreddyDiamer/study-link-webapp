@@ -44,7 +44,7 @@ onMounted(() => input.value?.focus())
 
     <div
       class="flex items-center h-[52px] rounded-card bg-d-panel border pl-4 pr-1.5 transition-colors"
-      :class="error ? 'border-d-coral' : 'border-d-border-soft focus-within:border-d-accent'"
+      :class="error ? 'border-d-coral' : 'border-d-border-soft focus-within:border-d-act'"
     >
       <span class="text-body text-d-text-hint" aria-hidden="true">@</span>
       <input

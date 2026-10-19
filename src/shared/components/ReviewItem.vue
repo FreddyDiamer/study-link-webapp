@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ROLE_META } from '@/shared/constants'
 import { computed } from 'vue'
 import AvatarChip from './AvatarChip.vue'
 
@@ -34,9 +35,7 @@ const stars = computed(() => {
       <span
         v-if="role"
         class="text-[9px] font-bold px-[7px] py-0.5 rounded-[5px]"
-        :class="
-          role === 'tutor' ? 'bg-d-accent/[0.16] text-d-accent' : 'bg-d-teal/[0.16] text-d-teal'
-        "
+        :class="ROLE_META[role === 'tutor' ? 'worker' : 'customer'].soft"
         >за роль {{ role === 'tutor' ? 'исполнителя' : 'заказчика' }}</span
       >
       <span class="ml-auto text-d-rating text-[12px] tracking-[1px]">{{ stars }}</span>

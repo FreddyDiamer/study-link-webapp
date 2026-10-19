@@ -1,4 +1,5 @@
 import { tutorsApi } from '@/services/api'
+import { formError } from './errors'
 import { useTelegramStore } from '@/stores'
 import type { Service, CreateServiceDto, UpdateServiceDto, PaginatedResponse } from '@/shared/types'
 
@@ -36,8 +37,13 @@ export class ServiceService {
 
       return this.convertServiceToRubles(service)
     } catch (error) {
-      this.handleError(error, 'Ошибка при создании услуги')
-      throw error
+      // форма показывает причину у кнопки — модальный алерт здесь лишний
+      this.telegramStore.hapticFeedback('error')
+      throw formError(
+        error,
+        'Не получилось опубликовать услугу',
+        'Предмет или преподаватель не найдены',
+      )
     }
   }
 

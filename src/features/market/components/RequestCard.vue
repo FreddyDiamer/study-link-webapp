@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import AvatarChip from '@/shared/components/AvatarChip.vue'
 import { countWithWord, formatDeadline, formatKopeks } from '@/shared/utils'
 import { RequestStatus, type Request } from '@/shared/types'
+import { ROLE_META } from '@/shared/constants'
 
 interface Props {
   request: Request
@@ -46,14 +47,17 @@ const responded = computed(() => isOpen.value && !!props.request.currentUserResp
       <span class="text-caption font-semibold truncate">{{
         request.student?.name || 'Студент'
       }}</span>
+      <!-- своя заявка — вы заказчик, отклик на чужую — исполнитель -->
       <span
         v-if="mine && isOpen"
-        class="text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-accent/[0.16] text-d-accent"
+        class="text-[11px] font-bold px-2.5 py-[3px] rounded-full"
+        :class="ROLE_META.customer.soft"
         >Моя</span
       >
       <span
         v-else-if="responded"
-        class="shrink-0 text-[11px] font-bold px-2.5 py-[3px] rounded-full bg-d-accent/[0.16] text-d-accent whitespace-nowrap"
+        class="shrink-0 text-[11px] font-bold px-2.5 py-[3px] rounded-full whitespace-nowrap"
+        :class="ROLE_META.worker.soft"
         >Вы откликнулись</span
       >
       <span

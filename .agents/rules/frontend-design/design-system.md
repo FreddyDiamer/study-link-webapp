@@ -21,6 +21,22 @@ names, **tokens.css/HTML win** for values/intent — flag the drift.
 5. **Hairlines, no shadows.** Separate regions with 1px `d-border` hairlines; borders brighten to
    `d-border-hover` on hover. Shadows only on floating things (toast/modal/logo).
 6. **One primary action per screen.** Money + status + rating visible on every card.
+7. **Your role has a colour.** Исполнитель = `d-role-worker` (indigo), заказчик =
+   `d-role-customer` (lime). Role is a property of the object, so the colour follows who *you* are
+   on it: your request / someone's service → customer; your service / someone's request → worker.
+   - **Labels** — role tags («Вы заказчик»), the header role prefix (`AppHeader :role`), role
+     segments, the feed hint dot, «Моя» / «Вы откликнулись» pills, profile section titles,
+     reputation cards — use `ROLE_META[role].text / .soft / .solid`.
+   - **Actions** take the colour of the role you act in: primary buttons, field focus, picker
+     selection, confirmation ticks. They use the **action colour** `d-act` (`bg-d-act`,
+     `focus:border-d-act`, `text-d-act`, `.btn-primary`, `ActionButton`), which is `d-accent` by
+     default and switches inside a `ROLE_META[role].scope` wrapper (`.role-worker` /
+     `.role-customer`, CSS var `--d-act`). Wrap the screen by your role on the object, and wrap a
+     single control when its action belongs to the other role (e.g. «Создать заявку» on the
+     Заявки tab is a customer action → `.role-customer`).
+   - **Stays neutral `d-accent`**: logo, `+`, tab bar, profile/settings links, toggles, toast,
+     spinners, status pills («Принят», «В работе», «Новый»). Destructive stays coral, ratings
+     gold, statuses teal — never use them for a role, and never hand-pick a role colour.
 
 ## Color tokens (`d-*`)
 
@@ -41,6 +57,8 @@ names, **tokens.css/HTML win** for values/intent — flag the drift.
 | `d-accent-hi` | `#9AA6FF` | Active stepper step, "В работе" status text |
 | `d-rating` | `#FFC247` | **Ratings/stars/reviews ONLY** |
 | `d-rating-dim` | `#A8843C` | Meta next to a rating (review count) |
+| `d-role-worker` | `#7C8CFF` | Role «исполнитель» — labels/accents (same hue as accent) |
+| `d-role-customer` | `#A8D96B` | Role «заказчик» — labels/accents; free of any status meaning |
 | `d-teal` | `#3FB5A8` | Completed / success / active service |
 | `d-coral` | `#E97A6B` | Destructive (delete/reject) + avatar chips |
 | `d-sk-base` / `d-sk-hi` | `#1A1D24` / `#242833` | Skeleton gradient stops |

@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { formatDayMonth, formatKopeks } from '@/shared/utils'
 import { DealStatus, type Deal } from '@/shared/types'
+import { ROLE_META } from '@/shared/constants'
 import DealChecklist from './DealChecklist.vue'
 import ContactButton from './ContactButton.vue'
 import DealReviews from './DealReviews.vue'
@@ -69,10 +70,8 @@ const statusClass = computed(() => {
   return 'bg-d-accent/[0.16] text-d-accent'
 })
 
-const roleTag = computed(() => (isCustomer.value ? 'Вы заказчик' : 'Вы исполнитель'))
-const roleTagClass = computed(() =>
-  isCustomer.value ? 'bg-d-rating/[0.14] text-d-rating' : 'bg-d-accent/[0.16] text-d-accent',
-)
+const roleTag = computed(() => ROLE_META[props.role].you)
+const roleTagClass = computed(() => ROLE_META[props.role].soft)
 
 const counterpartyLine = computed(() =>
   isCustomer.value ? `Репетитор: ${theirName.value}` : `Студент: ${theirName.value}`,
@@ -234,7 +233,7 @@ const cancelledBy = computed(() => {
         @open="emit('contact', deal)"
       />
       <button
-        class="press w-full text-center text-subhead font-semibold text-d-accent py-2 mb-1 disabled:opacity-40"
+        class="press w-full text-center text-subhead font-semibold text-d-act py-2 mb-1 disabled:opacity-40"
         :disabled="busy"
         @click="emit('confirm', deal)"
       >
@@ -252,7 +251,7 @@ const cancelledBy = computed(() => {
     <!-- вариант А: договорились — главное закрыть сделку -->
     <template v-else-if="!waitingForThem">
       <button
-        class="press w-full h-[50px] rounded-[13px] bg-d-accent text-d-ink text-[15px] font-bold mb-2.5 disabled:opacity-40"
+        class="press w-full h-[50px] rounded-[13px] bg-d-act text-d-ink text-[15px] font-bold mb-2.5 disabled:opacity-40"
         :disabled="busy"
         @click="emit('confirm', deal)"
       >

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ROLE_META } from '@/shared/constants'
 import { formatKopeks } from '@/shared/utils'
 import type { MyResponse } from '@/shared/composables'
 
@@ -60,6 +61,10 @@ const recent = () => props.items.slice(0, 2)
       >
         <div class="text-subhead font-semibold mb-0.5">{{ item.subject }} · {{ item.teacher }}</div>
         <div class="text-caption text-d-text-hint">
+          <span :class="ROLE_META[item.kind === 'request' ? 'worker' : 'customer'].text">{{
+            ROLE_META[item.kind === 'request' ? 'worker' : 'customer'].label
+          }}</span>
+          ·
           <template v-if="item.state === 'pending'">
             {{ item.price ? `${formatKopeks(item.price)} · ` : ''
             }}{{ waitingLabel(item.createdAt) }}
@@ -80,7 +85,8 @@ const recent = () => props.items.slice(0, 2)
         и отклик становится сделкой.
       </p>
       <button
-        class="press w-full h-11 rounded-[12px] bg-d-accent text-d-ink text-subhead font-bold"
+        class="press w-full h-11 rounded-[12px] bg-d-act text-d-ink text-subhead font-bold"
+        :class="ROLE_META.worker.scope"
         @click="emit('browse')"
       >
         Смотреть заявки

@@ -7,6 +7,16 @@
    База — Study Link «Defiant» (d-* токены)
    ============================================================ */
 @layer base {
+  /* Цвет действия: кнопки, фокус полей, отметки выбора. По умолчанию — общий акцент;
+     обёртка роли перекрашивает всё внутри в цвет того, кем вы действуете (ROLE_META.scope) */
+  :root,
+  .role-worker {
+    --d-act: 124 140 255; /* = d-role-worker */
+  }
+  .role-customer {
+    --d-act: 168 217 107; /* = d-role-customer */
+  }
+
   html,
   body {
     @apply bg-d-ink text-d-text font-sl;
@@ -46,7 +56,7 @@
   }
 
   .btn-primary {
-    @apply bg-d-accent text-d-ink;
+    @apply bg-d-act text-d-ink; /* цвет действия: акцент или цвет роли (.role-*) */
   }
 
   .btn-secondary {
@@ -76,7 +86,7 @@
     @apply w-full px-4 py-3.5 rounded-field;
     @apply bg-d-panel text-d-text placeholder-d-text-hint;
     @apply border border-d-border-soft;
-    @apply focus:outline-none focus:border-d-accent;
+    @apply focus:outline-none focus:border-d-act;
     @apply transition-colors duration-200;
   }
 

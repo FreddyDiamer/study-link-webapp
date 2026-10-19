@@ -10,7 +10,7 @@ const model = defineModel<string>({ required: true })
 
 <template>
   <div
-    class="flex items-center h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 focus-within:border-d-accent transition-colors"
+    class="flex items-center h-[52px] rounded-[12px] bg-d-panel border border-d-border-soft px-4 focus-within:border-d-act transition-colors"
   >
     <span class="text-body text-d-text-hint">₽</span>
     <input

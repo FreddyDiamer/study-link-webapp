@@ -32,7 +32,7 @@ const emit = defineEmits<{ reset: [] }>()
     </div>
     <button
       v-if="filtered"
-      class="press px-5 py-2.5 rounded-[12px] bg-d-panel border border-d-border text-d-accent text-subhead font-semibold"
+      class="press px-5 py-2.5 rounded-[12px] bg-d-panel border border-d-border text-d-act text-subhead font-semibold"
       @click="emit('reset')"
     >
       Сбросить фильтр

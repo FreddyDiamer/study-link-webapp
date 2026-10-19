@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS } from '@/router/paths'
+import { ROLE_META, type Role } from '@/shared/constants'
 
 interface Props {
   title: string
@@ -13,6 +14,8 @@ interface Props {
   menu?: boolean
   /** куда возвращает «‹», если некуда возвращаться в истории */
   backTo?: string
+  /** кто вы на этом экране: «Вы заказчик» / «Вы исполнитель» цветом роли перед sub */
+  role?: Role
 }
 const props = withDefaults(defineProps<Props>(), {
   back: false,
@@ -48,7 +51,7 @@ const onMenu = () => {
     <!-- back -->
     <button
       v-if="back"
-      class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-panel border border-d-border flex items-center justify-center text-d-accent text-2xl leading-none"
+      class="press shrink-0 w-10 h-10 rounded-[12px] bg-d-panel border border-d-border flex items-center justify-center text-d-act text-2xl leading-none"
       aria-label="Назад"
       @click="goBack"
     >
@@ -73,8 +76,11 @@ const onMenu = () => {
       <div class="text-[19px] font-bold tracking-[-0.015em] leading-[1.15] truncate">
         {{ title }}
       </div>
-      <div v-if="sub" class="text-[12px] text-d-text-hint leading-[1.2] mt-px truncate">
-        {{ sub }}
+      <div v-if="sub || role" class="text-[12px] text-d-text-hint leading-[1.2] mt-px truncate">
+        <span v-if="role" class="font-semibold" :class="ROLE_META[role].text">{{
+          ROLE_META[role].you
+        }}</span>
+        <template v-if="role && sub"> · </template>{{ sub }}
       </div>
     </div>
 

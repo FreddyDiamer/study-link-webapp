@@ -22,13 +22,15 @@ import EmptyMarket from '../components/EmptyMarket.vue'
 import FeedEnd from '../components/FeedEnd.vue'
 import CreateIntentSheet from '../components/CreateIntentSheet.vue'
 import type { Request, Service, SubjectOption } from '@/shared/types'
+import { ROLE_META } from '@/shared/constants'
 
 type MarketSeg = 'requests' | 'services'
 
 // порядок как в макете: сначала «Заявки», потом «Услуги»
 const SEGMENTS = [
-  { id: 'requests', label: 'Заявки' },
-  { id: 'services', label: 'Услуги' },
+  // в заявках вы отвечаете исполнителем, в услугах записываетесь заказчиком
+  { id: 'requests', label: 'Заявки', role: 'worker' },
+  { id: 'services', label: 'Услуги', role: 'customer' },
 ] as const
 
 const router = useRouter()
@@ -188,7 +190,10 @@ onMounted(() => load())
 </script>
 
 <template>
-  <div class="flex flex-col h-full" :class="{ 'no-reveal': revisited }">
+  <div
+    class="flex flex-col h-full"
+    :class="[ROLE_META[isRequests ? 'worker' : 'customer'].scope, { 'no-reveal': revisited }]"
+  >
     <AppHeader title="Лента" :sub="headerSub" add @add="intentSheet = true" />
 
     <div class="shrink-0 px-[18px] pt-3.5 pb-2.5">
@@ -198,7 +203,7 @@ onMounted(() => load())
       <div class="flex items-center gap-[7px] mb-2.5">
         <span
           class="shrink-0 w-1.5 h-1.5 rounded-full transition-colors duration-300"
-          :class="isRequests ? 'bg-d-accent' : 'bg-d-rating'"
+          :class="ROLE_META[isRequests ? 'worker' : 'customer'].solid"
         />
         <span class="text-[11px] text-d-text-hint">{{ feedHint }}</span>
       </div>
@@ -263,6 +268,7 @@ onMounted(() => load())
             title="Заявок пока никто не опубликовал"
             text="Вы можете быть первым: заявку увидят все репетиторы по вашему предмету."
             primary-label="Создать заявку"
+            role="customer"
             secondary-label="Смотреть услуги"
             @primary="router.push(PATHS.REQUEST_CREATE)"
             @secondary="segment = 'services'"
@@ -272,6 +278,7 @@ onMounted(() => load())
             title="Услуг пока никто не опубликовал"
             text="Вы можете быть первым: услуга встанет в начало ленты и её увидят все, кто ищет помощь по вашему предмету."
             primary-label="Предложить услугу"
+            role="worker"
             secondary-label="Смотреть заявки"
             @primary="router.push(PATHS.SERVICE_CREATE)"
             @secondary="segment = 'requests'"

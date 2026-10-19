@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useKeptScroll, useMyResponses } from '@/shared/composables'
 import { PATHS, dealsPath } from '@/router/paths'
+import { ROLE_META } from '@/shared/constants'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
 import { formatDayMonth, formatKopeks } from '@/shared/utils'
 
@@ -81,6 +82,12 @@ onMounted(load)
               "
             >
               {{ item.label }}
+            </span>
+            <span
+              class="text-micro uppercase"
+              :class="ROLE_META[item.kind === 'request' ? 'worker' : 'customer'].text"
+            >
+              {{ ROLE_META[item.kind === 'request' ? 'worker' : 'customer'].label }}
             </span>
             <span class="ml-auto text-[12px] text-d-text-hint">
               {{

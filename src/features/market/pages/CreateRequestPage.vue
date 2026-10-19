@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useFormExit, useOrder, useToast } from '@/shared/composables'
 import { useAuthStore } from '@/stores'
 import { useTelegramStore } from '@/stores/telegram'
 import { PATHS, requestDetailPath } from '@/router/paths'
 import AppHeader from '@/shared/components/layout/AppHeader.vue'
-import { ActionButton, DateField, MoneyInput } from '@/shared/components/ui'
+import { ActionButton, DateField, FormError, MoneyInput } from '@/shared/components/ui'
+import { dateInputToIso, isoToDateInput, isPastDateInput, todayDateInput } from '@/shared/utils'
 import SubjectTeacherFields from '../components/SubjectTeacherFields.vue'
 import type { SubjectOption, TeacherOption } from '@/shared/types'
+import { ROLE_META } from '@/shared/constants'
 
 const route = useRoute()
 const { exitTo } = useFormExit()
@@ -26,8 +28,22 @@ const budget = ref('')
 const deadline = ref('')
 const description = ref('')
 const submitting = ref(false)
+// причина, по которой форма не отправилась — у кнопки, а не модальным алертом
+const formError = ref('')
 
-const canSubmit = computed(() => !!subject.value && !!teacher.value && !submitting.value)
+// прошедший срок ловим до отправки: календарь его не даст, но старую заявку открывают с ним
+const deadlineError = computed(() =>
+  isPastDateInput(deadline.value) ? 'Срок уже прошёл — выберите сегодняшнюю или будущую дату' : '',
+)
+
+const canSubmit = computed(
+  () => !!subject.value && !!teacher.value && !deadlineError.value && !submitting.value,
+)
+
+// человек правит форму — прежняя причина отказа к ней уже не относится
+watch([subject, teacher, budget, deadline, description], () => {
+  formError.value = ''
+})
 
 const title = computed(() => (isEditing.value ? 'Изменить заявку' : 'Новая заявка'))
 const submitLabel = computed(() =>
@@ -46,7 +62,7 @@ const submit = async () => {
       await updateRequest(editingId.value, {
         description: description.value || undefined,
         budget: budgetKopeks.value,
-        deadline: deadline.value || undefined,
+        deadline: dateInputToIso(deadline.value),
       })
       telegramStore.hapticFeedback('success')
       showToast('Заявка обновлена')
@@ -58,15 +74,15 @@ const submit = async () => {
         teacherId: teacher.value.id,
         description: description.value || undefined,
         budget: budgetKopeks.value,
-        deadline: deadline.value || undefined,
+        deadline: dateInputToIso(deadline.value),
       })
       telegramStore.hapticFeedback('success')
       showToast('Заявка опубликована')
       exitTo(created?.id ? requestDetailPath(created.id) : PATHS.MARKET)
     }
   } catch (e) {
-    // причину уже показал алерт бизнес-слоя — второй текст здесь был бы дублем
     console.error('Не удалось сохранить заявку:', e)
+    formError.value = e instanceof Error ? e.message : 'Не получилось сохранить заявку'
     submitting.value = false
   }
 }
@@ -79,7 +95,7 @@ onMounted(async () => {
     subject.value = { id: request.subjectId, name: request.subject?.name ?? 'Предмет' }
     teacher.value = { id: request.teacherId, fullName: request.teacher?.fullName ?? '—' }
     budget.value = request.budget ? String(Math.round(request.budget / 100)) : ''
-    deadline.value = request.deadline ? request.deadline.slice(0, 10) : ''
+    deadline.value = isoToDateInput(request.deadline)
     description.value = request.description ?? ''
   } catch (e) {
     console.error('Не удалось загрузить заявку:', e)
@@ -88,8 +104,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
-    <AppHeader :title="title" :sub="isEditing ? '' : 'Вы заказчик'" back />
+  <div class="flex flex-col h-full" :class="ROLE_META.customer.scope">
+    <AppHeader :title="title" role="customer" back />
 
     <div class="flex-1 overflow-y-auto px-[18px] py-4">
       <SubjectTeacherFields
@@ -105,7 +121,12 @@ onMounted(async () => {
 
       <!-- срок -->
       <label class="block text-overline uppercase text-d-text-second mb-2.5">Срок</label>
-      <DateField v-model="deadline" class="mb-[18px]" />
+      <DateField
+        v-model="deadline"
+        :min="todayDateInput()"
+        :error="deadlineError"
+        class="mb-[18px]"
+      />
 
       <!-- описание -->
       <label class="block text-overline uppercase text-d-text-second mb-2.5">Описание</label>
@@ -113,13 +134,14 @@ onMounted(async () => {
         v-model="description"
         rows="3"
         placeholder="Опишите, с чем нужна помощь"
-        class="w-full min-h-[88px] rounded-[12px] bg-d-panel border border-d-border-soft focus:border-d-accent focus:outline-none px-4 py-3.5 text-body leading-[1.45] resize-none transition-colors"
+        class="w-full min-h-[88px] rounded-[12px] bg-d-panel border border-d-border-soft focus:border-d-act focus:outline-none px-4 py-3.5 text-body leading-[1.45] resize-none transition-colors"
       />
     </div>
 
     <div
       class="shrink-0 px-[18px] pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] bg-d-ink border-t border-d-border"
     >
+      <FormError :message="formError" />
       <ActionButton :loading="submitting" :disabled="!canSubmit" @click="submit">
         {{ submitLabel }}
       </ActionButton>

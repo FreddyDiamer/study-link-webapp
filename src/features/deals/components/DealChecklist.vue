@@ -20,7 +20,7 @@ defineProps<Props>()
         :key="`${row.done}-${row.timedOut}`"
         :class="
           row.done
-            ? 'bg-d-accent text-d-ink animate-d-pop'
+            ? 'bg-d-act text-d-ink animate-d-pop'
             : row.timedOut
               ? 'bg-d-surface text-d-text-hint'
               : 'border border-d-border-soft text-transparent'
